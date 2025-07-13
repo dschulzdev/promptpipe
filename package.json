@@ -1,6 +1,7 @@
 {
 	"name": "promptpipe",
 	"private": true,
+	"type": "module",
 	"workspaces": [
 		"apps/*",
 		"packages/*"
@@ -21,11 +22,6 @@
 		"@biomejs/biome": "^2.0.0",
 		"husky": "^9.1.7",
 		"lint-staged": "^15.5.0"
-	},
-	"lint-staged": {
-		"*.{js,ts,cjs,mjs,d.cts,d.mts,jsx,tsx,json,jsonc}": [
-			"biome check --write ."
-		]
 	},
 	"packageManager": "pnpm@10.13.1"
 }
