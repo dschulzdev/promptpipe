@@ -12,7 +12,9 @@ import {
 	TextQuote,
 } from "lucide-react";
 import type { IconType } from "react-icons/lib";
+import { useShallow } from "zustand/react/shallow";
 import { LLMProviderButtons } from "@/constants/llm-providers";
+import useNodeStore from "@/stores/node-store";
 import {
 	Collapsible,
 	CollapsibleContent,
@@ -69,6 +71,12 @@ export default function BlockSidebar() {
 			title: "Third-Party-Integration",
 		},
 	];
+
+	const { addLLMNode } = useNodeStore(
+		useShallow((state) => ({
+			addLLMNode: state.addLLMNode,
+		})),
+	);
 
 	return (
 		<Sidebar>
@@ -167,7 +175,9 @@ export default function BlockSidebar() {
 								<SidebarMenuSub>
 									{LLMProviderButtons.map((item) => (
 										<SidebarMenuSubItem key={item.title}>
-											<SidebarMenuSubButton>
+											<SidebarMenuSubButton
+												onClick={() => addLLMNode(item.provider)}
+											>
 												{item.icon && <item.icon />}
 												{item.title}
 											</SidebarMenuSubButton>

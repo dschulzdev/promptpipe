@@ -9,26 +9,40 @@ import {
 	ReactFlowProvider,
 } from "@xyflow/react";
 import { Play } from "lucide-react";
+import { useShallow } from "zustand/react/shallow";
 import BlockSidebar from "@/components/custom/block-sidebar";
 import { Button } from "@/components/ui/button";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
+import useNodeStore, { type AppState } from "../stores/node-store";
 
 export const Route = createFileRoute("/")({
 	component: HomeComponent,
 });
 function HomeComponent() {
-	const initialNodes = [
-		{ id: "1", position: { x: 0, y: 0 }, data: { label: "1" } },
-		{ id: "2", position: { x: 0, y: 100 }, data: { label: "2" } },
-	];
-	const initialEdges = [{ id: "e1-2", source: "1", target: "2" }];
+	const selector = (state: AppState) => ({
+		nodes: state.nodes,
+		edges: state.edges,
+		onNodesChange: state.onNodesChange,
+		onEdgesChange: state.onEdgesChange,
+		onConnect: state.onConnect,
+	});
+	const { nodes, edges, onNodesChange, onEdgesChange, onConnect } =
+		useNodeStore(useShallow(selector));
 	return (
 		<ReactFlowProvider>
 			<div className="h-max w-full">
 				<SidebarProvider>
 					<BlockSidebar />
 					<SidebarInset>
-						<ReactFlow nodes={initialNodes} edges={initialEdges}>
+						<ReactFlow
+							nodes={nodes}
+							edges={edges}
+							onNodesChange={onNodesChange}
+							onEdgesChange={onEdgesChange}
+							onConnect={onConnect}
+							fitView
+							snapToGrid
+						>
 							<Controls />
 							<Panel position={"top-right"}>
 								<div className="rounded-2xl bg-neutral-100 shadow-2xl">
