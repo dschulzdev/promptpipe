@@ -13,6 +13,7 @@ import { useShallow } from "zustand/react/shallow";
 import BlockSidebar from "@/components/custom/block-sidebar";
 import { Button } from "@/components/ui/button";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
+import { nodeTypes } from "@/constants/node_types";
 import useNodeStore, { type AppState } from "../stores/node-store";
 
 export const Route = createFileRoute("/")({
@@ -28,6 +29,7 @@ function HomeComponent() {
 	});
 	const { nodes, edges, onNodesChange, onEdgesChange, onConnect } =
 		useNodeStore(useShallow(selector));
+
 	return (
 		<ReactFlowProvider>
 			<div className="h-max w-full">
@@ -37,6 +39,7 @@ function HomeComponent() {
 						<ReactFlow
 							nodes={nodes}
 							edges={edges}
+							nodeTypes={nodeTypes}
 							onNodesChange={onNodesChange}
 							onEdgesChange={onEdgesChange}
 							onConnect={onConnect}

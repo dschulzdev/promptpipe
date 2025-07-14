@@ -8,8 +8,8 @@ import {
 	type OnEdgesChange,
 	type OnNodesChange,
 } from "@xyflow/react";
-import type { E } from "node_modules/@hey-api/openapi-ts/dist/types.d-CaH9PF-K";
 import { create } from "zustand";
+import type { LLMNodeProps } from "@/components/custom/nodes/llm-node";
 import type { LLMProvider } from "@/constants/llm-providers";
 
 export type AppNode = Node;
@@ -50,11 +50,11 @@ const useNodeStore = create<AppState>((set, get) => ({
 	addLLMNode: (provider) => {
 		const x = Math.round(Math.random() * 100);
 		const y = Math.round(Math.random() * 100);
-		const newNode: AppNode = {
+		const newNode: LLMNodeProps = {
 			id: crypto.randomUUID(),
+			type: "llm",
 			data: {
-				provider: provider,
-				label: provider,
+				llmProvider: provider,
 			},
 			position: { x: x, y: y },
 		};
