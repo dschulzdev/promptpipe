@@ -1,5 +1,13 @@
-import { Handle, type Node, type NodeProps, Position } from "@xyflow/react";
+import { type Node, type NodeProps, Position } from "@xyflow/react";
 import { memo } from "react";
+import {
+	BaseNode,
+	BaseNodeContent,
+	BaseNodeFooter,
+	BaseNodeHeader,
+	BaseNodeHeaderTitle,
+} from "@/components/base-node";
+import { LabeledHandle } from "@/components/labeled-handle";
 import {
 	Select,
 	SelectContent,
@@ -15,25 +23,22 @@ import {
 	LLMProviderRenderMap,
 } from "@/constants/llm-providers";
 
-export type LLMNodeProps = Node<
-	{
-		llmProvider: LLMProvider;
-	},
-	"llm"
->;
+export type LLMNodeData = {
+	llmProvider: LLMProvider;
+};
+
+export type LLMNodeProps = Node<LLMNodeData, "llm">;
 
 function LLMNode({ data }: NodeProps<LLMNodeProps>) {
 	const models = LLM_MODELS[data.llmProvider];
 	const renderData = LLMProviderRenderMap[data.llmProvider];
 	return (
-		<div className="flex w-48 flex-col rounded-md border border-neutral-300 bg-white shadow-md">
-			<div className="flex items-center gap-2 border-neutral-300 border-b p-2">
+		<BaseNode className="w-80">
+			<BaseNodeHeader>
 				<renderData.icon className="h-4 w-4 text-neutral-500" />
-				<p className="font-medium text-neutral-500 text-sm">
-					{renderData.title}
-				</p>
-			</div>
-			<div className="p-2">
+				<BaseNodeHeaderTitle>{renderData.title}</BaseNodeHeaderTitle>
+			</BaseNodeHeader>
+			<BaseNodeContent>
 				<Select defaultValue={models[0]}>
 					<SelectTrigger className="w-full">
 						<SelectValue placeholder="Select a model" />
@@ -49,10 +54,13 @@ function LLMNode({ data }: NodeProps<LLMNodeProps>) {
 						</SelectGroup>
 					</SelectContent>
 				</Select>
-			</div>
-			<Handle type="source" position={Position.Left} />
-			<Handle type="target" position={Position.Right} />
-		</div>
+			</BaseNodeContent>
+			<BaseNodeFooter className="w-full px-0">
+				<div className="flex w-full flex-col items-end gap-2">
+					<LabeledHandle title="LLM" type="target" position={Position.Right} />
+				</div>
+			</BaseNodeFooter>
+		</BaseNode>
 	);
 }
 

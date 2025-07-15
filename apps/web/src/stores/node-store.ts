@@ -9,8 +9,12 @@ import {
 	type OnNodesChange,
 } from "@xyflow/react";
 import { create } from "zustand";
+import type { TextGenerationNodeProps } from "@/components/custom/nodes/generation/text-generation-node";
+import type { TextInputNodeProps } from "@/components/custom/nodes/input/text-input-node";
 import type { LLMNodeProps } from "@/components/custom/nodes/llm-node";
+import type { TextOutputNodeProps } from "@/components/custom/nodes/output/text-output-node";
 import type { LLMProvider } from "@/constants/llm-providers";
+import type { NodeInputData } from "@/constants/node_types";
 
 export type AppNode = Node;
 
@@ -21,6 +25,10 @@ export type AppState = {
 	onEdgesChange: OnEdgesChange;
 	onConnect: OnConnect;
 	addLLMNode: (provider: LLMProvider) => void;
+	addTextInputNode: () => void;
+	addTextGenerationNode: () => void;
+	addTextOutputNode: () => void;
+	updateNode: (id: string, data: NodeInputData) => void;
 	setNodes: (nodes: AppNode[]) => void;
 	setEdges: (edges: Edge[]) => void;
 };
@@ -47,16 +55,69 @@ const useNodeStore = create<AppState>((set, get) => ({
 			edges: addEdge(connection, get().edges),
 		});
 	},
+	updateNode: (id: string, data: NodeInputData) => {
+		set({
+			nodes: get().nodes.map((node) => {
+				if (node.id === id) {
+					return {
+						...node,
+						data: {
+							...node.data,
+							...data,
+						},
+					};
+				}
+				return node;
+			}),
+		});
+	},
+	addTextInputNode: () => {
+		const newNode: TextInputNodeProps = {
+			id: crypto.randomUUID(),
+			type: "text_input",
+			data: {
+				prompt: "Why is the banana yellow?",
+			},
+			position: generateRandomStartPosition(),
+		};
+		set({
+			nodes: [...get().nodes, newNode],
+		});
+	},
+	addTextOutputNode: () => {
+		const newNode: TextOutputNodeProps = {
+			id: crypto.randomUUID(),
+			type: "text_output",
+			data: {
+				response: "",
+			},
+			position: generateRandomStartPosition(),
+		};
+		set({
+			nodes: [...get().nodes, newNode],
+		});
+	},
+	addTextGenerationNode: () => {
+		const newNode: TextGenerationNodeProps = {
+			id: crypto.randomUUID(),
+			type: "text_generation",
+			data: {
+				json_mode: false,
+			},
+			position: generateRandomStartPosition(),
+		};
+		set({
+			nodes: [...get().nodes, newNode],
+		});
+	},
 	addLLMNode: (provider) => {
-		const x = Math.round(Math.random() * 100);
-		const y = Math.round(Math.random() * 100);
 		const newNode: LLMNodeProps = {
 			id: crypto.randomUUID(),
 			type: "llm",
 			data: {
 				llmProvider: provider,
 			},
-			position: { x: x, y: y },
+			position: generateRandomStartPosition(),
 		};
 		set({
 			nodes: [...get().nodes, newNode],
@@ -71,3 +132,10 @@ const useNodeStore = create<AppState>((set, get) => ({
 }));
 
 export default useNodeStore;
+
+function generateRandomStartPosition() {
+	return {
+		x: Math.round(Math.random() * 100),
+		y: Math.round(Math.random() * 100),
+	};
+}

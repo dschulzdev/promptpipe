@@ -7,7 +7,9 @@ import {
 	DatabaseZap,
 	FileArchive,
 	FileJson,
+	Loader,
 	type LucideIcon,
+	MessageSquare,
 	TextCursorInput,
 	TextQuote,
 } from "lucide-react";
@@ -37,46 +39,65 @@ export interface SidebarButton {
 	title: string;
 }
 
+interface SidebarButtonWithAction extends SidebarButton {
+	action: () => Promise<void> | void;
+}
+
 export default function BlockSidebar() {
-	const inputButtons: SidebarButton[] = [
+	const {
+		addLLMNode,
+		addTextInputNode,
+		addTextGenerationNode,
+		addTextOutputNode,
+	} = useNodeStore(
+		useShallow((state) => ({
+			addLLMNode: state.addLLMNode,
+			addTextInputNode: state.addTextInputNode,
+			addTextGenerationNode: state.addTextGenerationNode,
+			addTextOutputNode: state.addTextOutputNode,
+		})),
+	);
+
+	const inputButtons: SidebarButtonWithAction[] = [
 		{
 			icon: TextCursorInput,
 			title: "Text Input",
+			action: addTextInputNode,
 		},
 		{
 			icon: Database,
 			title: "Database Table Input",
+			action: () => {},
 		},
 		{
 			icon: FileJson,
 			title: "JSON Input",
+			action: () => {},
 		},
 	];
 
-	const outputButtons: SidebarButton[] = [
+	const outputButtons: SidebarButtonWithAction[] = [
 		{
 			icon: TextQuote,
 			title: "Text Output",
+			action: addTextOutputNode,
 		},
 		{
 			icon: FileArchive,
 			title: "File Output",
+			action: () => {},
 		},
 		{
 			icon: DatabaseZap,
 			title: "Database Insert",
+			action: () => {},
 		},
 		{
 			icon: CloudDownload,
 			title: "Third-Party-Integration",
+			action: () => {},
 		},
 	];
-
-	const { addLLMNode } = useNodeStore(
-		useShallow((state) => ({
-			addLLMNode: state.addLLMNode,
-		})),
-	);
 
 	return (
 		<Sidebar>
@@ -105,7 +126,7 @@ export default function BlockSidebar() {
 								<SidebarMenuSub>
 									{inputButtons.map((item) => (
 										<SidebarMenuSubItem key={item.title}>
-											<SidebarMenuSubButton>
+											<SidebarMenuSubButton onClick={item.action}>
 												{item.icon && <item.icon />}
 												{item.title}
 											</SidebarMenuSubButton>
@@ -140,7 +161,7 @@ export default function BlockSidebar() {
 								<SidebarMenuSub>
 									{outputButtons.map((item) => (
 										<SidebarMenuSubItem key={item.title}>
-											<SidebarMenuSubButton>
+											<SidebarMenuSubButton onClick={item.action}>
 												{item.icon && <item.icon />}
 												{item.title}
 											</SidebarMenuSubButton>
@@ -183,6 +204,43 @@ export default function BlockSidebar() {
 											</SidebarMenuSubButton>
 										</SidebarMenuSubItem>
 									))}
+								</SidebarMenuSub>
+							</SidebarGroupContent>
+						</CollapsibleContent>
+					</SidebarGroup>
+				</Collapsible>
+				<Collapsible
+					key={"Response generation"}
+					title={"Response generation"}
+					defaultOpen
+					className="group/collapsible"
+				>
+					<SidebarGroup>
+						<SidebarGroupLabel
+							asChild
+							className="group/label text-sidebar-foreground text-sm hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+						>
+							<CollapsibleTrigger asChild>
+								<SidebarMenuButton>
+									<Loader />
+									{"Response generation"}
+									<ChevronRight className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-90" />
+								</SidebarMenuButton>
+							</CollapsibleTrigger>
+						</SidebarGroupLabel>
+						<CollapsibleContent>
+							<SidebarGroupContent>
+								<SidebarMenuSub>
+									<SidebarMenuSubItem key={"Text generation"}>
+										<SidebarMenuSubButton
+											onClick={() => {
+												addTextGenerationNode();
+											}}
+										>
+											<MessageSquare />
+											{"Text generation"}
+										</SidebarMenuSubButton>
+									</SidebarMenuSubItem>
 								</SidebarMenuSub>
 							</SidebarGroupContent>
 						</CollapsibleContent>
