@@ -7,6 +7,7 @@
 	"license": "UNLICENSED",
 	"scripts": {
 		"build": "nest build",
+		"check": "biome check --write .",
 		"start": "nest start",
 		"dev": "nest start --watch",
 		"start:debug": "nest start --debug --watch",
@@ -18,15 +19,19 @@
 		"test:e2e": "jest --config ./test/jest-e2e.json"
 	},
 	"dependencies": {
-		"@ai-sdk/google": "^1.2.22",
-		"@ai-sdk/openai": "^1.3.23",
+		"@ai-sdk/google": "2.0.0-beta.9",
+		"@ai-sdk/openai": "2.0.0-beta.7",
+		"@nestjs/bullmq": "^11.0.2",
 		"@nestjs/common": "^11.0.1",
+		"@nestjs/config": "^4.0.2",
 		"@nestjs/core": "^11.0.1",
 		"@nestjs/platform-express": "^11.0.1",
 		"@nestjs/swagger": "^11.2.0",
-		"ai": "^4.3.17",
+		"ai": "5.0.0-beta.18",
+		"bullmq": "^5.56.4",
 		"reflect-metadata": "^0.2.2",
-		"rxjs": "^7.8.1"
+		"rxjs": "^7.8.1",
+		"zod": "^4.0.5"
 	},
 	"devDependencies": {
 		"@eslint/eslintrc": "^3.2.0",

@@ -7,7 +7,7 @@
 		"packages/*"
 	],
 	"scripts": {
-		"check": "biome check --write .",
+		"check": "turbo check",
 		"prepare": "husky",
 		"dev": "turbo dev",
 		"build": "turbo build",

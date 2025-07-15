@@ -29,14 +29,18 @@ function TextOutputNode({ data }: NodeProps<TextOutputNodeProps>) {
 			<BaseNodeContent>
 				<div className="grid w-full gap-3">
 					<Label htmlFor="message">LLM output</Label>
-					<Textarea placeholder="Your output will appear here" id="message" />
+					<Textarea
+						placeholder="Your output will appear here"
+						id="message"
+						readOnly
+					/>
 				</div>
 			</BaseNodeContent>
 			<BaseNodeFooter className="w-full px-0">
 				<div className="flex w-full flex-col items-start gap-2">
 					<LabeledHandle
 						title={"Response"}
-						type="target"
+						type="source"
 						position={Position.Left}
 					/>
 				</div>
