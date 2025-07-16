@@ -1,7 +1,7 @@
 import { BullModule } from "@nestjs/bullmq";
 import { Module } from "@nestjs/common";
 import { AiModule } from "src/ai/ai.module";
-import { RunnerController } from "./runner.controller";
+import { RunnerProcessor } from "./runner.processor";
 import { RunnerService } from "./runner.service";
 
 @Module({
@@ -11,7 +11,8 @@ import { RunnerService } from "./runner.service";
 			name: "workflow_runs",
 		}),
 	],
-	controllers: [RunnerController],
-	providers: [RunnerService],
+	controllers: [],
+	providers: [RunnerService, RunnerProcessor],
+	exports: [RunnerService],
 })
 export class RunnerModule {}

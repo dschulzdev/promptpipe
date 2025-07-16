@@ -1,3 +1,4 @@
+import { RedisModule } from "@liaoliaots/nestjs-redis";
 import { BullModule } from "@nestjs/bullmq";
 import { Module } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
@@ -6,6 +7,7 @@ import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
 import { validateConfig } from "./configuration";
 import { RunnerModule } from "./runner/runner.module";
+import { WorkflowModule } from "./workflow/workflow.module";
 
 @Module({
 	imports: [
@@ -20,8 +22,22 @@ import { RunnerModule } from "./runner/runner.module";
 				port: 6379,
 			},
 		}),
+		RedisModule.forRoot({
+			config: [
+				{
+					host: "localhost",
+					port: 6379,
+				},
+				{
+					namespace: "runner-subscriber",
+					host: "localhost",
+					port: 6379,
+				},
+			],
+		}),
 		RunnerModule,
 		AiModule,
+		WorkflowModule,
 	],
 	controllers: [AppController],
 	providers: [AppService],
