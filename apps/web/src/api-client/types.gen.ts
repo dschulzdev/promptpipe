@@ -13,44 +13,35 @@ export type AppControllerGetHelloResponses = {
 
 export type AppControllerGetHelloResponse = AppControllerGetHelloResponses[keyof AppControllerGetHelloResponses];
 
-export type RunnerControllerRunData = {
+export type WorkflowControllerRunData = {
     body?: never;
     path?: never;
     query?: never;
-    url: '/runner/run';
+    url: '/workflow/run';
 };
 
-export type RunnerControllerRunResponses = {
-    201: unknown;
+export type WorkflowControllerRunResponses = {
+    201: string;
 };
 
-export type RunnerControllerStreamUpdatesData = {
+export type WorkflowControllerRunResponse = WorkflowControllerRunResponses[keyof WorkflowControllerRunResponses];
+
+export type WorkflowControllerStreamUpdatesData = {
     body?: never;
     path: {
-        jobId: string;
+        runId: string;
     };
     query?: never;
-    url: '/runner/stream/{jobId}';
+    url: '/workflow/stream/{runId}';
 };
 
-export type RunnerControllerStreamUpdatesResponses = {
+export type WorkflowControllerStreamUpdatesResponses = {
     200: {
         [key: string]: unknown;
     };
 };
 
-export type RunnerControllerStreamUpdatesResponse = RunnerControllerStreamUpdatesResponses[keyof RunnerControllerStreamUpdatesResponses];
-
-export type RunnerControllerCancelData = {
-    body?: never;
-    path?: never;
-    query?: never;
-    url: '/runner/cancel';
-};
-
-export type RunnerControllerCancelResponses = {
-    201: unknown;
-};
+export type WorkflowControllerStreamUpdatesResponse = WorkflowControllerStreamUpdatesResponses[keyof WorkflowControllerStreamUpdatesResponses];
 
 export type ClientOptions = {
     baseUrl: string;

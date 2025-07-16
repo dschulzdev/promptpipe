@@ -27,8 +27,19 @@ export class RunnerProcessor extends WorkerHost {
 
 		const publishProgress = (type: string, payload: any) => {
 			const channel = `workflow-progress:${job.id}`;
+			const messagesKey = `workflow-messages:${job.id}`;
+			const message = JSON.stringify({ type, payload });
+
 			console.log(`Publishing ${type} to channel ${channel}:`, payload);
-			this.redisPublisher.publish(channel, JSON.stringify({ type, payload }));
+
+			// Store the message in Redis list for replay
+			this.redisPublisher.lpush(messagesKey, message);
+
+			// Set TTL for the messages list (24 hours) - this will extend the TTL each time
+			this.redisPublisher.expire(messagesKey, 86400);
+
+			// Publish to live subscribers
+			this.redisPublisher.publish(channel, message);
 		};
 
 		// Simulate long-running process
@@ -58,16 +69,33 @@ export class RunnerProcessor extends WorkerHost {
 		console.log(`Job ${job.id} has completed!`);
 		// Close the pub/sub channel for this job
 		const channel = `workflow-progress:${job.id}`;
-		this.redisPublisher.publish(channel, JSON.stringify({ type: "done" }));
+		const messagesKey = `workflow-messages:${job.id}`;
+		const message = JSON.stringify({ type: "done" });
+
+		// Store the message in Redis list for replay
+		this.redisPublisher.lpush(messagesKey, message);
+
+		// Set TTL for the messages list (24 hours)
+		this.redisPublisher.expire(messagesKey, 86400);
+
+		// Publish to live subscribers
+		this.redisPublisher.publish(channel, message);
 	}
 
 	@OnWorkerEvent("failed")
 	onFailed(job: Job, err: Error) {
 		console.log(`Job ${job.id} has failed with error: ${err.message}`);
 		const channel = `workflow-progress:${job.id}`;
-		this.redisPublisher.publish(
-			channel,
-			JSON.stringify({ type: "error", payload: err.message }),
-		);
+		const messagesKey = `workflow-messages:${job.id}`;
+		const message = JSON.stringify({ type: "error", payload: err.message });
+
+		// Store the message in Redis list for replay
+		this.redisPublisher.lpush(messagesKey, message);
+
+		// Set TTL for the messages list (24 hours)
+		this.redisPublisher.expire(messagesKey, 86400);
+
+		// Publish to live subscribers
+		this.redisPublisher.publish(channel, message);
 	}
 }

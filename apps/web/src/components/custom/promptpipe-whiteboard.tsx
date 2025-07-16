@@ -1,0 +1,46 @@
+import {
+	Background,
+	BackgroundVariant,
+	Controls,
+	MiniMap,
+	Panel,
+	ReactFlow,
+} from "@xyflow/react";
+import { useShallow } from "zustand/react/shallow";
+import { nodeTypes } from "@/constants/node_types";
+import { useJobUpdates } from "@/hooks/use-job-updates";
+import type { NodeActions, NodeState } from "@/stores/node-store";
+import useNodeStore from "@/stores/node-store";
+import { WorkflowButtonGroup } from "./workflow-button-group";
+
+export default function PromptpipeWhiteboard() {
+	const { data } = useJobUpdates();
+	const selector = (state: NodeState & NodeActions) => ({
+		nodes: state.nodes,
+		edges: state.edges,
+		onNodesChange: state.onNodesChange,
+		onEdgesChange: state.onEdgesChange,
+		onConnect: state.onConnect,
+	});
+	const { nodes, edges, onNodesChange, onEdgesChange, onConnect } =
+		useNodeStore(useShallow(selector));
+	return (
+		<ReactFlow
+			nodes={nodes}
+			edges={edges}
+			nodeTypes={nodeTypes}
+			onNodesChange={onNodesChange}
+			onEdgesChange={onEdgesChange}
+			onConnect={onConnect}
+			fitView
+			snapToGrid
+		>
+			<Controls />
+			<Panel position={"top-right"}>
+				<WorkflowButtonGroup />
+			</Panel>
+			<MiniMap />
+			<Background variant={BackgroundVariant.Dots} gap={12} size={1} />
+		</ReactFlow>
+	);
+}

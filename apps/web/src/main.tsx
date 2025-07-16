@@ -1,9 +1,13 @@
 import { createRouter, RouterProvider } from "@tanstack/react-router";
 import ReactDOM from "react-dom/client";
+import { scan } from "react-scan";
 import Loader from "./components/loader";
 import { routeTree } from "./routeTree.gen";
 
 import "@xyflow/react/dist/style.css";
+scan({
+	enabled: true,
+});
 
 const router = createRouter({
 	routeTree,

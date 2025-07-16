@@ -9,8 +9,20 @@ import Loader from "@/components/loader";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import "../index.css";
+import {
+	QueryClient,
+	QueryClientProvider,
+	queryOptions,
+} from "@tanstack/react-query";
+import { client } from "@/api-client/client.gen";
 
 export type RouterAppContext = {};
+
+const queryClient = new QueryClient();
+
+client.setConfig({
+	baseUrl: import.meta.env.VITE_SERVER_URL,
+});
 
 export const Route = createRootRouteWithContext<RouterAppContext>()({
 	component: RootComponent,
@@ -40,11 +52,14 @@ function RootComponent() {
 
 	return (
 		<>
-			<HeadContent />
-			<ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-				{isFetching ? <Loader /> : <Outlet />}
-				<Toaster richColors />
-			</ThemeProvider>
+			<QueryClientProvider client={queryClient}>
+				<HeadContent />
+				<ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+					{isFetching ? <Loader /> : <Outlet />}
+					<Toaster richColors />
+				</ThemeProvider>
+				<Toaster />
+			</QueryClientProvider>
 			<TanStackRouterDevtools position="bottom-left" />
 		</>
 	);

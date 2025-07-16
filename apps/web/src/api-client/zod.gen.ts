@@ -10,24 +10,20 @@ export const zAppControllerGetHelloData = z.object({
 
 export const zAppControllerGetHelloResponse = z.string();
 
-export const zRunnerControllerRunData = z.object({
+export const zWorkflowControllerRunData = z.object({
     body: z.never().optional(),
     path: z.never().optional(),
     query: z.never().optional()
 });
 
-export const zRunnerControllerStreamUpdatesData = z.object({
+export const zWorkflowControllerRunResponse = z.string();
+
+export const zWorkflowControllerStreamUpdatesData = z.object({
     body: z.never().optional(),
     path: z.object({
-        jobId: z.string()
+        runId: z.string()
     }),
     query: z.never().optional()
 });
 
-export const zRunnerControllerStreamUpdatesResponse = z.object({});
-
-export const zRunnerControllerCancelData = z.object({
-    body: z.never().optional(),
-    path: z.never().optional(),
-    query: z.never().optional()
-});
+export const zWorkflowControllerStreamUpdatesResponse = z.object({});

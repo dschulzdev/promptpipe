@@ -18,9 +18,12 @@ import type { NodeInputData } from "@/constants/node_types";
 
 export type AppNode = Node;
 
-export type AppState = {
+export type NodeState = {
 	nodes: AppNode[];
 	edges: Edge[];
+};
+
+export type NodeActions = {
 	onNodesChange: OnNodesChange<AppNode>;
 	onEdgesChange: OnEdgesChange;
 	onConnect: OnConnect;
@@ -37,7 +40,7 @@ const initialNodes: AppNode[] = [];
 const initialEdges: Edge[] = [];
 
 // this is our useStore hook that we can use in our components to get parts of the store and call actions
-const useNodeStore = create<AppState>((set, get) => ({
+const useNodeStore = create<NodeState & NodeActions>((set, get) => ({
 	nodes: initialNodes,
 	edges: initialEdges,
 	onNodesChange: (changes) => {

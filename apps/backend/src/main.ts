@@ -5,6 +5,14 @@ import { AppModule } from "./app.module";
 async function bootstrap() {
 	const app = await NestFactory.create(AppModule);
 
+	// Enable CORS
+	app.enableCors({
+		origin: process.env.FRONTEND_URL, // Default Vite dev server port
+		credentials: true,
+		methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+		allowedHeaders: ["Content-Type", "Authorization"],
+	});
+
 	const config = new DocumentBuilder()
 		.setTitle("PromptPipe API")
 		.setDescription("The API documentation for the PromptPipe backend.")

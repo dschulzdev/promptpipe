@@ -12,6 +12,7 @@ export class WorkflowService {
 	}
 	public getJobStream(jobId: string): Observable<MessageEvent> {
 		// Implementation to get the job stream
-		return this.runnerService.getJobStream(jobId);
+		const stream = this.runnerService.getJobStream(jobId);
+		return stream;
 	}
 }

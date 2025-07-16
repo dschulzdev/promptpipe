@@ -6,6 +6,7 @@ const configSchema = z.object({
 		.enum(["development", "staging", "production"])
 		.default("development"),
 	port: z.coerce.number().int().positive().default(3000),
+	frontend_url: z.string().min(1),
 	database: z.object({
 		host: z.string().min(1).default("localhost"),
 		port: z.coerce.number().int().positive().default(5432),
@@ -35,6 +36,7 @@ export const validateConfig = () => {
 	const config = {
 		nodeEnv: process.env.NODE_ENV,
 		port: process.env.PORT,
+		frontend_url: process.env.FRONTEND_URL,
 		database: {
 			host: process.env.DATABASE_HOST,
 			port: process.env.DATABASE_PORT,
