@@ -14,7 +14,7 @@ import useNodeStore from "@/stores/node-store";
 import { WorkflowButtonGroup } from "./workflow-button-group";
 
 export default function PromptpipeWhiteboard() {
-	const { data } = useJobUpdates();
+	void useJobUpdates();
 	const selector = (state: NodeState & NodeActions) => ({
 		nodes: state.nodes,
 		edges: state.edges,

@@ -37,7 +37,13 @@ export const useJobUpdates = () => {
 
 	// biome-ignore lint/correctness/useExhaustiveDependencies: connectedToUpdateStream should not rerun the useEffect
 	useEffect(() => {
-		if (!currentRunId || connectedToUpdateStream) {
+		if (
+			!currentRunId ||
+			connectedToUpdateStream ||
+			(data.length > 0 &&
+				// @ts-ignore When the last log is a done type, the stream was finished and should not be resubscribed
+				["result", "error", "done"].includes(data[data.length - 1].type))
+		) {
 			console.log(
 				"No current run ID or already running, skipping SSE connection and reading from cache.",
 			);

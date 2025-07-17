@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import {
 	Sheet,
 	SheetContent,
+	SheetDescription,
 	SheetHeader,
 	SheetTitle,
 	SheetTrigger,
@@ -17,11 +18,17 @@ export default function LogSheet() {
 					<Logs />
 				</Button>
 			</SheetTrigger>
-			<SheetContent>
+			<SheetContent className="flex h-full w-full flex-col">
 				<SheetHeader>
 					<SheetTitle>Logs of your current run</SheetTitle>
-					<JobLogs />
+					<SheetDescription>
+						Run logs are streamed in real-time. You can view the logs of your
+						current run here.
+					</SheetDescription>
 				</SheetHeader>
+				<div className="flex-1 overflow-hidden p-4">
+					<JobLogs />
+				</div>
 			</SheetContent>
 		</Sheet>
 	);
