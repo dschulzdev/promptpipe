@@ -11,7 +11,7 @@ import { nodeTypes } from "@/constants/node_types";
 import { useJobUpdates } from "@/hooks/use-job-updates";
 import type { NodeActions, NodeState } from "@/stores/node-store";
 import useNodeStore from "@/stores/node-store";
-import { WorkflowButtonGroup } from "./workflow-button-group";
+import { WorkflowButtonGroup } from "./nodes/panels/workflow-button-group";
 
 export default function PromptpipeWhiteboard() {
 	void useJobUpdates();

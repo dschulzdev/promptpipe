@@ -2,6 +2,7 @@ import {
 	Blocks,
 	Brain,
 	ChevronRight,
+	CirclePlay,
 	CloudDownload,
 	Database,
 	DatabaseZap,
@@ -49,12 +50,14 @@ export default function BlockSidebar() {
 		addTextInputNode,
 		addTextGenerationNode,
 		addTextOutputNode,
+		addBasicStartNode,
 	} = useNodeStore(
 		useShallow((state) => ({
 			addLLMNode: state.addLLMNode,
 			addTextInputNode: state.addTextInputNode,
 			addTextGenerationNode: state.addTextGenerationNode,
 			addTextOutputNode: state.addTextOutputNode,
+			addBasicStartNode: state.addBasicStartNode,
 		})),
 	);
 
@@ -102,6 +105,39 @@ export default function BlockSidebar() {
 	return (
 		<Sidebar>
 			<SidebarContent>
+				<Collapsible
+					key={"basic"}
+					title={"Basic blocks"}
+					defaultOpen
+					className="group/collapsible"
+				>
+					<SidebarGroup>
+						<SidebarGroupLabel
+							asChild
+							className="group/label text-sidebar-foreground text-sm hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+						>
+							<CollapsibleTrigger asChild>
+								<SidebarMenuButton>
+									<Blocks />
+									{"Basic blocks"}
+									<ChevronRight className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-90" />
+								</SidebarMenuButton>
+							</CollapsibleTrigger>
+						</SidebarGroupLabel>
+						<CollapsibleContent>
+							<SidebarGroupContent>
+								<SidebarMenuSub>
+									<SidebarMenuSubItem key={"basic_start"}>
+										<SidebarMenuSubButton onClick={addBasicStartNode}>
+											<CirclePlay />
+											{"Basic Start"}
+										</SidebarMenuSubButton>
+									</SidebarMenuSubItem>
+								</SidebarMenuSub>
+							</SidebarGroupContent>
+						</CollapsibleContent>
+					</SidebarGroup>
+				</Collapsible>
 				<Collapsible
 					key={"basic_input"}
 					title={"Basic input blocks"}

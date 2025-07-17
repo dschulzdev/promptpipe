@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import { useShallow } from "zustand/react/shallow";
 import { workflowControllerRunMutation } from "@/api-client/@tanstack/react-query.gen";
 import useRunnerStore from "@/stores/runner-store";
-import { Button } from "../ui/button";
+import { Button } from "../../../ui/button";
 
 export default function StartWorkflowButton() {
 	const { mutate, isPending } = useMutation(workflowControllerRunMutation());

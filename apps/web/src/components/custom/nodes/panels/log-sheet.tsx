@@ -7,8 +7,8 @@ import {
 	SheetHeader,
 	SheetTitle,
 	SheetTrigger,
-} from "../ui/sheet";
-import JobLogs from "./nodes/panels/job-logs";
+} from "../../../ui/sheet";
+import JobLogs from "./job-logs";
 
 export default function LogSheet() {
 	return (

@@ -1,8 +1,8 @@
 import { Loader2 } from "lucide-react";
 import { useJobUpdates } from "@/hooks/use-job-updates";
 import useRunnerStore from "@/stores/runner-store";
-import { ScrollArea } from "../ui/scroll-area";
-import { SheetDescription } from "../ui/sheet";
+import { ScrollArea } from "../../../ui/scroll-area";
+import { SheetDescription } from "../../../ui/sheet";
 import {
 	Table,
 	TableBody,
@@ -10,7 +10,7 @@ import {
 	TableHead,
 	TableHeader,
 	TableRow,
-} from "../ui/table";
+} from "../../../ui/table";
 
 export default function JobLogs() {
 	const { data, error } = useJobUpdates();

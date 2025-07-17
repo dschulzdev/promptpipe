@@ -3,8 +3,6 @@ import { BullModule } from "@nestjs/bullmq";
 import { Module } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
 import { AiModule } from "./ai/ai.module";
-import { AppController } from "./app.controller";
-import { AppService } from "./app.service";
 import { validateConfig } from "./configuration";
 import { RunnerModule } from "./runner/runner.module";
 import { WorkflowModule } from "./workflow/workflow.module";
@@ -39,7 +37,5 @@ import { WorkflowModule } from "./workflow/workflow.module";
 		AiModule,
 		WorkflowModule,
 	],
-	controllers: [AppController],
-	providers: [AppService],
 })
 export class AppModule {}

@@ -11,10 +11,7 @@ import {
 import { LabeledHandle } from "@/components/labeled-handle";
 import { Input } from "@/components/ui/input";
 import useNodeStore from "@/stores/node-store";
-
-export type TextInputNodeData = {
-	prompt: string;
-};
+import type { TextInputNodeData } from "~/workflow/dto/nodes.dto";
 
 export type TextInputNodeProps = Node<TextInputNodeData, "text_input">;
 
@@ -37,6 +34,13 @@ function TextInputNode({ id, data }: NodeProps<TextInputNodeProps>) {
 				/>
 			</BaseNodeContent>
 			<BaseNodeFooter className="w-full px-0">
+				<div className="flex w-full flex-col items-start gap-2">
+					<LabeledHandle
+						title={"Start trigger"}
+						type="source"
+						position={Position.Left}
+					/>
+				</div>
 				<div className="flex w-full flex-col items-end gap-2">
 					<LabeledHandle
 						title={"Output"}

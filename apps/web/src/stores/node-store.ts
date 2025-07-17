@@ -9,6 +9,7 @@ import {
 	type OnNodesChange,
 } from "@xyflow/react";
 import { create } from "zustand";
+import type { BasicStartNodeProps } from "@/components/custom/nodes/basic/start-node";
 import type { TextGenerationNodeProps } from "@/components/custom/nodes/generation/text-generation-node";
 import type { TextInputNodeProps } from "@/components/custom/nodes/input/text-input-node";
 import type { LLMNodeProps } from "@/components/custom/nodes/llm-node";
@@ -29,6 +30,7 @@ export type NodeActions = {
 	onConnect: OnConnect;
 	addLLMNode: (provider: LLMProvider) => void;
 	addTextInputNode: () => void;
+	addBasicStartNode: () => void;
 	addTextGenerationNode: () => void;
 	addTextOutputNode: () => void;
 	updateNode: (id: string, data: NodeInputData) => void;
@@ -81,6 +83,17 @@ const useNodeStore = create<NodeState & NodeActions>((set, get) => ({
 			data: {
 				prompt: "Why is the banana yellow?",
 			},
+			position: generateRandomStartPosition(),
+		};
+		set({
+			nodes: [...get().nodes, newNode],
+		});
+	},
+	addBasicStartNode: () => {
+		const newNode: BasicStartNodeProps = {
+			id: crypto.randomUUID(),
+			type: "basic_start",
+			data: {},
 			position: generateRandomStartPosition(),
 		};
 		set({

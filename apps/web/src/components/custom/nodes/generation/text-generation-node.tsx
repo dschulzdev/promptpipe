@@ -12,17 +12,14 @@ import { LabeledHandle } from "@/components/labeled-handle";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import useNodeStore from "@/stores/node-store";
-
-export type TextGenerationNodeData = {
-	json_mode: boolean;
-};
+import type { TextGenerationNodeData } from "~/workflow/dto/nodes.dto";
 
 export type TextGenerationNodeProps = Node<
 	TextGenerationNodeData,
 	"text_generation"
 >;
 
-function TextGeneratioNode({ id, data }: NodeProps<TextGenerationNodeProps>) {
+function TextGenerationNode({ id, data }: NodeProps<TextGenerationNodeProps>) {
 	const updateNode = useNodeStore((state) => state.updateNode);
 	return (
 		<BaseNode className="w-80">
@@ -76,4 +73,4 @@ function TextGeneratioNode({ id, data }: NodeProps<TextGenerationNodeProps>) {
 	);
 }
 
-export default memo(TextGeneratioNode);
+export default memo(TextGenerationNode);

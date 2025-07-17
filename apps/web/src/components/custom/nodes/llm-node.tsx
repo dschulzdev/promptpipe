@@ -17,15 +17,9 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
-import {
-	LLM_MODELS,
-	type LLMProvider,
-	LLMProviderRenderMap,
-} from "@/constants/llm-providers";
-
-export type LLMNodeData = {
-	llmProvider: LLMProvider;
-};
+import { LLMProviderRenderMap } from "@/constants/llm-providers";
+import type { LLMNodeData } from "~/workflow/dto/nodes.dto";
+import { LLM_MODELS } from "../../../../../backend/src/ai/llm-providers";
 
 export type LLMNodeProps = Node<LLMNodeData, "llm">;
 
