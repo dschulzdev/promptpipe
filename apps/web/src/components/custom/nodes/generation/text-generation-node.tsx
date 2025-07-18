@@ -12,7 +12,7 @@ import { LabeledHandle } from "@/components/labeled-handle";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import useNodeStore from "@/stores/node-store";
-import type { TextGenerationNodeData } from "~/workflow/dto/nodes.dto";
+import type { TextGenerationNodeData } from "~/workflow/dto/text-generation-node-data.dto";
 
 export type TextGenerationNodeProps = Node<
 	TextGenerationNodeData,

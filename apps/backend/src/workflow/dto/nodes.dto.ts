@@ -1,58 +1,18 @@
-import {
-	IsBoolean,
-	IsDefined,
-	IsEnum,
-	IsNotEmpty,
-	IsString,
-} from "class-validator";
-import { LLMProvider, LLMProviderArray } from "src/ai/llm-providers";
+import { BasicStartNodeDataDto } from "./basic-start-node-data.dto";
+import { LLMNodeDataDto } from "./llm-node-data.dto";
+import { TextGenerationNodeDataDto } from "./text-generation-node-data.dto";
+import { TextInputNodeDataDto } from "./text-input-node-data.dto";
+import { TextOutputNodeDataDto } from "./text-output-node-data.dto";
 
-export const NodeTypes = [
-	"text_input",
-	"text_generation",
-	"text_output",
-	"basic_start",
-	"llm",
-] as const;
-
-export type NodeType = (typeof NodeTypes)[number];
-
-export interface TextGenerationNodeData extends Record<string, any> {
-	json_mode: boolean;
+export enum NodeTypes {
+	TEXT_INPUT = "text_input",
+	TEXT_OUTPUT = "text_output",
+	TEXT_GENERATION = "text_generation",
+	BASIC_START = "basic_start",
+	LLM = "llm",
 }
 
-export class TextGenerationNodeDataDto implements TextGenerationNodeData {
-	@IsBoolean()
-	json_mode: boolean;
-}
-
-export interface TextInputNodeData extends Record<string, any> {
-	prompt: string;
-}
-
-export class TextInputNodeDataDto implements TextInputNodeData {
-	@IsString()
-	@IsNotEmpty()
-	prompt: string;
-}
-
-export interface TextOutputNodeData extends Record<string, any> {}
-
-export class TextOutputNodeDataDto implements TextOutputNodeData {}
-
-export interface LLMNodeData extends Record<string, any> {
-	llmProvider: LLMProvider;
-}
-
-export class LLMNodeDataDto implements LLMNodeData {
-	@IsEnum(LLMProviderArray)
-	@IsDefined()
-	llmProvider: LLMProvider;
-}
-
-export interface BasicStartNodeData extends Record<string, any> {}
-
-export class BasicStartNodeDataDto implements BasicStartNodeData {}
+export type NodeType = `${NodeTypes}`;
 
 export type NodeDataDto =
 	| TextGenerationNodeDataDto

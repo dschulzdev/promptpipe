@@ -11,12 +11,11 @@ import {
 import { LabeledHandle } from "@/components/labeled-handle";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import type { TextOutputNodeData } from "~/workflow/dto/nodes.dto";
+import type { TextOutputNodeData } from "~/workflow/dto/text-output-node-data.dto";
 
 export type TextOutputNodeProps = Node<TextOutputNodeData, "text_output">;
 
-function TextOutputNode({ data }: NodeProps<TextOutputNodeProps>) {
-	console.log(data);
+function TextOutputNode(_props: NodeProps<TextOutputNodeProps>) {
 	return (
 		<BaseNode className="w-80">
 			<BaseNodeHeader>

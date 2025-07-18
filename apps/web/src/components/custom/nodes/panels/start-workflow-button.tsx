@@ -3,11 +3,21 @@ import { Loader2, Play } from "lucide-react";
 import { toast } from "sonner";
 import { useShallow } from "zustand/react/shallow";
 import { workflowControllerRunMutation } from "@/api-client/@tanstack/react-query.gen";
+import { mapToNodeTypeWithData, nodeTypes } from "@/constants/node_types";
+import useNodeStore from "@/stores/node-store";
 import useRunnerStore from "@/stores/runner-store";
 import { Button } from "../../../ui/button";
 
 export default function StartWorkflowButton() {
 	const { mutate, isPending } = useMutation(workflowControllerRunMutation());
+	const { nodes, edges } = useNodeStore(
+		useShallow((state) => {
+			return {
+				nodes: state.nodes,
+				edges: state.edges,
+			};
+		}),
+	);
 	const { isRunning, setLocalWorkflowId } = useRunnerStore(
 		useShallow((state) => {
 			return {
@@ -22,7 +32,29 @@ export default function StartWorkflowButton() {
 	function handleStartWorkflow() {
 		// TODO: Pass the actual workflow data here
 		mutate(
-			{},
+			{
+				body: {
+					connections: edges.map((edge) => ({
+						id: edge.id,
+						sourceNodeId: edge.source,
+						targetNodeId: edge.target,
+					})),
+					nodes: nodes.map((node) => {
+						if (!node.type) {
+							throw new Error("Node type is not defined");
+						}
+						return {
+							id: node.id,
+							// @ts-ignore
+							type: node.type as keyof typeof nodeTypes,
+							...mapToNodeTypeWithData(
+								node.type as keyof typeof nodeTypes,
+								node.data,
+							),
+						};
+					}),
+				},
+			},
 			{
 				onSuccess: (data) => {
 					if (data) {

@@ -4,6 +4,7 @@ import { Injectable, MessageEvent } from "@nestjs/common";
 import { Queue } from "bullmq";
 import Redis from "ioredis";
 import { Observable } from "rxjs";
+import { RunWorkloadDto } from "src/workflow/dto/run-workload.dto";
 
 @Injectable()
 export class RunnerService {
@@ -18,7 +19,9 @@ export class RunnerService {
 		this.redisSubscriber = this.redisService.getOrThrow("runner-subscriber");
 	}
 
-	public async runWorkflow(workflowData: string): Promise<string | undefined> {
+	public async runWorkflow(
+		workflowData: RunWorkloadDto,
+	): Promise<string | undefined> {
 		const job = await this.workflowRunsQueue.add("workflow_runs", {
 			workflowData,
 		});

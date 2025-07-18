@@ -1,5 +1,8 @@
-export const LLMProviderArray = ["openai", "google_genai"] as const;
-export type LLMProvider = (typeof LLMProviderArray)[number];
+export enum LLMProviderArray {
+	openai = "openai",
+	google_genai = "google_genai",
+}
+export type LLMProvider = `${LLMProviderArray}`;
 
 export const google_genai_models = [
 	"gemini-2.5-flash",

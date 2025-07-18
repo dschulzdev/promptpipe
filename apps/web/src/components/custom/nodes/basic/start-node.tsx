@@ -1,5 +1,5 @@
 import { type Node, type NodeProps, Position } from "@xyflow/react";
-import { PlayCircle, TextCursorInput } from "lucide-react";
+import { PlayCircle } from "lucide-react";
 import { memo } from "react";
 import {
 	BaseNode,
@@ -8,7 +8,7 @@ import {
 	BaseNodeHeaderTitle,
 } from "@/components/base-node";
 import { LabeledHandle } from "@/components/labeled-handle";
-import type { BasicStartNodeData } from "~/workflow/dto/nodes.dto";
+import type { BasicStartNodeData } from "~/workflow/dto/basic-start-node-data.dto";
 
 export type BasicStartNodeProps = Node<BasicStartNodeData, "basic_start">;
 

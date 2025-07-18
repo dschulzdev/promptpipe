@@ -2,16 +2,66 @@
 
 import { z } from 'zod';
 
-export const zAppControllerGetHelloData = z.object({
-    body: z.never().optional(),
-    path: z.never().optional(),
-    query: z.never().optional()
+export const zTextGenerationNodeDataDto = z.object({
+    json_mode: z.boolean()
 });
 
-export const zAppControllerGetHelloResponse = z.string();
+export const zTextInputNodeDataDto = z.object({
+    prompt: z.string()
+});
+
+export const zTextOutputNodeDataDto = z.object({});
+
+export const zBasicStartNodeDataDto = z.object({});
+
+export const zLlmNodeDataDto = z.object({
+    llmProvider: z.enum([
+        'openai',
+        'google_genai'
+    ])
+});
+
+export const zPipelineNodeDto = z.object({
+    data: z.union([
+        z.object({
+            type: z.literal('text_generation')
+        }).and(zTextGenerationNodeDataDto),
+        z.object({
+            type: z.literal('text_input')
+        }).and(zTextInputNodeDataDto),
+        z.object({
+            type: z.literal('text_output')
+        }).and(zTextOutputNodeDataDto),
+        z.object({
+            type: z.literal('basic_start')
+        }).and(zBasicStartNodeDataDto),
+        z.object({
+            type: z.literal('llm')
+        }).and(zLlmNodeDataDto)
+    ]),
+    id: z.string().uuid(),
+    type: z.enum([
+        'text_input',
+        'text_output',
+        'text_generation',
+        'basic_start',
+        'llm'
+    ])
+});
+
+export const zPipelineConnectionDto = z.object({
+    id: z.string().uuid(),
+    sourceNodeId: z.string().uuid(),
+    targetNodeId: z.string().uuid()
+});
+
+export const zRunWorkloadDto = z.object({
+    nodes: z.array(zPipelineNodeDto),
+    connections: z.array(zPipelineConnectionDto)
+});
 
 export const zWorkflowControllerRunData = z.object({
-    body: z.never().optional(),
+    body: zRunWorkloadDto,
     path: z.never().optional(),
     query: z.never().optional()
 });

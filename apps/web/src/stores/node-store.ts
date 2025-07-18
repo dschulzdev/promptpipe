@@ -14,10 +14,10 @@ import type { TextGenerationNodeProps } from "@/components/custom/nodes/generati
 import type { TextInputNodeProps } from "@/components/custom/nodes/input/text-input-node";
 import type { LLMNodeProps } from "@/components/custom/nodes/llm-node";
 import type { TextOutputNodeProps } from "@/components/custom/nodes/output/text-output-node";
-import type { LLMProvider } from "@/constants/llm-providers";
 import type { NodeInputData } from "@/constants/node_types";
+import type { LLMProvider } from "~/ai/llm-providers";
 
-export type AppNode = Node;
+export type AppNode = Node<NodeInputData>;
 
 export type NodeState = {
 	nodes: AppNode[];

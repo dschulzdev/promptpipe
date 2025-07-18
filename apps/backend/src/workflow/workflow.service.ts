@@ -1,12 +1,15 @@
 import { Injectable, MessageEvent } from "@nestjs/common";
 import { Observable } from "rxjs";
 import { RunnerService } from "src/runner/runner.service";
+import { RunWorkloadDto } from "./dto/run-workload.dto";
 
 @Injectable()
 export class WorkflowService {
 	constructor(private readonly runnerService: RunnerService) {}
 
-	public runWorkflow(workflowData: string): Promise<string | undefined> {
+	public runWorkflow(
+		workflowData: RunWorkloadDto,
+	): Promise<string | undefined> {
 		// Implementation of the workflow execution logic
 		return this.runnerService.runWorkflow(workflowData);
 	}
