@@ -1,7 +1,7 @@
 import type { GoogleGenerativeAIProvider } from "@ai-sdk/google";
 import type { OpenAIProvider } from "@ai-sdk/openai";
 import { Inject, Injectable } from "@nestjs/common";
-import { streamText } from "ai";
+import { generateText, LanguageModel } from "ai";
 
 //type LooseToStrict<T> = T extends any ? (string extends T ? never : T) : never;
 //type OpenAiModels = LooseToStrict<Parameters<typeof openai>[0]>;
@@ -19,9 +19,8 @@ export class AiService {
 		@Inject("GOOGLE_CLIENT") private googleClient: GoogleGenerativeAIProvider,
 	) {}
 
-	async getResponse({
+	getLLMProvider({
 		modelConfig,
-		prompt,
 	}: {
 		modelConfig:
 			| {
@@ -32,8 +31,7 @@ export class AiService {
 					provider: "google";
 					model: SelectedGoogleGenAIModel;
 			  };
-		prompt: string;
-	}) {
+	}): LanguageModel {
 		let llm_client: GoogleGenerativeAIProvider | OpenAIProvider;
 		switch (modelConfig.provider) {
 			case "openai":
@@ -45,8 +43,18 @@ export class AiService {
 			default:
 				throw new Error("Unsupported provider");
 		}
-		return streamText({
-			model: llm_client(modelConfig.model),
+		return llm_client(modelConfig.model);
+	}
+
+	async getResponse({
+		modelConfig,
+		prompt,
+	}: {
+		modelConfig: LanguageModel;
+		prompt: string;
+	}) {
+		return await generateText({
+			model: modelConfig,
 			prompt,
 		});
 	}

@@ -1,9 +1,3 @@
-import { BasicStartNodeDataDto } from "./basic-start-node-data.dto";
-import { LLMNodeDataDto } from "./llm-node-data.dto";
-import { TextGenerationNodeDataDto } from "./text-generation-node-data.dto";
-import { TextInputNodeDataDto } from "./text-input-node-data.dto";
-import { TextOutputNodeDataDto } from "./text-output-node-data.dto";
-
 export enum NodeTypes {
 	TEXT_INPUT = "text_input",
 	TEXT_OUTPUT = "text_output",
@@ -14,9 +8,8 @@ export enum NodeTypes {
 
 export type NodeType = `${NodeTypes}`;
 
-export type NodeDataDto =
-	| TextGenerationNodeDataDto
-	| TextInputNodeDataDto
-	| TextOutputNodeDataDto
-	| BasicStartNodeDataDto
-	| LLMNodeDataDto;
+export class NodeDataDto {}
+
+export type NodeActionDtos = NodeTypes.TEXT_GENERATION;
+
+export type NodeOutputDtos = NodeTypes.TEXT_OUTPUT;

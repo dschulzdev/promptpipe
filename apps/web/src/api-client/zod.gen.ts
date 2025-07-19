@@ -2,6 +2,12 @@
 
 import { z } from 'zod';
 
+export const zNodeHandleDto = z.object({
+    id: z.string(),
+    type: z.object({}),
+    handleKey: z.string()
+});
+
 export const zTextGenerationNodeDataDto = z.object({
     json_mode: z.boolean()
 });
@@ -39,20 +45,21 @@ export const zPipelineNodeDto = z.object({
             type: z.literal('llm')
         }).and(zLlmNodeDataDto)
     ]),
-    id: z.string().uuid(),
+    id: z.string(),
     type: z.enum([
         'text_input',
         'text_output',
         'text_generation',
         'basic_start',
         'llm'
-    ])
+    ]),
+    handles: z.array(zNodeHandleDto)
 });
 
 export const zPipelineConnectionDto = z.object({
-    id: z.string().uuid(),
-    sourceNodeId: z.string().uuid(),
-    targetNodeId: z.string().uuid()
+    id: z.string(),
+    sourceNodeHandleId: z.string(),
+    targetNodeHandleId: z.string()
 });
 
 export const zRunWorkloadDto = z.object({

@@ -3,11 +3,13 @@ import { NestFactory } from "@nestjs/core";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import { AppModule } from "./app.module";
 import "reflect-metadata";
-import { BasicStartNodeDataDto } from "./workflow/dto/basic-start-node-data.dto";
-import { LLMNodeDataDto } from "./workflow/dto/llm-node-data.dto";
-import { TextGenerationNodeDataDto } from "./workflow/dto/text-generation-node-data.dto";
-import { TextInputNodeDataDto } from "./workflow/dto/text-input-node-data.dto";
-import { TextOutputNodeDataDto } from "./workflow/dto/text-output-node-data.dto";
+import {
+	BasicStartNodeDto,
+	LlmNodeDto,
+	TextGenerationNodeDto,
+	TextInputNodeDto,
+	TextOutputNodeDto,
+} from "./workflow/dto/pipeline-node.dto";
 
 async function bootstrap() {
 	const app = await NestFactory.create(AppModule);
@@ -35,11 +37,11 @@ async function bootstrap() {
 
 	const document = SwaggerModule.createDocument(app, config, {
 		extraModels: [
-			BasicStartNodeDataDto,
-			LLMNodeDataDto,
-			TextGenerationNodeDataDto,
-			TextInputNodeDataDto,
-			TextOutputNodeDataDto,
+			LlmNodeDto,
+			BasicStartNodeDto,
+			TextInputNodeDto,
+			TextOutputNodeDto,
+			TextGenerationNodeDto,
 		],
 	});
 	SwaggerModule.setup("api", app, document);

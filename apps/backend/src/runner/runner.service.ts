@@ -1,10 +1,12 @@
 import { RedisService } from "@liaoliaots/nestjs-redis";
 import { InjectQueue } from "@nestjs/bullmq";
-import { Injectable, MessageEvent } from "@nestjs/common";
+import { BadRequestException, Injectable, MessageEvent } from "@nestjs/common";
 import { Queue } from "bullmq";
 import Redis from "ioredis";
 import { Observable } from "rxjs";
 import { RunWorkloadDto } from "src/workflow/dto/run-workload.dto";
+import { hasCycle } from "./graph-functions";
+import { ProgressMessage } from "./progress-message";
 
 @Injectable()
 export class RunnerService {
@@ -22,6 +24,11 @@ export class RunnerService {
 	public async runWorkflow(
 		workflowData: RunWorkloadDto,
 	): Promise<string | undefined> {
+		if (!hasCycle(workflowData.connections)) {
+			throw new BadRequestException(
+				"Workflow contains a cycle. Cycles are currently not supported.",
+			);
+		}
 		const job = await this.workflowRunsQueue.add("workflow_runs", {
 			workflowData,
 		});
@@ -68,7 +75,7 @@ export class RunnerService {
 					);
 
 					for (const message of existingMessages) {
-						const data = JSON.parse(message);
+						const data: ProgressMessage = JSON.parse(message);
 						subscriber.next({ data: message });
 
 						// If this is a final message, complete after replaying
@@ -115,10 +122,6 @@ export class RunnerService {
 		});
 	}
 
-	/**
-	 * Clean up stored messages for a completed workflow
-	 * Call this method after a reasonable time has passed since workflow completion
-	 */
 	public async cleanupWorkflowMessages(jobId: string): Promise<void> {
 		const messagesKey = `workflow-messages:${jobId}`;
 		await this.redisPublisher.del(messagesKey);

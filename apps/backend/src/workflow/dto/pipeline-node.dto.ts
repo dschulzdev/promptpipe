@@ -1,70 +1,94 @@
-import { ApiProperty, getSchemaPath } from "@nestjs/swagger";
+import { ApiProperty } from "@nestjs/swagger";
 import { Type, TypeHelpOptions } from "class-transformer";
 import { IsEnum, IsString, ValidateNested } from "class-validator";
 import { BasicStartNodeDataDto } from "./basic-start-node-data.dto";
 import { LLMNodeDataDto } from "./llm-node-data.dto";
-import { NodeDataDto, NodeTypes } from "./nodes.dto";
+import { NodeHandleDto } from "./node-handle.dto";
+import { NodeTypes } from "./nodes.dto";
 import { TextGenerationNodeDataDto } from "./text-generation-node-data.dto";
 import { TextInputNodeDataDto } from "./text-input-node-data.dto";
 import { TextOutputNodeDataDto } from "./text-output-node-data.dto";
 
-// Define the possible node types as a const for reusability
-
-export class PipelineNodeDto {
+class BasePipelineNodeDto {
 	@IsString()
-	id: string;
+	@ApiProperty()
+	id!: string;
+
 	@IsEnum(NodeTypes)
-	type: NodeTypes;
-	@ValidateNested()
-	@Type(
-		({ object }: TypeHelpOptions) => {
-			const type = (object as PipelineNodeDto).type;
-			switch (type) {
-				case NodeTypes.LLM:
-					return LLMNodeDataDto;
-				case NodeTypes.BASIC_START:
-					return BasicStartNodeDataDto;
-				// For types with no specific data, we can return a generic or empty DTO
-				case NodeTypes.TEXT_INPUT:
-					return TextInputNodeDataDto;
-				case NodeTypes.TEXT_OUTPUT:
-					return TextOutputNodeDataDto; // Assumes no data is needed
-				case NodeTypes.TEXT_GENERATION:
-					return TextGenerationNodeDataDto; // Assumes no data is needed
-			}
-		},
-		{
-			keepDiscriminatorProperty: true,
-			discriminator: {
-				property: "type",
-				subTypes: [
-					{ value: LLMNodeDataDto, name: NodeTypes.LLM },
-					{ value: BasicStartNodeDataDto, name: NodeTypes.BASIC_START },
-					{ value: TextInputNodeDataDto, name: NodeTypes.TEXT_INPUT },
-					{ value: TextOutputNodeDataDto, name: NodeTypes.TEXT_OUTPUT },
-					{ value: TextGenerationNodeDataDto, name: NodeTypes.TEXT_GENERATION },
-				],
-			},
-		},
-	)
-	@ApiProperty({
-		oneOf: [
-			{ $ref: getSchemaPath(TextGenerationNodeDataDto) },
-			{ $ref: getSchemaPath(TextInputNodeDataDto) },
-			{ $ref: getSchemaPath(TextOutputNodeDataDto) },
-			{ $ref: getSchemaPath(BasicStartNodeDataDto) },
-			{ $ref: getSchemaPath(LLMNodeDataDto) },
-		],
-		discriminator: {
-			propertyName: "type",
-			mapping: {
-				[NodeTypes.LLM]: getSchemaPath(LLMNodeDataDto),
-				[NodeTypes.BASIC_START]: getSchemaPath(BasicStartNodeDataDto),
-				[NodeTypes.TEXT_INPUT]: getSchemaPath(TextInputNodeDataDto),
-				[NodeTypes.TEXT_OUTPUT]: getSchemaPath(TextOutputNodeDataDto),
-				[NodeTypes.TEXT_GENERATION]: getSchemaPath(TextGenerationNodeDataDto),
-			},
-		},
-	})
-	data: NodeDataDto;
+	@ApiProperty({ enum: NodeTypes })
+	type!: NodeTypes;
+
+	@ValidateNested({ each: true })
+	handles: NodeHandleDto[];
 }
+
+export class LlmNodeDto extends BasePipelineNodeDto {
+	type: NodeTypes.LLM = NodeTypes.LLM;
+
+	@ValidateNested()
+	@Type(() => LLMNodeDataDto)
+	@ApiProperty({ type: LLMNodeDataDto })
+	data!: LLMNodeDataDto;
+}
+
+export class TextInputNodeDto extends BasePipelineNodeDto {
+	type: NodeTypes.TEXT_INPUT = NodeTypes.TEXT_INPUT;
+
+	@ValidateNested()
+	@Type(() => TextInputNodeDataDto)
+	@ApiProperty({ type: TextInputNodeDataDto })
+	data!: TextInputNodeDataDto;
+}
+
+export class TextOutputNodeDto extends BasePipelineNodeDto {
+	type: NodeTypes.TEXT_OUTPUT = NodeTypes.TEXT_OUTPUT;
+
+	@ValidateNested()
+	@Type(() => TextOutputNodeDataDto)
+	@ApiProperty({ type: TextOutputNodeDataDto })
+	data!: TextOutputNodeDataDto;
+}
+
+export class BasicStartNodeDto extends BasePipelineNodeDto {
+	type: NodeTypes.BASIC_START = NodeTypes.BASIC_START;
+
+	@ValidateNested()
+	@Type(() => BasicStartNodeDataDto)
+	@ApiProperty({ type: BasicStartNodeDataDto })
+	data!: BasicStartNodeDataDto;
+}
+
+export class TextGenerationNodeDto extends BasePipelineNodeDto {
+	type: NodeTypes.TEXT_GENERATION = NodeTypes.TEXT_GENERATION;
+
+	@ValidateNested()
+	@Type(() => TextGenerationNodeDataDto)
+	@ApiProperty({ type: TextGenerationNodeDataDto })
+	data!: TextGenerationNodeDataDto;
+}
+
+export type PipelineNodeDto =
+	| LlmNodeDto
+	| TextInputNodeDto
+	| TextOutputNodeDto
+	| BasicStartNodeDto
+	| TextGenerationNodeDto;
+
+export const PipelineNodeDtoDiscriminated = (
+	options?: TypeHelpOptions,
+): PropertyDecorator => {
+	return Type(() => BasePipelineNodeDto, {
+		discriminator: {
+			property: "type",
+			subTypes: [
+				{ value: LlmNodeDto, name: NodeTypes.LLM },
+				{ value: TextInputNodeDto, name: NodeTypes.TEXT_INPUT },
+				{ value: TextOutputNodeDto, name: NodeTypes.TEXT_OUTPUT },
+				{ value: BasicStartNodeDto, name: NodeTypes.BASIC_START },
+				{ value: TextGenerationNodeDto, name: NodeTypes.TEXT_GENERATION },
+			],
+		},
+		...options,
+		keepDiscriminatorProperty: true,
+	});
+};
