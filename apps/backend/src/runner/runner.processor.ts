@@ -3,17 +3,14 @@ import { OnWorkerEvent, Processor, WorkerHost } from "@nestjs/bullmq";
 import { BadRequestException, Logger } from "@nestjs/common";
 import { Job } from "bullmq";
 import Redis from "ioredis";
+import { ResultAsync } from "neverthrow";
 import { NodeTypes } from "src/workflow/dto/nodes.dto";
 import { PipelineNodeDto } from "src/workflow/dto/pipeline-node.dto";
 import { RunWorkloadDto } from "src/workflow/dto/run-workload.dto";
 import { AiService } from "../ai/ai.service";
 import { deleteUnlinkedNodes, isNextNodeAvailable } from "./graph-functions";
-import { processLLMNodeHandles } from "./node-functions";
+import { processNode } from "./node-functions";
 import { ProgressMessage, ResultMessage } from "./progress-message";
-
-type NodeProcessCacheEntry = {
-	data: any;
-};
 
 @Processor("workflow_runs")
 export class RunnerProcessor extends WorkerHost {
@@ -59,30 +56,64 @@ export class RunnerProcessor extends WorkerHost {
 	async process(
 		job: Job<RunWorkloadDto, ResultMessage, string>,
 	): Promise<ResultMessage> {
-		this.logger.log(`Worker processing job ${job.id} for workflow ${job.id}`);
+		// biome-ignore lint/style/noNonNullAssertion: job id has to exist
+		const jobId: string = job.id!;
+		this.logger.log(`Worker processing job ${jobId} for workflow ${jobId}`);
 
-		const { cleanedPayload, startNode } = this.initializeTest(
-			// biome-ignore lint/style/noNonNullAssertion: job id has to exist
-			job.id!,
-			job.data,
-		);
+		const { cleanedPayload, startNode } = this.initializeTest(jobId, job.data);
+
 		if (!startNode) {
 			throw new BadRequestException(
 				"No start node found in the workflow data.",
 			);
 		}
+
+		await ResultAsync.fromPromise(
+			this.runGraph(startNode as PipelineNodeDto, jobId, cleanedPayload),
+			(error) => {
+				if (error instanceof Error) {
+					this.logger.error(`Graph execution failed: ${error.message}`);
+				}
+				const finalResult = this.sendFinalResult(jobId, "fail");
+				return finalResult;
+			},
+		);
+
+		const finalResult = this.sendFinalResult(jobId, "success");
+		return finalResult; // This is the return value of the job
+	}
+
+	private async runGraph(
+		startNode: PipelineNodeDto,
+		jobId: string,
+		cleanedPayload: RunWorkloadDto,
+	) {
 		let currentNode: PipelineNodeDto = startNode;
-		const nodeOutputMap = new Map<string, NodeProcessCacheEntry>();
+		// biome-ignore lint/suspicious/noExplicitAny: We need to use any here to allow dynamic typing
+		const nodeOutputMap = new Map<string, any>();
 		while (isNextNodeAvailable(cleanedPayload, currentNode)) {
-			const { results } = await this.processNode(currentNode);
-			for (const { key, result } of results) {
-				if (!key) {
+			this.publishProgress(jobId, "log", {
+				log: `Processing node ${currentNode.id}`,
+				type: "progress",
+			});
+			const results = await processNode(
+				currentNode,
+				cleanedPayload,
+				nodeOutputMap,
+				this.aiService,
+			);
+			for (const entry of results) {
+				if (!entry) {
 					continue;
 				}
-				nodeOutputMap.set(key, {
-					data: result.data,
+				nodeOutputMap.set(entry.key, {
+					data: entry.data,
 				});
 			}
+			this.publishProgress(jobId, "log", {
+				log: `Node finished: ${currentNode.id}`,
+				type: "success_node",
+			});
 
 			const nextNode = this.getNextNode(currentNode.id, cleanedPayload);
 			if (!nextNode) {
@@ -90,37 +121,7 @@ export class RunnerProcessor extends WorkerHost {
 			}
 			currentNode = nextNode;
 		}
-
-		// biome-ignore lint/style/noNonNullAssertion: job id has to exist
-		const finalResult = this.sendFinalResult(job.id!, "success");
-		return finalResult; // This is the return value of the job
 	}
-
-	private processNode = async (
-		node: PipelineNodeDto,
-	): Promise<{
-		results: {
-			key: string;
-			result: NodeProcessCacheEntry;
-		}[];
-	}> => {
-		let data: any = {};
-		switch (node.type) {
-			case NodeTypes.LLM:
-				data = processLLMNodeHandles(node.data);
-		}
-		// Process the node using the cleaned payload
-		return {
-			results: [
-				{
-					key: node.id,
-					result: {
-						data: data,
-					},
-				},
-			],
-		};
-	};
 
 	private getNextNode(
 		currentNodeId: string,

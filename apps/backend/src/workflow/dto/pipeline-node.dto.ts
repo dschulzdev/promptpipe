@@ -1,13 +1,13 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { Type, TypeHelpOptions } from "class-transformer";
 import { IsEnum, IsString, ValidateNested } from "class-validator";
-import { BasicStartNodeDataDto } from "./basic-start-node-data.dto";
-import { LLMNodeDataDto } from "./llm-node-data.dto";
 import { NodeHandleDto } from "./node-handle.dto";
+import { BasicStartNodeDataDto } from "./nodes/basic-start-node-data.dto";
+import { LLMNodeDataDto } from "./nodes/llm-node-data.dto";
+import { TextGenerationNodeDataDto } from "./nodes/text-generation-node-data.dto";
+import { TextInputNodeDataDto } from "./nodes/text-input-node-data.dto";
+import { TextOutputNodeDataDto } from "./nodes/text-output-node-data.dto";
 import { NodeTypes } from "./nodes.dto";
-import { TextGenerationNodeDataDto } from "./text-generation-node-data.dto";
-import { TextInputNodeDataDto } from "./text-input-node-data.dto";
-import { TextOutputNodeDataDto } from "./text-output-node-data.dto";
 
 class BasePipelineNodeDto {
 	@IsString()

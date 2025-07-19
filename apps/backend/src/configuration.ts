@@ -7,13 +7,7 @@ const configSchema = z.object({
 		.default("development"),
 	port: z.coerce.number().int().positive().default(3000),
 	frontend_url: z.string().min(1),
-	database: z.object({
-		host: z.string().min(1).default("localhost"),
-		port: z.coerce.number().int().positive().default(5432),
-		username: z.string().min(1).default("postgres"),
-		password: z.string().min(1).default("password"),
-		database: z.string().min(1).default("promptpipe"),
-	}),
+	database_url: z.string().min(1),
 	ai: z.object({
 		openai: z.object({
 			apiKey: z.string().min(1).optional(),
@@ -37,13 +31,7 @@ export const validateConfig = () => {
 		nodeEnv: process.env.NODE_ENV,
 		port: process.env.PORT,
 		frontend_url: process.env.FRONTEND_URL,
-		database: {
-			host: process.env.DATABASE_HOST,
-			port: process.env.DATABASE_PORT,
-			username: process.env.DATABASE_USERNAME,
-			password: process.env.DATABASE_PASSWORD,
-			database: process.env.DATABASE_NAME,
-		},
+		database_url: process.env.DATABASE_URL,
 		ai: {
 			openai: {
 				apiKey: process.env.OPENAI_API_KEY,

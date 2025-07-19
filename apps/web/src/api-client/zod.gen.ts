@@ -2,23 +2,13 @@
 
 import { z } from 'zod';
 
-export const zNodeHandleDto = z.object({
+export const zPipelineConnectionDto = z.object({
     id: z.string(),
-    type: z.object({}),
-    handleKey: z.string()
+    sourceNodeId: z.string(),
+    targetNodeId: z.string(),
+    sourceNodeHandleId: z.string(),
+    targetNodeHandleId: z.string()
 });
-
-export const zTextGenerationNodeDataDto = z.object({
-    json_mode: z.boolean()
-});
-
-export const zTextInputNodeDataDto = z.object({
-    prompt: z.string()
-});
-
-export const zTextOutputNodeDataDto = z.object({});
-
-export const zBasicStartNodeDataDto = z.object({});
 
 export const zLlmNodeDataDto = z.object({
     llmProvider: z.enum([
@@ -27,24 +17,13 @@ export const zLlmNodeDataDto = z.object({
     ])
 });
 
-export const zPipelineNodeDto = z.object({
-    data: z.union([
-        z.object({
-            type: z.literal('text_generation')
-        }).and(zTextGenerationNodeDataDto),
-        z.object({
-            type: z.literal('text_input')
-        }).and(zTextInputNodeDataDto),
-        z.object({
-            type: z.literal('text_output')
-        }).and(zTextOutputNodeDataDto),
-        z.object({
-            type: z.literal('basic_start')
-        }).and(zBasicStartNodeDataDto),
-        z.object({
-            type: z.literal('llm')
-        }).and(zLlmNodeDataDto)
-    ]),
+export const zNodeHandleDto = z.object({
+    id: z.string(),
+    type: z.object({}),
+    handleKey: z.string()
+});
+
+export const zLlmNodeDto = z.object({
     id: z.string(),
     type: z.enum([
         'text_input',
@@ -53,18 +32,94 @@ export const zPipelineNodeDto = z.object({
         'basic_start',
         'llm'
     ]),
+    data: zLlmNodeDataDto,
     handles: z.array(zNodeHandleDto)
 });
 
-export const zPipelineConnectionDto = z.object({
+export const zTextInputNodeDataDto = z.object({
+    prompt: z.string()
+});
+
+export const zTextInputNodeDto = z.object({
     id: z.string(),
-    sourceNodeHandleId: z.string(),
-    targetNodeHandleId: z.string()
+    type: z.enum([
+        'text_input',
+        'text_output',
+        'text_generation',
+        'basic_start',
+        'llm'
+    ]),
+    data: zTextInputNodeDataDto,
+    handles: z.array(zNodeHandleDto)
+});
+
+export const zTextOutputNodeDataDto = z.object({});
+
+export const zTextOutputNodeDto = z.object({
+    id: z.string(),
+    type: z.enum([
+        'text_input',
+        'text_output',
+        'text_generation',
+        'basic_start',
+        'llm'
+    ]),
+    data: zTextOutputNodeDataDto,
+    handles: z.array(zNodeHandleDto)
+});
+
+export const zBasicStartNodeDataDto = z.object({});
+
+export const zBasicStartNodeDto = z.object({
+    id: z.string(),
+    type: z.enum([
+        'text_input',
+        'text_output',
+        'text_generation',
+        'basic_start',
+        'llm'
+    ]),
+    data: zBasicStartNodeDataDto,
+    handles: z.array(zNodeHandleDto)
+});
+
+export const zTextGenerationNodeDataDto = z.object({
+    json_mode: z.boolean()
+});
+
+export const zTextGenerationNodeDto = z.object({
+    id: z.string(),
+    type: z.enum([
+        'text_input',
+        'text_output',
+        'text_generation',
+        'basic_start',
+        'llm'
+    ]),
+    data: zTextGenerationNodeDataDto,
+    handles: z.array(zNodeHandleDto)
 });
 
 export const zRunWorkloadDto = z.object({
-    nodes: z.array(zPipelineNodeDto),
+    nodes: z.array(z.union([
+        zLlmNodeDto,
+        zTextInputNodeDto,
+        zTextOutputNodeDto,
+        zBasicStartNodeDto,
+        zTextGenerationNodeDto
+    ])),
     connections: z.array(zPipelineConnectionDto)
+});
+
+export const zWorkflowDto = z.object({
+    id: z.string(),
+    name: z.string(),
+    createdAt: z.string().datetime(),
+    updatedAt: z.string().datetime()
+});
+
+export const zCreateWorkflowDto = z.object({
+    name: z.string()
 });
 
 export const zWorkflowControllerRunData = z.object({
@@ -84,3 +139,29 @@ export const zWorkflowControllerStreamUpdatesData = z.object({
 });
 
 export const zWorkflowControllerStreamUpdatesResponse = z.object({});
+
+export const zWorkflowControllerFindAllData = z.object({
+    body: z.never().optional(),
+    path: z.never().optional(),
+    query: z.never().optional()
+});
+
+export const zWorkflowControllerFindAllResponse = z.array(zWorkflowDto);
+
+export const zWorkflowControllerCreateData = z.object({
+    body: zCreateWorkflowDto,
+    path: z.never().optional(),
+    query: z.never().optional()
+});
+
+export const zWorkflowControllerCreateResponse = zWorkflowDto;
+
+export const zWorkflowControllerFindOneData = z.object({
+    body: z.never().optional(),
+    path: z.object({
+        id: z.string()
+    }),
+    query: z.never().optional()
+});
+
+export const zWorkflowControllerFindOneResponse = zWorkflowDto;

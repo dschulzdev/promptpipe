@@ -16,7 +16,7 @@ import TextOutputNode, {
 import type { NodeType } from "~/workflow/dto/nodes.dto";
 import type { TextGenerationNodeData } from "../../../backend/dist/src/workflow/dto/text-generation-node-data.dto";
 import type { TextOutputNodeData } from "../../../backend/dist/src/workflow/dto/text-output-node-data.dto";
-import type { LLMNodeData } from "../../../backend/src/workflow/dto/llm-node-data.dto";
+import type { LLMNodeData } from "../../../backend/src/workflow/dto/nodes/llm-node-data.dto";
 import type { TextInputNodeData } from "../../../backend/src/workflow/dto/text-input-node-data.dto";
 
 export type NodeInputData =

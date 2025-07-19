@@ -1,13 +1,17 @@
 import {
 	Body,
 	Controller,
+	Get,
 	MessageEvent,
+	NotFoundException,
 	Param,
 	Post,
 	Sse,
 } from "@nestjs/common";
 import { Observable } from "rxjs";
+import { CreateWorkflowDto } from "./dto/create-workflow.dto";
 import { RunWorkloadDto } from "./dto/run-workload.dto";
+import { WorkflowDto } from "./dto/workflow.dto";
 import { WorkflowService } from "./workflow.service";
 
 @Controller("workflow")
@@ -23,5 +27,26 @@ export class WorkflowController {
 	@Sse("stream/:runId")
 	streamUpdates(@Param("runId") runId: string): Observable<MessageEvent> {
 		return this.workflowService.getJobStream(runId);
+	}
+
+	@Get()
+	async findAll(): Promise<WorkflowDto[]> {
+		return await this.workflowService.findAll();
+	}
+
+	@Get(":id")
+	async findOne(@Param("id") id: string): Promise<WorkflowDto> {
+		const workflow = await this.workflowService.findOne(id);
+		if (!workflow) {
+			throw new NotFoundException(`Workflow with id ${id} not found`);
+		}
+		return workflow;
+	}
+
+	@Post()
+	async create(
+		@Body() createWorkflowDto: CreateWorkflowDto,
+	): Promise<WorkflowDto> {
+		return this.workflowService.create(createWorkflowDto);
 	}
 }

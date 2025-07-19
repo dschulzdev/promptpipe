@@ -5,3 +5,17 @@ services:
     ports:
       - "6379:6379"
     restart: unless-stopped
+  postgres:
+    image: postgres:15.4
+    container_name: promptpipe-postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: promptpipe
+      POSTGRES_PASSWORD: promptpipe
+      POSTGRES_DB: promptpipe
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+volumes:
+  postgres_data:

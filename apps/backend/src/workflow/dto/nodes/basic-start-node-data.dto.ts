@@ -1,4 +1,4 @@
-import { NodeDataDto } from "./nodes.dto";
+import { NodeDataDto } from "../nodes.dto";
 
 // biome-ignore lint/suspicious/noExplicitAny: needed
 export interface BasicStartNodeData extends Record<string, any> {}
