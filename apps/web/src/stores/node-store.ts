@@ -25,6 +25,7 @@ export type NodeState = {
 };
 
 export type NodeActions = {
+	initData: () => void;
 	onNodesChange: OnNodesChange<AppNode>;
 	onEdgesChange: OnEdgesChange;
 	onConnect: OnConnect;
@@ -45,6 +46,7 @@ const initialEdges: Edge[] = [];
 const useNodeStore = create<NodeState & NodeActions>((set, get) => ({
 	nodes: initialNodes,
 	edges: initialEdges,
+	initData: () => {},
 	onNodesChange: (changes) => {
 		set({
 			nodes: applyNodeChanges(changes, get().nodes),

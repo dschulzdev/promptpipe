@@ -3,14 +3,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { SquareDashed } from "lucide-react";
 import { workflowControllerFindAllOptions } from "@/api-client/@tanstack/react-query.gen";
 import AddWorkflowDialog from "@/components/custom/add-workflow-dialog";
-import { Button } from "@/components/ui/button";
-import {
-	Card,
-	CardContent,
-	CardFooter,
-	CardHeader,
-	CardTitle,
-} from "@/components/ui/card";
+import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 
 export const Route = createFileRoute("/")({
 	component: HomeComponent,
@@ -74,11 +67,9 @@ function WorkflowList() {
 
 function NoWorkflows() {
 	return (
-		<div className="flex h-full flex-col items-center justify-center">
+		<div className="flex h-full w-full flex-col items-center justify-center">
 			<SquareDashed />
-			<h2 className="mt-4 mb-SquareDashed4 font-semibold text-lg">
-				No Workflows Found
-			</h2>
+			<h2 className="mt-4 mb-4 font-semibold text-lg">No Workflows Found</h2>
 			<p className="mb-4 text-gray-500">
 				Create your first workflow to get started.
 			</p>

@@ -5,15 +5,21 @@ import Loader from "./components/loader";
 import { routeTree } from "./routeTree.gen";
 
 import "@xyflow/react/dist/style.css";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
 scan({
 	enabled: true,
 });
+
+const queryClient = new QueryClient();
 
 const router = createRouter({
 	routeTree,
 	defaultPreload: "intent",
 	defaultPendingComponent: () => <Loader />,
-	context: {},
+	context: {
+		queryClient,
+	},
 });
 
 declare module "@tanstack/react-router" {
@@ -30,5 +36,9 @@ if (!rootElement) {
 
 if (!rootElement.innerHTML) {
 	const root = ReactDOM.createRoot(rootElement);
-	root.render(<RouterProvider router={router} />);
+	root.render(
+		<QueryClientProvider client={queryClient}>
+			<RouterProvider router={router} />
+		</QueryClientProvider>,
+	);
 }

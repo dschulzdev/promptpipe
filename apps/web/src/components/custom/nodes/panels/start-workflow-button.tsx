@@ -31,6 +31,8 @@ export default function StartWorkflowButton() {
 				body: {
 					connections: edges.map((edge) => ({
 						id: edge.id,
+						sourceNodeId: edge.source,
+						targetNodeId: edge.target,
 						sourceNodeHandleId: edge.sourceHandle || "",
 						targetNodeHandleId: edge.targetHandle || "",
 					})),
@@ -40,7 +42,6 @@ export default function StartWorkflowButton() {
 						}
 						return {
 							id: node.id,
-							// @ts-ignore
 							type: node.type as keyof typeof nodeTypes,
 							...mapToNodeTypeWithData(
 								node.type as keyof typeof nodeTypes,

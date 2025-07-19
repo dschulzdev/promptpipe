@@ -5,12 +5,14 @@ import {
 	MessageEvent,
 	NotFoundException,
 	Param,
+	Patch,
 	Post,
 	Sse,
 } from "@nestjs/common";
 import { Observable } from "rxjs";
 import { CreateWorkflowDto } from "./dto/create-workflow.dto";
 import { RunWorkloadDto } from "./dto/run-workload.dto";
+import { UpdateWorkflowDto } from "./dto/update-workflow.dto";
 import { WorkflowDto } from "./dto/workflow.dto";
 import { WorkflowService } from "./workflow.service";
 
@@ -48,5 +50,13 @@ export class WorkflowController {
 		@Body() createWorkflowDto: CreateWorkflowDto,
 	): Promise<WorkflowDto> {
 		return this.workflowService.create(createWorkflowDto);
+	}
+
+	@Patch(":id")
+	async update(
+		@Param("id") id: string,
+		@Body() updateWorkflowDto: UpdateWorkflowDto,
+	): Promise<WorkflowDto> {
+		return this.workflowService.update(id, updateWorkflowDto);
 	}
 }

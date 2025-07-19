@@ -4,6 +4,8 @@ import { PrismaService } from "src/prisma/prisma.service";
 import { RunnerService } from "src/runner/runner.service";
 import { CreateWorkflowDto } from "./dto/create-workflow.dto";
 import { RunWorkloadDto } from "./dto/run-workload.dto";
+import { UpdateWorkflowDto } from "./dto/update-workflow.dto";
+import { WorkflowDto } from "./dto/workflow.dto";
 
 @Injectable()
 export class WorkflowService {
@@ -28,6 +30,7 @@ export class WorkflowService {
 		return await this.prismaService.workflow.findMany();
 	}
 	public async findOne(id: string) {
+		//await new Promise((resolve) => setTimeout(resolve, 10000)); // Simulate delay
 		return await this.prismaService.workflow.findUnique({
 			where: { id },
 		});
@@ -36,6 +39,17 @@ export class WorkflowService {
 	public async create(createWorkflowDto: CreateWorkflowDto) {
 		const workflow = await this.prismaService.workflow.create({
 			data: createWorkflowDto,
+		});
+		return workflow;
+	}
+
+	public async update(
+		id: string,
+		updateWorkflowDto: UpdateWorkflowDto,
+	): Promise<WorkflowDto> {
+		const workflow = await this.prismaService.workflow.update({
+			where: { id },
+			data: updateWorkflowDto,
 		});
 		return workflow;
 	}

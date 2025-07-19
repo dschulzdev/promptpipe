@@ -1,5 +1,5 @@
 import { IsBoolean } from "class-validator";
-import { NodeDataDto } from "./nodes.dto";
+import { NodeDataDto } from "../nodes.dto";
 
 // biome-ignore lint/suspicious/noExplicitAny: needed
 export interface TextGenerationNodeData extends Record<string, any> {
