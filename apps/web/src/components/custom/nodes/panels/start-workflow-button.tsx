@@ -1,18 +1,16 @@
 import { useMutation } from "@tanstack/react-query";
+import { useParams } from "@tanstack/react-router";
 import { Loader2, Play } from "lucide-react";
-import { useCallback } from "react";
+import { memo, useCallback } from "react";
 import { toast } from "sonner";
 import { useShallow } from "zustand/react/shallow";
 import { workflowControllerRunMutation } from "@/api-client/@tanstack/react-query.gen";
-import { mapToNodeTypeWithData, nodeTypes } from "@/constants/node_types";
-import useNodeStore from "@/stores/node-store";
 import useRunnerStore from "@/stores/runner-store";
 import { Button } from "../../../ui/button";
 
-export default function StartWorkflowButton() {
+function StartWorkflowButton() {
+	const { id } = useParams({ strict: false });
 	const { mutate, isPending } = useMutation(workflowControllerRunMutation());
-	const nodes = useNodeStore(useShallow((state) => state.nodes));
-	const edges = useNodeStore(useShallow((state) => state.edges));
 	const { isRunning, setLocalWorkflowId } = useRunnerStore(
 		useShallow((state) => {
 			return {
@@ -25,30 +23,15 @@ export default function StartWorkflowButton() {
 	const workflowInProgress = isRunning || isPending;
 
 	const handleStartWorkflow = useCallback(() => {
+		if (!id) {
+			toast.error("Workflow ID is not available.");
+			return;
+		}
 		// TODO: Pass the actual workflow data here
 		mutate(
 			{
-				body: {
-					connections: edges.map((edge) => ({
-						id: edge.id,
-						sourceNodeId: edge.source,
-						targetNodeId: edge.target,
-						sourceNodeHandleId: edge.sourceHandle || "",
-						targetNodeHandleId: edge.targetHandle || "",
-					})),
-					nodes: nodes.map((node) => {
-						if (!node.type) {
-							throw new Error("Node type is not defined");
-						}
-						return {
-							id: node.id,
-							type: node.type as keyof typeof nodeTypes,
-							...mapToNodeTypeWithData(
-								node.type as keyof typeof nodeTypes,
-								node.data,
-							),
-						};
-					}),
+				path: {
+					workflowId: id, // Replace with actual workflow ID if needed
 				},
 			},
 			{
@@ -62,7 +45,7 @@ export default function StartWorkflowButton() {
 				},
 			},
 		);
-	}, [mutate, edges, nodes, setLocalWorkflowId]);
+	}, [mutate, setLocalWorkflowId]);
 	return (
 		<Button
 			size={"icon"}
@@ -73,3 +56,5 @@ export default function StartWorkflowButton() {
 		</Button>
 	);
 }
+
+export default memo(StartWorkflowButton);

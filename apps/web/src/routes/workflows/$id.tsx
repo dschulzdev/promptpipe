@@ -2,13 +2,14 @@ import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { ReactFlowProvider } from "@xyflow/react";
 import { Loader2 } from "lucide-react";
-import { use, useEffect } from "react";
+import { useEffect } from "react";
 import { workflowControllerFindOneOptions } from "@/api-client/@tanstack/react-query.gen";
 import BlockSidebar from "@/components/custom/block-sidebar";
 import PromptpipeWhiteboard from "@/components/custom/promptpipe-whiteboard";
 import { Button } from "@/components/ui/button";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import useNodeStore from "@/stores/node-store";
+import type { PipelineNodeDto } from "~/workflow/dto/pipeline-node.dto";
 
 export const Route = createFileRoute("/workflows/$id")({
 	component: RouteComponent,
@@ -51,18 +52,21 @@ function Backdrop({ id }: { id: string }) {
 		}),
 	});
 	const initData = useNodeStore((state) => state.initData);
+
 	useEffect(() => {
-		if (isSuccess) {
-			initData();
+		if (isSuccess && data) {
+			// TODO: Fix types
+			console.log(data);
+			initData(data.nodes as unknown as PipelineNodeDto[], data.connections);
 		}
-	}, [isSuccess, initData]);
+	}, [isSuccess, initData, data]);
 
 	if (!isPending && isSuccess) {
 		return null;
 	}
 	return (
 		<div
-			className={`fixed inset-0 z-50 grid h-screen w-screen place-items-center ${isPending ? "bg-black/50 backdrop-blur-sm" : ""}`}
+			className={`fixed inset-0 z-50 grid h-screen w-screen place-items-center ${isPending && !isSuccess ? "bg-black/50 backdrop-blur-sm" : ""}`}
 		>
 			{error && (
 				<div className="flex flex-col gap-4 text-white">

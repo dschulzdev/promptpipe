@@ -8,20 +8,25 @@ export type PipelineConnectionDto = {
     targetNodeHandleId: string;
 };
 
-export type RunWorkloadDto = {
-    nodes: Array<LlmNodeDto | TextInputNodeDto | TextOutputNodeDto | BasicStartNodeDto | TextGenerationNodeDto>;
-    connections: Array<PipelineConnectionDto>;
-};
-
 export type WorkflowDto = {
+    nodes: Array<LlmNodeDto | TextInputNodeDto | TextOutputNodeDto | BasicStartNodeDto | TextGenerationNodeDto>;
     id: string;
     name: string;
     createdAt: string;
     updatedAt: string;
+    connections: Array<PipelineConnectionDto>;
 };
 
 export type CreateWorkflowDto = {
+    nodes?: Array<LlmNodeDto | TextInputNodeDto | TextOutputNodeDto | BasicStartNodeDto | TextGenerationNodeDto>;
     name: string;
+    connections?: Array<PipelineConnectionDto>;
+};
+
+export type UpdateWorkflowDto = {
+    nodes?: Array<LlmNodeDto | TextInputNodeDto | TextOutputNodeDto | BasicStartNodeDto | TextGenerationNodeDto>;
+    name?: string;
+    connections?: Array<PipelineConnectionDto>;
 };
 
 export type LlmNodeDataDto = {
@@ -36,11 +41,17 @@ export type NodeHandleDto = {
     handleKey: string;
 };
 
+export type Position = {
+    x: number;
+    y: number;
+};
+
 export type LlmNodeDto = {
     id: string;
     type: 'text_input' | 'text_output' | 'text_generation' | 'basic_start' | 'llm';
     data: LlmNodeDataDto;
     handles: Array<NodeHandleDto>;
+    position: Position;
 };
 
 export type BasicStartNodeDataDto = {
@@ -52,6 +63,7 @@ export type BasicStartNodeDto = {
     type: 'text_input' | 'text_output' | 'text_generation' | 'basic_start' | 'llm';
     data: BasicStartNodeDataDto;
     handles: Array<NodeHandleDto>;
+    position: Position;
 };
 
 export type TextInputNodeDataDto = {
@@ -63,6 +75,7 @@ export type TextInputNodeDto = {
     type: 'text_input' | 'text_output' | 'text_generation' | 'basic_start' | 'llm';
     data: TextInputNodeDataDto;
     handles: Array<NodeHandleDto>;
+    position: Position;
 };
 
 export type TextOutputNodeDataDto = {
@@ -74,6 +87,7 @@ export type TextOutputNodeDto = {
     type: 'text_input' | 'text_output' | 'text_generation' | 'basic_start' | 'llm';
     data: TextOutputNodeDataDto;
     handles: Array<NodeHandleDto>;
+    position: Position;
 };
 
 export type TextGenerationNodeDataDto = {
@@ -85,13 +99,16 @@ export type TextGenerationNodeDto = {
     type: 'text_input' | 'text_output' | 'text_generation' | 'basic_start' | 'llm';
     data: TextGenerationNodeDataDto;
     handles: Array<NodeHandleDto>;
+    position: Position;
 };
 
 export type WorkflowControllerRunData = {
-    body: RunWorkloadDto;
-    path?: never;
+    body?: never;
+    path: {
+        workflowId: string;
+    };
     query?: never;
-    url: '/workflow/run';
+    url: '/workflow/run/{workflowId}';
 };
 
 export type WorkflowControllerRunResponses = {
@@ -157,6 +174,21 @@ export type WorkflowControllerFindOneResponses = {
 };
 
 export type WorkflowControllerFindOneResponse = WorkflowControllerFindOneResponses[keyof WorkflowControllerFindOneResponses];
+
+export type WorkflowControllerUpdateData = {
+    body: UpdateWorkflowDto;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/workflow/{id}';
+};
+
+export type WorkflowControllerUpdateResponses = {
+    200: WorkflowDto;
+};
+
+export type WorkflowControllerUpdateResponse = WorkflowControllerUpdateResponses[keyof WorkflowControllerUpdateResponses];
 
 export type ClientOptions = {
     baseUrl: string;

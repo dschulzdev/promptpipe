@@ -9,6 +9,7 @@ import {
 	type OnNodesChange,
 } from "@xyflow/react";
 import { create } from "zustand";
+import type { PipelineConnectionDto } from "@/api-client";
 import type { BasicStartNodeProps } from "@/components/custom/nodes/basic/start-node";
 import type { TextGenerationNodeProps } from "@/components/custom/nodes/generation/text-generation-node";
 import type { TextInputNodeProps } from "@/components/custom/nodes/input/text-input-node";
@@ -16,6 +17,7 @@ import type { LLMNodeProps } from "@/components/custom/nodes/llm-node";
 import type { TextOutputNodeProps } from "@/components/custom/nodes/output/text-output-node";
 import type { NodeInputData } from "@/constants/node_types";
 import type { LLMProvider } from "~/ai/llm-providers";
+import type { PipelineNodeDto } from "../../../backend/dist/src/workflow/dto/pipeline-node.dto";
 
 export type AppNode = Node<NodeInputData>;
 
@@ -25,7 +27,10 @@ export type NodeState = {
 };
 
 export type NodeActions = {
-	initData: () => void;
+	initData: (
+		nodes: PipelineNodeDto[],
+		connections: PipelineConnectionDto[],
+	) => void;
 	onNodesChange: OnNodesChange<AppNode>;
 	onEdgesChange: OnEdgesChange;
 	onConnect: OnConnect;
@@ -46,7 +51,25 @@ const initialEdges: Edge[] = [];
 const useNodeStore = create<NodeState & NodeActions>((set, get) => ({
 	nodes: initialNodes,
 	edges: initialEdges,
-	initData: () => {},
+	initData: (nodes, connections) => {
+		const transformedNodes: AppNode[] = nodes.map((node) => ({
+			id: node.id,
+			type: node.type,
+			data: node.data,
+			position: node.position,
+		}));
+		const transformedConnections: Edge[] = connections.map((connection) => ({
+			id: connection.id,
+			source: connection.sourceNodeId,
+			target: connection.targetNodeId,
+			sourceHandle: connection.sourceNodeHandleId,
+			targetHandle: connection.targetNodeHandleId,
+		}));
+		set({
+			nodes: transformedNodes,
+			edges: transformedConnections,
+		});
+	},
 	onNodesChange: (changes) => {
 		set({
 			nodes: applyNodeChanges(changes, get().nodes),

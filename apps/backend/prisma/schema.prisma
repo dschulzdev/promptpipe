@@ -9,6 +9,10 @@ generator client {
   output   = "../node_modules/@generated/prisma"
 }
 
+generator json {
+  provider = "prisma-json-types-generator"
+}
+
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
@@ -17,8 +21,10 @@ datasource db {
 model Workflow {
   id          String   @id @default(cuid())
   name        String
-  nodeData    Json @default("{}")
-  edgeData    Json @default("{}")
+  /// [PipelineNodeDto]
+  nodes       Json[]
+  /// [PipelineConnectionDto]
+  connections Json[]
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }

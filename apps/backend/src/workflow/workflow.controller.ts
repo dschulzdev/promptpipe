@@ -11,7 +11,6 @@ import {
 } from "@nestjs/common";
 import { Observable } from "rxjs";
 import { CreateWorkflowDto } from "./dto/create-workflow.dto";
-import { RunWorkloadDto } from "./dto/run-workload.dto";
 import { UpdateWorkflowDto } from "./dto/update-workflow.dto";
 import { WorkflowDto } from "./dto/workflow.dto";
 import { WorkflowService } from "./workflow.service";
@@ -20,10 +19,10 @@ import { WorkflowService } from "./workflow.service";
 export class WorkflowController {
 	constructor(private readonly workflowService: WorkflowService) {}
 
-	@Post("run")
-	async run(@Body() runWorkloadDto: RunWorkloadDto) {
-		console.log("Running workflow with data:", runWorkloadDto);
-		return await this.workflowService.runWorkflow(runWorkloadDto);
+	@Post("run/:workflowId")
+	async run(@Param("workflowId") workflowId: string) {
+		console.log("Running workflow with id:", workflowId);
+		return await this.workflowService.runWorkflow(workflowId);
 	}
 
 	@Sse("stream/:runId")

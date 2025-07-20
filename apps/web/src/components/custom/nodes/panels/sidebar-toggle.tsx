@@ -1,8 +1,9 @@
 import { SidebarClose, SidebarOpen } from "lucide-react";
+import { memo } from "react";
 import { Button } from "@/components/ui/button";
 import { useSidebar } from "@/components/ui/sidebar";
 
-export default function SidebarToggle() {
+function SidebarToggle() {
 	const { open, toggleSidebar } = useSidebar();
 	return (
 		<Button variant="outline" size="icon" onClick={toggleSidebar}>
@@ -10,3 +11,5 @@ export default function SidebarToggle() {
 		</Button>
 	);
 }
+
+export default memo(SidebarToggle);

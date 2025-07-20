@@ -1,9 +1,9 @@
-import { Injectable, MessageEvent } from "@nestjs/common";
+import { Injectable, MessageEvent, NotFoundException } from "@nestjs/common";
+import { instanceToPlain } from "class-transformer";
 import { Observable } from "rxjs";
 import { PrismaService } from "src/prisma/prisma.service";
 import { RunnerService } from "src/runner/runner.service";
 import { CreateWorkflowDto } from "./dto/create-workflow.dto";
-import { RunWorkloadDto } from "./dto/run-workload.dto";
 import { UpdateWorkflowDto } from "./dto/update-workflow.dto";
 import { WorkflowDto } from "./dto/workflow.dto";
 
@@ -14,11 +14,18 @@ export class WorkflowService {
 		private readonly prismaService: PrismaService,
 	) {}
 
-	public runWorkflow(
-		workflowData: RunWorkloadDto,
-	): Promise<string | undefined> {
+	public async runWorkflow(workflowId: string): Promise<string | undefined> {
+		const workflowData = await this.prismaService.workflow.findUnique({
+			where: { id: workflowId },
+		});
+		if (!workflowData) {
+			throw new NotFoundException(`Workflow with id ${workflowId} not found`);
+		}
 		// Implementation of the workflow execution logic
-		return this.runnerService.runWorkflow(workflowData);
+		return this.runnerService.runWorkflow({
+			nodes: instanceToPlain(workflowData.nodes),
+			connections: instanceToPlain(workflowData.connections),
+		});
 	}
 	public getJobStream(jobId: string): Observable<MessageEvent> {
 		// Implementation to get the job stream
@@ -38,7 +45,11 @@ export class WorkflowService {
 
 	public async create(createWorkflowDto: CreateWorkflowDto) {
 		const workflow = await this.prismaService.workflow.create({
-			data: createWorkflowDto,
+			data: {
+				name: createWorkflowDto.name,
+				nodes: instanceToPlain(createWorkflowDto.nodes ?? []),
+				connections: instanceToPlain(createWorkflowDto.connections ?? []),
+			},
 		});
 		return workflow;
 	}

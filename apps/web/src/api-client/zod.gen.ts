@@ -23,6 +23,11 @@ export const zNodeHandleDto = z.object({
     handleKey: z.string()
 });
 
+export const zPosition = z.object({
+    x: z.number(),
+    y: z.number()
+});
+
 export const zLlmNodeDto = z.object({
     id: z.string(),
     type: z.enum([
@@ -33,7 +38,8 @@ export const zLlmNodeDto = z.object({
         'llm'
     ]),
     data: zLlmNodeDataDto,
-    handles: z.array(zNodeHandleDto)
+    handles: z.array(zNodeHandleDto),
+    position: zPosition
 });
 
 export const zTextInputNodeDataDto = z.object({
@@ -50,7 +56,8 @@ export const zTextInputNodeDto = z.object({
         'llm'
     ]),
     data: zTextInputNodeDataDto,
-    handles: z.array(zNodeHandleDto)
+    handles: z.array(zNodeHandleDto),
+    position: zPosition
 });
 
 export const zTextOutputNodeDataDto = z.object({});
@@ -65,7 +72,8 @@ export const zTextOutputNodeDto = z.object({
         'llm'
     ]),
     data: zTextOutputNodeDataDto,
-    handles: z.array(zNodeHandleDto)
+    handles: z.array(zNodeHandleDto),
+    position: zPosition
 });
 
 export const zBasicStartNodeDataDto = z.object({});
@@ -80,7 +88,8 @@ export const zBasicStartNodeDto = z.object({
         'llm'
     ]),
     data: zBasicStartNodeDataDto,
-    handles: z.array(zNodeHandleDto)
+    handles: z.array(zNodeHandleDto),
+    position: zPosition
 });
 
 export const zTextGenerationNodeDataDto = z.object({
@@ -97,10 +106,11 @@ export const zTextGenerationNodeDto = z.object({
         'llm'
     ]),
     data: zTextGenerationNodeDataDto,
-    handles: z.array(zNodeHandleDto)
+    handles: z.array(zNodeHandleDto),
+    position: zPosition
 });
 
-export const zRunWorkloadDto = z.object({
+export const zWorkflowDto = z.object({
     nodes: z.array(z.union([
         zLlmNodeDto,
         zTextInputNodeDto,
@@ -108,23 +118,42 @@ export const zRunWorkloadDto = z.object({
         zBasicStartNodeDto,
         zTextGenerationNodeDto
     ])),
-    connections: z.array(zPipelineConnectionDto)
-});
-
-export const zWorkflowDto = z.object({
     id: z.string(),
     name: z.string(),
     createdAt: z.string().datetime(),
-    updatedAt: z.string().datetime()
+    updatedAt: z.string().datetime(),
+    connections: z.array(zPipelineConnectionDto)
 });
 
 export const zCreateWorkflowDto = z.object({
-    name: z.string()
+    nodes: z.array(z.union([
+        zLlmNodeDto,
+        zTextInputNodeDto,
+        zTextOutputNodeDto,
+        zBasicStartNodeDto,
+        zTextGenerationNodeDto
+    ])).optional(),
+    name: z.string(),
+    connections: z.array(zPipelineConnectionDto).optional()
+});
+
+export const zUpdateWorkflowDto = z.object({
+    nodes: z.array(z.union([
+        zLlmNodeDto,
+        zTextInputNodeDto,
+        zTextOutputNodeDto,
+        zBasicStartNodeDto,
+        zTextGenerationNodeDto
+    ])).optional(),
+    name: z.string().optional(),
+    connections: z.array(zPipelineConnectionDto).optional()
 });
 
 export const zWorkflowControllerRunData = z.object({
-    body: zRunWorkloadDto,
-    path: z.never().optional(),
+    body: z.never().optional(),
+    path: z.object({
+        workflowId: z.string()
+    }),
     query: z.never().optional()
 });
 
@@ -165,3 +194,13 @@ export const zWorkflowControllerFindOneData = z.object({
 });
 
 export const zWorkflowControllerFindOneResponse = zWorkflowDto;
+
+export const zWorkflowControllerUpdateData = z.object({
+    body: zUpdateWorkflowDto,
+    path: z.object({
+        id: z.string()
+    }),
+    query: z.never().optional()
+});
+
+export const zWorkflowControllerUpdateResponse = zWorkflowDto;
