@@ -23,8 +23,8 @@ export class WorkflowService {
 		}
 		// Implementation of the workflow execution logic
 		return this.runnerService.runWorkflow({
-			nodes: instanceToPlain(workflowData.nodes),
-			connections: instanceToPlain(workflowData.connections),
+			nodes: workflowData.nodes,
+			connections: workflowData.connections,
 		});
 	}
 	public getJobStream(jobId: string): Observable<MessageEvent> {

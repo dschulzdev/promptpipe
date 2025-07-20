@@ -5,7 +5,7 @@ import { TextInputNodeDataDto } from "src/workflow/dto/nodes/text-input-node-dat
 import { TextOutputNodeDataDto } from "src/workflow/dto/nodes/text-output-node-data.dto";
 import { NodeTypes } from "src/workflow/dto/nodes.dto";
 import { PipelineNodeDto } from "src/workflow/dto/pipeline-node.dto";
-import { RunWorkloadDto } from "src/workflow/dto/run-workload.dto";
+import { RunWorkloadDto } from "src/workflow/dto/run-workflow.dto";
 
 export type HandleDataResult = {
 	key: string;

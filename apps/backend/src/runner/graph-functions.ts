@@ -1,6 +1,7 @@
+import { instanceToInstance } from "class-transformer";
 import { PipelineConnectionDto } from "src/workflow/dto/pipeline-connection.dto";
 import { PipelineNodeDto } from "src/workflow/dto/pipeline-node.dto";
-import { RunWorkloadDto } from "src/workflow/dto/run-workload.dto";
+import { RunWorkloadDto } from "src/workflow/dto/run-workflow.dto";
 
 /**
  * Checks if a graph, represented by a list of edges, contains a cycle.
@@ -69,6 +70,7 @@ export function hasCycle(edges: PipelineConnectionDto[]): boolean {
 	for (const nodeId of allNodes) {
 		if (!visited.has(nodeId)) {
 			if (dfs(nodeId)) {
+				console.log("nodeId", nodeId);
 				return true; // A cycle was found in one of the components.
 			}
 		}
@@ -79,17 +81,19 @@ export function hasCycle(edges: PipelineConnectionDto[]): boolean {
 }
 
 export function deleteUnlinkedNodes(payload: RunWorkloadDto): RunWorkloadDto {
+	const cleanedPayload = instanceToInstance(payload);
 	const isNodeConnectedMap = new Map<string, boolean>();
-	for (const connection of payload.connections) {
+
+	cleanedPayload.connections.forEach((connection) => {
 		isNodeConnectedMap.set(connection.sourceNodeId, true);
 		isNodeConnectedMap.set(connection.targetNodeId, true);
-	}
+	});
 
 	// Remove unlinked nodes
-	payload.nodes = payload.nodes.filter((node) =>
+	cleanedPayload.nodes = cleanedPayload.nodes.filter((node) =>
 		isNodeConnectedMap.has(node.id),
 	);
-	return payload;
+	return cleanedPayload;
 }
 
 export function isNextNodeAvailable(

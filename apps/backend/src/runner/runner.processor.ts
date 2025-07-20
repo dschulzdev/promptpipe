@@ -6,7 +6,7 @@ import Redis from "ioredis";
 import { ResultAsync } from "neverthrow";
 import { NodeTypes } from "src/workflow/dto/nodes.dto";
 import { PipelineNodeDto } from "src/workflow/dto/pipeline-node.dto";
-import { RunWorkloadDto } from "src/workflow/dto/run-workload.dto";
+import { RunWorkloadDto } from "src/workflow/dto/run-workflow.dto";
 import { AiService } from "../ai/ai.service";
 import { deleteUnlinkedNodes, isNextNodeAvailable } from "./graph-functions";
 import { processNode } from "./node-functions";
@@ -144,7 +144,7 @@ export class RunnerProcessor extends WorkerHost {
 			type: "progress",
 		});
 		const cleanedPayload = deleteUnlinkedNodes(workflowData);
-		const startNode = cleanedPayload.nodes.find(
+		const startNode = workflowData.nodes.find(
 			(node) => node.type === NodeTypes.BASIC_START,
 		);
 		return { cleanedPayload, startNode };
@@ -189,6 +189,7 @@ export class RunnerProcessor extends WorkerHost {
 	@OnWorkerEvent("failed")
 	onFailed(job: Job, err: Error) {
 		console.log(`Job ${job.id} has failed with error: ${err.message}`);
+		console.log(err.stack);
 		const channel = `workflow-progress:${job.id}`;
 		const messagesKey = `workflow-messages:${job.id}`;
 		const message = JSON.stringify({ type: "error", payload: err.message });

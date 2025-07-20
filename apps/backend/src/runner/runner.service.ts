@@ -4,7 +4,7 @@ import { BadRequestException, Injectable, MessageEvent } from "@nestjs/common";
 import { Queue } from "bullmq";
 import Redis from "ioredis";
 import { Observable } from "rxjs";
-import { RunWorkloadDto } from "src/workflow/dto/run-workload.dto";
+import { RunWorkloadDto } from "src/workflow/dto/run-workflow.dto";
 import { hasCycle } from "./graph-functions";
 import { ProgressMessage } from "./progress-message";
 
@@ -24,14 +24,12 @@ export class RunnerService {
 	public async runWorkflow(
 		workflowData: RunWorkloadDto,
 	): Promise<string | undefined> {
-		if (!hasCycle(workflowData.connections)) {
+		if (hasCycle(workflowData.connections)) {
 			throw new BadRequestException(
 				"Workflow contains a cycle. Cycles are currently not supported.",
 			);
 		}
-		const job = await this.workflowRunsQueue.add("workflow_runs", {
-			workflowData,
-		});
+		const job = await this.workflowRunsQueue.add("workflow_runs", workflowData);
 		const isWaiting = await job.isWaiting();
 		if (isWaiting) {
 			console.log(`Job ${job.id} is waiting in the queue.`);
