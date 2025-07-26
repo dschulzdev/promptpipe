@@ -17,12 +17,6 @@ export const zLlmNodeDataDto = z.object({
     ])
 });
 
-export const zNodeHandleDto = z.object({
-    id: z.string(),
-    type: z.object({}),
-    handleKey: z.string()
-});
-
 export const zPosition = z.object({
     x: z.number(),
     y: z.number()
@@ -38,7 +32,6 @@ export const zLlmNodeDto = z.object({
         'llm'
     ]),
     data: zLlmNodeDataDto,
-    handles: z.array(zNodeHandleDto),
     position: zPosition
 });
 
@@ -56,7 +49,6 @@ export const zTextInputNodeDto = z.object({
         'llm'
     ]),
     data: zTextInputNodeDataDto,
-    handles: z.array(zNodeHandleDto),
     position: zPosition
 });
 
@@ -72,7 +64,6 @@ export const zTextOutputNodeDto = z.object({
         'llm'
     ]),
     data: zTextOutputNodeDataDto,
-    handles: z.array(zNodeHandleDto),
     position: zPosition
 });
 
@@ -88,7 +79,6 @@ export const zBasicStartNodeDto = z.object({
         'llm'
     ]),
     data: zBasicStartNodeDataDto,
-    handles: z.array(zNodeHandleDto),
     position: zPosition
 });
 
@@ -106,7 +96,6 @@ export const zTextGenerationNodeDto = z.object({
         'llm'
     ]),
     data: zTextGenerationNodeDataDto,
-    handles: z.array(zNodeHandleDto),
     position: zPosition
 });
 

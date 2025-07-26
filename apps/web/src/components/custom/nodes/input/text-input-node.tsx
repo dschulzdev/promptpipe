@@ -11,7 +11,7 @@ import {
 import { LabeledHandle } from "@/components/labeled-handle";
 import { Input } from "@/components/ui/input";
 import useNodeStore from "@/stores/node-store";
-import type { TextInputNodeData } from "~/workflow/dto/text-input-node-data.dto";
+import type { TextInputNodeData } from "~/workflow/dto/nodes/text-input-node-data.dto";
 
 export type TextInputNodeProps = Node<TextInputNodeData, "text_input">;
 

@@ -18,7 +18,7 @@ import {
 	SelectValue,
 } from "@/components/ui/select";
 import { LLMProviderRenderMap } from "@/constants/llm-providers";
-import type { LLMNodeData } from "~/workflow/dto/nodes.dto";
+import type { LLMNodeData } from "~/workflow/dto/nodes/llm-node-data.dto";
 import { LLM_MODELS } from "../../../../../backend/src/ai/llm-providers";
 
 export type LLMNodeProps = Node<LLMNodeData, "llm">;

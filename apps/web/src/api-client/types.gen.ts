@@ -33,14 +33,6 @@ export type LlmNodeDataDto = {
     llmProvider: 'openai' | 'google_genai';
 };
 
-export type NodeHandleDto = {
-    id: string;
-    type: {
-        [key: string]: unknown;
-    };
-    handleKey: string;
-};
-
 export type Position = {
     x: number;
     y: number;
@@ -50,7 +42,6 @@ export type LlmNodeDto = {
     id: string;
     type: 'text_input' | 'text_output' | 'text_generation' | 'basic_start' | 'llm';
     data: LlmNodeDataDto;
-    handles: Array<NodeHandleDto>;
     position: Position;
 };
 
@@ -62,7 +53,6 @@ export type BasicStartNodeDto = {
     id: string;
     type: 'text_input' | 'text_output' | 'text_generation' | 'basic_start' | 'llm';
     data: BasicStartNodeDataDto;
-    handles: Array<NodeHandleDto>;
     position: Position;
 };
 
@@ -74,7 +64,6 @@ export type TextInputNodeDto = {
     id: string;
     type: 'text_input' | 'text_output' | 'text_generation' | 'basic_start' | 'llm';
     data: TextInputNodeDataDto;
-    handles: Array<NodeHandleDto>;
     position: Position;
 };
 
@@ -86,7 +75,6 @@ export type TextOutputNodeDto = {
     id: string;
     type: 'text_input' | 'text_output' | 'text_generation' | 'basic_start' | 'llm';
     data: TextOutputNodeDataDto;
-    handles: Array<NodeHandleDto>;
     position: Position;
 };
 
@@ -98,7 +86,6 @@ export type TextGenerationNodeDto = {
     id: string;
     type: 'text_input' | 'text_output' | 'text_generation' | 'basic_start' | 'llm';
     data: TextGenerationNodeDataDto;
-    handles: Array<NodeHandleDto>;
     position: Position;
 };
 

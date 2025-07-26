@@ -1,7 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { Type, TypeHelpOptions } from "class-transformer";
 import { IsEnum, IsNumber, IsString, ValidateNested } from "class-validator";
-import { NodeHandleDto } from "./node-handle.dto";
 import { BasicStartNodeDataDto } from "./nodes/basic-start-node-data.dto";
 import { LLMNodeDataDto } from "./nodes/llm-node-data.dto";
 import { TextGenerationNodeDataDto } from "./nodes/text-generation-node-data.dto";
@@ -24,9 +23,6 @@ export class BasePipelineNodeDto {
 	@IsEnum(NodeTypes)
 	@ApiProperty({ enum: NodeTypes })
 	type!: NodeTypes;
-
-	@ValidateNested({ each: true })
-	handles: NodeHandleDto[];
 
 	@ValidateNested()
 	position: Position;

@@ -11,7 +11,7 @@ import {
 import { LabeledHandle } from "@/components/labeled-handle";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import type { TextOutputNodeData } from "~/workflow/dto/text-output-node-data.dto";
+import type { TextOutputNodeData } from "~/workflow/dto/nodes/text-output-node-data.dto";
 
 export type TextOutputNodeProps = Node<TextOutputNodeData, "text_output">;
 

@@ -1,5 +1,5 @@
 import { LoaderCircle } from "lucide-react";
-import { ReactNode } from "react";
+import type { ReactNode } from "react";
 
 import { cn } from "@/lib/utils";
 
@@ -57,7 +57,7 @@ export const BorderLoadingIndicator = ({
         }
       `}
 				</style>
-				<div className="absolute inset-0 overflow-hidden rounded-[7px]">
+				<div className="absolute inset-0 overflow-hidden rounded-[8px]">
 					<div className="spinner rounded-full bg-[conic-gradient(from_0deg_at_50%_50%,_rgb(42,67,233)_0deg,_rgba(42,138,246,0)_360deg)]" />
 				</div>
 			</div>
@@ -77,7 +77,7 @@ const StatusBorder = ({
 		<>
 			<div
 				className={cn(
-					"-left-[1px] -top-[1px] absolute h-[calc(100%+2px)] w-[calc(100%+2px)] rounded-[7px] border-2",
+					"-left-[1px] -top-[1px] absolute h-[calc(100%+2px)] w-[calc(100%+2px)] rounded-[8px] border-2",
 					className,
 				)}
 			/>

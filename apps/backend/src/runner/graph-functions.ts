@@ -100,10 +100,13 @@ export function isNextNodeAvailable(
 	payload: RunWorkloadDto,
 	currentNode: PipelineNodeDto,
 ): boolean {
+	console.log(payload);
+	console.log(
+		`Checking if next node is available for current node ${currentNode.id}`,
+	);
+
 	const nextConnections = payload.connections.filter(
-		(connection) =>
-			connection.sourceNodeHandleId in
-			currentNode.handles.map((handle) => handle.id),
+		(connection) => connection.targetNodeId === currentNode.id,
 	);
 	return nextConnections.length > 0;
 }

@@ -1,33 +1,22 @@
 import {
 	Background,
 	BackgroundVariant,
+	type Connection,
 	Controls,
+	type Edge,
+	type EdgeTypes,
+	getOutgoers,
 	MiniMap,
+	type Node,
 	Panel,
 	ReactFlow,
 } from "@xyflow/react";
-import { FileIcon, Menu, SidebarClose } from "lucide-react";
+import { useCallback } from "react";
 import { useShallow } from "zustand/react/shallow";
 import { nodeTypes } from "@/constants/node_types";
 import { useJobUpdates } from "@/hooks/use-job-updates";
 import type { NodeActions, NodeState } from "@/stores/node-store";
 import useNodeStore from "@/stores/node-store";
-import { Button } from "../ui/button";
-import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuGroup,
-	DropdownMenuItem,
-	DropdownMenuLabel,
-	DropdownMenuPortal,
-	DropdownMenuSeparator,
-	DropdownMenuShortcut,
-	DropdownMenuSub,
-	DropdownMenuSubContent,
-	DropdownMenuSubTrigger,
-	DropdownMenuTrigger,
-} from "../ui/dropdown-menu";
-import { SidebarTrigger } from "../ui/sidebar";
 import FileMenu from "./nodes/panels/file-menu";
 import SidebarToggle from "./nodes/panels/sidebar-toggle";
 import {
@@ -46,6 +35,41 @@ export default function PromptpipeWhiteboard() {
 	});
 	const { nodes, edges, onNodesChange, onEdgesChange, onConnect } =
 		useNodeStore(useShallow(selector));
+
+	const isValidConnection = useCallback(
+		(connection: Edge | Connection) => {
+			// we are using getNodes and getEdges helpers here
+			// to make sure we create isValidConnection function only once
+			const target = nodes.find((node) => node.id === connection.target);
+			const source = nodes.find((node) => node.id === connection.source);
+			if (!source || !target) {
+				return false;
+			}
+			if (target.id === connection.source) return false;
+
+			if (target.type === "llm" && connection.sourceHandle !== "llm") {
+				return false;
+			}
+
+			if (connection.sourceHandle === "llm" && target.type !== "llm") {
+				return false;
+			}
+
+			const hasCycle = (node: Node, visited = new Set()) => {
+				if (visited.has(node.id)) return false;
+
+				visited.add(node.id);
+
+				for (const outgoer of getOutgoers(node, nodes, edges)) {
+					if (outgoer.id === connection.source) return true;
+					if (hasCycle(outgoer, visited)) return true;
+				}
+			};
+
+			return !hasCycle(target);
+		},
+		[nodes, edges],
+	);
 	return (
 		<ReactFlow
 			nodes={nodes}
@@ -54,8 +78,8 @@ export default function PromptpipeWhiteboard() {
 			onNodesChange={onNodesChange}
 			onEdgesChange={onEdgesChange}
 			onConnect={onConnect}
+			isValidConnection={isValidConnection}
 			fitView
-			snapToGrid
 		>
 			<Controls />
 			<Panel position={"top-left"}>

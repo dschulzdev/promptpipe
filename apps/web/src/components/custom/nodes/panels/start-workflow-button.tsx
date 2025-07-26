@@ -27,7 +27,6 @@ function StartWorkflowButton() {
 			toast.error("Workflow ID is not available.");
 			return;
 		}
-		// TODO: Pass the actual workflow data here
 		mutate(
 			{
 				path: {
@@ -45,7 +44,7 @@ function StartWorkflowButton() {
 				},
 			},
 		);
-	}, [mutate, setLocalWorkflowId]);
+	}, [mutate, setLocalWorkflowId, id]);
 	return (
 		<Button
 			size={"icon"}

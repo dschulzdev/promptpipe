@@ -68,6 +68,18 @@ export class RunnerProcessor extends WorkerHost {
 			);
 		}
 
+		this.publishProgress(jobId, "log", {
+			log: "Step 2: Processing data...",
+			type: "progress",
+		});
+		await new Promise((res) => setTimeout(res, 2000));
+
+		this.publishProgress(jobId, "log", {
+			log: "Step 3: Running graph...",
+			type: "progress",
+		});
+		await new Promise((res) => setTimeout(res, 1500));
+
 		await ResultAsync.fromPromise(
 			this.runGraph(startNode as PipelineNodeDto, jobId, cleanedPayload),
 			(error) => {
@@ -88,10 +100,13 @@ export class RunnerProcessor extends WorkerHost {
 		jobId: string,
 		cleanedPayload: RunWorkloadDto,
 	) {
-		let currentNode: PipelineNodeDto = startNode;
+		let currentNode: PipelineNodeDto | undefined = startNode;
 		// biome-ignore lint/suspicious/noExplicitAny: We need to use any here to allow dynamic typing
 		const nodeOutputMap = new Map<string, any>();
-		while (isNextNodeAvailable(cleanedPayload, currentNode)) {
+		while (currentNode) {
+			this.logger.log(
+				`Processing node ${currentNode.id} of type ${currentNode.type}`,
+			);
 			this.publishProgress(jobId, "log", {
 				log: `Processing node ${currentNode.id}`,
 				type: "progress",
@@ -116,9 +131,7 @@ export class RunnerProcessor extends WorkerHost {
 			});
 
 			const nextNode = this.getNextNode(currentNode.id, cleanedPayload);
-			if (!nextNode) {
-				break;
-			}
+			this.logger.log(`Next node found:${nextNode?.id}`);
 			currentNode = nextNode;
 		}
 	}
@@ -128,13 +141,13 @@ export class RunnerProcessor extends WorkerHost {
 		payload: RunWorkloadDto,
 	): PipelineNodeDto | undefined {
 		const nextConnection = payload.connections.find(
-			(connection) => connection.sourceNodeId === currentNodeId,
+			(connection) => connection.targetNodeId === currentNodeId,
 		);
 		if (!nextConnection) {
 			return undefined;
 		}
 		return payload.nodes.find(
-			(node) => node.id === nextConnection.targetNodeId,
+			(node) => node.id === nextConnection.sourceNodeId,
 		);
 	}
 
