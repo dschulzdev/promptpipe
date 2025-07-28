@@ -4,7 +4,6 @@ import { ArrowLeft, Loader2, Menu, Save } from "lucide-react";
 import { memo } from "react";
 import { toast } from "sonner";
 import { workflowControllerUpdateMutation } from "@/api-client/@tanstack/react-query.gen";
-import type { NodeHandleDto } from "@/api-client/types.gen";
 import { Button } from "@/components/ui/button";
 import {
 	DropdownMenu,
@@ -62,12 +61,6 @@ function FileMenu() {
 										type: n.type as NodeType,
 										data: n.data,
 										position: n.position,
-										handles:
-											n.handles?.map<NodeHandleDto>((h) => ({
-												// biome-ignore lint/style/noNonNullAssertion: has to exist here
-												id: h.id!,
-												type: h.type,
-											})) ?? [],
 									})),
 									connections: connections.map((c) => ({
 										id: c.id,

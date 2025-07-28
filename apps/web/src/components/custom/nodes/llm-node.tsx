@@ -18,12 +18,14 @@ import {
 	SelectValue,
 } from "@/components/ui/select";
 import { LLMProviderRenderMap } from "@/constants/llm-providers";
+import useNodeStore from "@/stores/node-store";
 import type { LLMNodeData } from "~/workflow/dto/nodes/llm-node-data.dto";
 import { LLM_MODELS } from "../../../../../backend/src/ai/llm-providers";
 
 export type LLMNodeProps = Node<LLMNodeData, "llm">;
 
-function LLMNode({ data }: NodeProps<LLMNodeProps>) {
+function LLMNode({ id, data }: NodeProps<LLMNodeProps>) {
+	const updateNode = useNodeStore((state) => state.updateNode);
 	const models = LLM_MODELS[data.llmProvider];
 	const renderData = LLMProviderRenderMap[data.llmProvider];
 	return (
@@ -33,7 +35,16 @@ function LLMNode({ data }: NodeProps<LLMNodeProps>) {
 				<BaseNodeHeaderTitle>{renderData.title}</BaseNodeHeaderTitle>
 			</BaseNodeHeader>
 			<BaseNodeContent>
-				<Select defaultValue={models[0]}>
+				<Select
+					defaultValue={data.llmModel}
+					value={data.llmModel}
+					onValueChange={(value) => {
+						updateNode(id, {
+							...data,
+							llmModel: value,
+						});
+					}}
+				>
 					<SelectTrigger className="w-full">
 						<SelectValue placeholder="Select a model" />
 					</SelectTrigger>

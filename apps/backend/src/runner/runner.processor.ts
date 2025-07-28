@@ -102,7 +102,7 @@ export class RunnerProcessor extends WorkerHost {
 	) {
 		let currentNode: PipelineNodeDto | undefined = startNode;
 		// biome-ignore lint/suspicious/noExplicitAny: We need to use any here to allow dynamic typing
-		const nodeOutputMap = new Map<string, any>();
+		const nodeHandleOutputMap = new Map<string, any>();
 		while (currentNode) {
 			this.logger.log(
 				`Processing node ${currentNode.id} of type ${currentNode.type}`,
@@ -114,14 +114,14 @@ export class RunnerProcessor extends WorkerHost {
 			const results = await processNode(
 				currentNode,
 				cleanedPayload,
-				nodeOutputMap,
+				nodeHandleOutputMap,
 				this.aiService,
 			);
 			for (const entry of results) {
 				if (!entry) {
 					continue;
 				}
-				nodeOutputMap.set(entry.key, {
+				nodeHandleOutputMap.set(entry.key, {
 					data: entry.data,
 				});
 			}

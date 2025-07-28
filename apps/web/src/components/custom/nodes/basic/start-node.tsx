@@ -15,7 +15,7 @@ export type BasicStartNodeProps = Node<BasicStartNodeData, "basic_start">;
 
 function BasicStartNode(_props: NodeProps<BasicStartNodeProps>) {
 	return (
-		<NodeStatusIndicator status="loading" variant="border">
+		<NodeStatusIndicator status="initial" variant="border">
 			<BaseNode className="w-32">
 				<BaseNodeHeader>
 					<PlayCircle className="h-4 w-4 text-neutral-500" />

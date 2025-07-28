@@ -1,10 +1,12 @@
 import type { GoogleGenerativeAIProvider } from "@ai-sdk/google";
 import type { OpenAIProvider } from "@ai-sdk/openai";
-import { Inject, Injectable } from "@nestjs/common";
-import { generateText, LanguageModel } from "ai";
-
-//type LooseToStrict<T> = T extends any ? (string extends T ? never : T) : never;
-//type OpenAiModels = LooseToStrict<Parameters<typeof openai>[0]>;
+import { Inject, Injectable, Logger } from "@nestjs/common";
+import {
+	generateObject,
+	generateText,
+	LanguageModel,
+	UserModelMessage,
+} from "ai";
 
 type SelectedOpenAiModel = "gpt-4.1-mini" | "gpt-4o-mini" | "gpt-4.1-nano";
 type SelectedGoogleGenAIModel =
@@ -14,6 +16,7 @@ type SelectedGoogleGenAIModel =
 
 @Injectable()
 export class AiService {
+	private readonly logger = new Logger(AiService.name);
 	constructor(
 		@Inject("OPENAI_CLIENT") private openaiClient: OpenAIProvider,
 		@Inject("GOOGLE_CLIENT") private googleClient: GoogleGenerativeAIProvider,
@@ -28,7 +31,7 @@ export class AiService {
 					model: SelectedOpenAiModel;
 			  }
 			| {
-					provider: "google";
+					provider: "google_genai";
 					model: SelectedGoogleGenAIModel;
 			  };
 	}): LanguageModel {
@@ -37,7 +40,7 @@ export class AiService {
 			case "openai":
 				llm_client = this.openaiClient;
 				break;
-			case "google":
+			case "google_genai":
 				llm_client = this.googleClient;
 				break;
 			default:
@@ -51,11 +54,29 @@ export class AiService {
 		prompt,
 	}: {
 		modelConfig: LanguageModel;
-		prompt: string;
+		prompt: UserModelMessage;
 	}) {
-		return await generateText({
+		const response = await generateText({
 			model: modelConfig,
-			prompt,
+			prompt: [prompt],
 		});
+		this.logger.log("Generated response: ", response.content);
+		return response;
+	}
+
+	async getStructuredResponse({
+		modelConfig,
+		prompt,
+	}: {
+		modelConfig: LanguageModel;
+		prompt: UserModelMessage;
+	}): Promise<ReturnType<typeof generateObject>> {
+		const response = await generateObject({
+			model: modelConfig,
+			prompt: [prompt],
+			output: "no-schema",
+		});
+		this.logger.log("Generated response: ", response.object);
+		return response;
 	}
 }

@@ -1,10 +1,13 @@
+import { UserModelMessage } from "ai";
 import { AiService } from "src/ai/ai.service";
-import { LLMNodeDataDto } from "src/workflow/dto/nodes/llm-node-data.dto";
-import { TextGenerationNodeDataDto } from "src/workflow/dto/nodes/text-generation-node-data.dto";
-import { TextInputNodeDataDto } from "src/workflow/dto/nodes/text-input-node-data.dto";
-import { TextOutputNodeDataDto } from "src/workflow/dto/nodes/text-output-node-data.dto";
 import { NodeTypes } from "src/workflow/dto/nodes.dto";
-import { PipelineNodeDto } from "src/workflow/dto/pipeline-node.dto";
+import {
+	LlmNodeDto,
+	PipelineNodeDto,
+	TextGenerationNodeDto,
+	TextInputNodeDto,
+	TextOutputNodeDto,
+} from "src/workflow/dto/pipeline-node.dto";
 import { RunWorkloadDto } from "src/workflow/dto/run-workflow.dto";
 
 export type HandleDataResult = {
@@ -13,51 +16,155 @@ export type HandleDataResult = {
 	data: any;
 };
 
-export function processLLMNodeHandles(
-	node: LLMNodeDataDto,
-	workflowData: RunWorkloadDto,
-	aiService: AiService,
-) {
+export type NodeOutputMap = Map<
+	HandleDataResult["key"],
+	HandleDataResult["data"]
+>;
+
+export function processLLMNodeHandles(node: LlmNodeDto) {
 	// Implement the logic to process LLM node handles
-	return [];
+	return {
+		model: node.data.llmModel,
+		provider: node.data.llmProvider,
+	};
 }
 
-export function processTextInputNodeHandles(
-	node: TextInputNodeDataDto,
-	workflowData: RunWorkloadDto,
-) {
-	return [];
+export function processTextInputNodeHandles(node: TextInputNodeDto) {
+	return {
+		role: "user",
+		content: node.data.prompt,
+	} as UserModelMessage;
 }
 
 export function processTextOutputNodeHandles(
-	node: TextOutputNodeDataDto,
+	node: TextOutputNodeDto,
 	workflowData: RunWorkloadDto,
+	nodeHandleOutputMap: NodeOutputMap,
 ) {
-	return [];
+	const connectionTargetId = workflowData.connections.find((connection) => {
+		return connection.sourceNodeId === node.id;
+	})?.targetNodeId;
+
+	if (!connectionTargetId) {
+		return "";
+	}
+	return nodeHandleOutputMap.get(connectionTargetId)?.data || "";
 }
 
-export function processTextGenerationNodeHandles(
-	node: TextGenerationNodeDataDto,
+export async function processTextGenerationNodeHandles(
+	node: TextGenerationNodeDto,
 	workflowData: RunWorkloadDto,
+	nodeHandleOutputMap: NodeOutputMap,
+	aiService: AiService,
 ) {
+	const connectionTargetId = workflowData.connections
+		.filter((connection) => {
+			return connection.sourceNodeId === node.id;
+		})
+		?.map((connection) => connection.targetNodeId);
+	for (const targetId of connectionTargetId) {
+		if (!nodeHandleOutputMap.has(targetId)) {
+			const parentNode = workflowData.nodes.find((n) => n.id === targetId);
+			if (!parentNode) {
+				throw new Error(`Parent node with ID ${targetId} not found`);
+			}
+			const results = await processNode(
+				parentNode,
+				workflowData,
+				nodeHandleOutputMap,
+				aiService,
+			);
+
+			for (const entry of results) {
+				if (!entry) {
+					continue;
+				}
+				nodeHandleOutputMap.set(entry.key, {
+					data: entry.data,
+				});
+			}
+		}
+	}
+	const llmProviderId = workflowData.connections.find((connection) => {
+		return (
+			connection.sourceNodeId === node.id &&
+			connection.sourceNodeHandleId === "llm"
+		);
+	});
+	const promptId = workflowData.connections.find((connection) => {
+		return (
+			connection.sourceNodeId === node.id &&
+			connection.sourceNodeHandleId === "prompt"
+		);
+	});
+	// biome-ignore lint/style/noNonNullAssertion: should be there
+	const llmProvider = nodeHandleOutputMap.get(llmProviderId!.targetNodeId);
+	// biome-ignore lint/style/noNonNullAssertion: should be there
+	const prompt = nodeHandleOutputMap.get(promptId!.targetNodeId);
+	console.log("LLM Provider:", llmProvider);
+	console.log("Prompt:", prompt);
+	const llmClient = aiService.getLLMProvider({ modelConfig: llmProvider.data });
+	if (node.data.json_mode) {
+		const response = await aiService.getStructuredResponse({
+			modelConfig: llmClient,
+			prompt: prompt.data,
+		});
+		console.log("Response from LLM:", response);
+		nodeHandleOutputMap.set(node.id, {
+			data: response.object,
+		});
+	} else {
+		const response = await aiService.getResponse({
+			modelConfig: llmClient,
+			prompt: prompt.data,
+		});
+		console.log("Response from LLM:", response);
+		nodeHandleOutputMap.set(node.id, {
+			data: response.content,
+		});
+	}
 	return [];
 }
 
 export const processNode = async (
 	node: PipelineNodeDto,
 	workflowData: RunWorkloadDto,
-	nodeOutputMap: Map<string, any>,
+	nodeHandleOutputMap: NodeOutputMap,
 	aiService: AiService,
 ): Promise<Array<HandleDataResult>> => {
 	switch (node.type) {
 		case NodeTypes.LLM:
-			return processLLMNodeHandles(node.data, workflowData, aiService);
+			return [
+				{
+					key: node.id,
+					data: processLLMNodeHandles(node),
+				},
+			];
 		case NodeTypes.TEXT_INPUT:
-			return processTextInputNodeHandles(node.data, workflowData);
+			return [
+				{
+					key: node.id,
+					data: processTextInputNodeHandles(node),
+				},
+			];
 		case NodeTypes.TEXT_OUTPUT:
-			return processTextOutputNodeHandles(node.data, workflowData);
+			return [
+				{
+					key: node.id,
+					data: processTextOutputNodeHandles(
+						node,
+						workflowData,
+						nodeHandleOutputMap,
+					),
+				},
+			];
 		case NodeTypes.TEXT_GENERATION:
-			return processTextGenerationNodeHandles(node.data, workflowData);
+			return processTextGenerationNodeHandles(
+				node,
+				workflowData,
+				nodeHandleOutputMap,
+				aiService,
+			);
 	}
 	return [];
 };

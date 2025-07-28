@@ -14,6 +14,14 @@ export const zLlmNodeDataDto = z.object({
     llmProvider: z.enum([
         'openai',
         'google_genai'
+    ]),
+    llmModel: z.enum([
+        'gemini-2.5-flash',
+        'gemini-2.0-flash',
+        'gemini-2.0-flash-lite',
+        '4.1-mini',
+        '4.1-nano',
+        '4o-mini'
     ])
 });
 

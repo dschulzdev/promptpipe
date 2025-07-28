@@ -31,6 +31,7 @@ export type UpdateWorkflowDto = {
 
 export type LlmNodeDataDto = {
     llmProvider: 'openai' | 'google_genai';
+    llmModel: 'gemini-2.5-flash' | 'gemini-2.0-flash' | 'gemini-2.0-flash-lite' | '4.1-mini' | '4.1-nano' | '4o-mini';
 };
 
 export type Position = {

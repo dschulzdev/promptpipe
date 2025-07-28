@@ -7,3 +7,5 @@
 - Migrate Ai calls from generation to streaming
 - Upgrade to stable AI Sdk
 - Add splitting of nodes
+- Make JSON Mode working
+

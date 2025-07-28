@@ -16,8 +16,11 @@ import type { TextInputNodeProps } from "@/components/custom/nodes/input/text-in
 import type { LLMNodeProps } from "@/components/custom/nodes/llm-node";
 import type { TextOutputNodeProps } from "@/components/custom/nodes/output/text-output-node";
 import type { NodeInputData } from "@/constants/node_types";
-import type { LLMProvider } from "~/ai/llm-providers";
-import type { PipelineNodeDto } from "../../../backend/dist/src/workflow/dto/pipeline-node.dto";
+import {
+	LLM_MODELS,
+	type LLMProvider,
+} from "../../../backend/src/ai/llm-providers";
+import type { PipelineNodeDto } from "../../../backend/src/workflow/dto/pipeline-node.dto";
 
 export type AppNode = Node<NodeInputData>;
 
@@ -157,6 +160,7 @@ const useNodeStore = create<NodeState & NodeActions>((set, get) => ({
 			type: "llm",
 			data: {
 				llmProvider: provider,
+				llmModel: LLM_MODELS[provider][0], // Default to the first model for the provider],
 			},
 			position: generateRandomStartPosition(),
 		};
