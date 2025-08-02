@@ -56,7 +56,6 @@ function Backdrop({ id }: { id: string }) {
 	useEffect(() => {
 		if (isSuccess && data) {
 			// TODO: Fix types
-			console.log(data);
 			initData(data.nodes as unknown as PipelineNodeDto[], data.connections);
 		}
 	}, [isSuccess, initData, data]);

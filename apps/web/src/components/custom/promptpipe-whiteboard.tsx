@@ -4,7 +4,6 @@ import {
 	type Connection,
 	Controls,
 	type Edge,
-	type EdgeTypes,
 	getOutgoers,
 	MiniMap,
 	type Node,

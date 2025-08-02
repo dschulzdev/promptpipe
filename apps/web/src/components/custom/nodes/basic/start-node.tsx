@@ -9,13 +9,17 @@ import {
 } from "@/components/base-node";
 import { LabeledHandle } from "@/components/labeled-handle";
 import { NodeStatusIndicator } from "@/components/node-status-indicator";
+import type { LoadingStateMixin } from "@/stores/node-store";
 import type { BasicStartNodeData } from "~/workflow/dto/nodes/basic-start-node-data.dto";
 
-export type BasicStartNodeProps = Node<BasicStartNodeData, "basic_start">;
+export type BasicStartNodeProps = Node<
+	BasicStartNodeData & LoadingStateMixin,
+	"basic_start"
+>;
 
-function BasicStartNode(_props: NodeProps<BasicStartNodeProps>) {
+function BasicStartNode(props: NodeProps<BasicStartNodeProps>) {
 	return (
-		<NodeStatusIndicator status="initial" variant="border">
+		<NodeStatusIndicator status={props.data.state} variant="border">
 			<BaseNode className="w-32">
 				<BaseNodeHeader>
 					<PlayCircle className="h-4 w-4 text-neutral-500" />

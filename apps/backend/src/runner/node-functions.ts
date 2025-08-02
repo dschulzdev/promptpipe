@@ -23,6 +23,11 @@ export type NodeOutputMap = Map<
 
 export function processLLMNodeHandles(node: LlmNodeDto) {
 	// Implement the logic to process LLM node handles
+	if (!node.data.llmModel || !node.data.llmProvider) {
+		throw new Error(
+			"LLM node missing required model or provider configuration",
+		);
+	}
 	return {
 		model: node.data.llmModel,
 		provider: node.data.llmProvider,
@@ -30,10 +35,12 @@ export function processLLMNodeHandles(node: LlmNodeDto) {
 }
 
 export function processTextInputNodeHandles(node: TextInputNodeDto) {
-	return {
-		role: "user",
-		content: node.data.prompt,
-	} as UserModelMessage;
+	return [
+		{
+			role: "user",
+			content: node.data.prompt,
+		},
+	] satisfies UserModelMessage[];
 }
 
 export function processTextOutputNodeHandles(
@@ -48,7 +55,9 @@ export function processTextOutputNodeHandles(
 	if (!connectionTargetId) {
 		return "";
 	}
-	return nodeHandleOutputMap.get(connectionTargetId)?.data || "";
+	return {
+		response: nodeHandleOutputMap.get(connectionTargetId)?.data || "",
+	};
 }
 
 export async function processTextGenerationNodeHandles(
@@ -97,33 +106,34 @@ export async function processTextGenerationNodeHandles(
 			connection.sourceNodeHandleId === "prompt"
 		);
 	});
-	// biome-ignore lint/style/noNonNullAssertion: should be there
-	const llmProvider = nodeHandleOutputMap.get(llmProviderId!.targetNodeId);
-	// biome-ignore lint/style/noNonNullAssertion: should be there
-	const prompt = nodeHandleOutputMap.get(promptId!.targetNodeId);
-	console.log("LLM Provider:", llmProvider);
-	console.log("Prompt:", prompt);
-	const llmClient = aiService.getLLMProvider({ modelConfig: llmProvider.data });
-	if (node.data.json_mode) {
-		const response = await aiService.getStructuredResponse({
-			modelConfig: llmClient,
-			prompt: prompt.data,
-		});
-		console.log("Response from LLM:", response);
-		nodeHandleOutputMap.set(node.id, {
-			data: response.object,
-		});
-	} else {
-		const response = await aiService.getResponse({
-			modelConfig: llmClient,
-			prompt: prompt.data,
-		});
-		console.log("Response from LLM:", response);
-		nodeHandleOutputMap.set(node.id, {
-			data: response.content,
-		});
+
+	if (!llmProviderId) {
+		throw new Error(`LLM provider connection not found for node ${node.id}`);
 	}
-	return [];
+	if (!promptId) {
+		throw new Error(`Prompt connection not found for node ${node.id}`);
+	}
+
+	const llmProvider = nodeHandleOutputMap.get(llmProviderId.targetNodeId);
+	const messages = nodeHandleOutputMap.get(promptId.targetNodeId);
+
+	if (!llmProvider || !llmProvider.data) {
+		throw new Error(
+			`LLM provider data not found for target ${llmProviderId.targetNodeId}`,
+		);
+	}
+	if (!messages || !messages.data) {
+		throw new Error(
+			`Messages data not found for target ${promptId.targetNodeId}`,
+		);
+	}
+
+	const response = await aiService.getResponse({
+		modelConfig: aiService.getLLMProvider({ modelConfig: llmProvider.data }),
+		messages: messages.data,
+	});
+	nodeHandleOutputMap.set(node.id, response);
+	return response;
 }
 
 export const processNode = async (
@@ -159,12 +169,18 @@ export const processNode = async (
 				},
 			];
 		case NodeTypes.TEXT_GENERATION:
-			return processTextGenerationNodeHandles(
-				node,
-				workflowData,
-				nodeHandleOutputMap,
-				aiService,
-			);
+			return [
+				{
+					key: node.id,
+					data: await processTextGenerationNodeHandles(
+						node,
+						workflowData,
+						nodeHandleOutputMap,
+						aiService,
+					),
+				},
+			];
+		default:
+			throw new Error(`Unsupported node type: ${node.type}`);
 	}
-	return [];
 };

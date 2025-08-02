@@ -59,7 +59,10 @@ function FileMenu() {
 										id: n.id,
 										// TODO: fix assertion (sad i have to do it this way rn)
 										type: n.type as NodeType,
-										data: n.data,
+										data: {
+											...n.data,
+											state: undefined,
+										},
 										position: n.position,
 									})),
 									connections: connections.map((c) => ({

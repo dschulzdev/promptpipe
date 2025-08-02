@@ -1,7 +1,13 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo } from "react";
 import { useShallow } from "zustand/react/shallow";
+import useNodeStore from "@/stores/node-store";
 import useRunnerStore from "@/stores/runner-store";
+import type {
+	ProgressMessage,
+	ProgressMessageWithType,
+	ProgressType,
+} from "../../../backend/src/runner/progress-message";
 import { workflowControllerStreamUpdatesOptions } from "../api-client/@tanstack/react-query.gen";
 
 export const useJobUpdates = () => {
@@ -23,14 +29,19 @@ export const useJobUpdates = () => {
 			},
 		}).queryKey;
 	}, [currentRunId]);
-	const { data, error } = useQuery({
+	const updateNode = useNodeStore(useShallow((state) => state.updateNode));
+	const { data, error } = useQuery<
+		ProgressMessageWithType[],
+		Error,
+		ProgressMessageWithType[]
+	>({
 		enabled: !!currentRunId,
 		staleTime: Number.POSITIVE_INFINITY,
 		queryKey,
 		initialData: [],
 		queryFn: () => {
 			console.log("Fetching job updates for run ID:", currentRunId);
-			return [] as unknown[];
+			return [] as ProgressMessageWithType[];
 		},
 	});
 	const queryClient = useQueryClient();
@@ -40,9 +51,11 @@ export const useJobUpdates = () => {
 		if (
 			!currentRunId ||
 			connectedToUpdateStream ||
-			(data.length > 0 &&
-				// @ts-ignore When the last log is a done type, the stream was finished and should not be resubscribed
-				["result", "error", "done"].includes(data[data.length - 1].type))
+			(data &&
+				data.length > 0 &&
+				["result_success", "result_fail", "error", "done"].includes(
+					data[data.length - 1]?.type,
+				))
 		) {
 			console.log(
 				"No current run ID or already running, skipping SSE connection and reading from cache.",
@@ -57,15 +70,70 @@ export const useJobUpdates = () => {
 		eventSource.addEventListener("open", () => {
 			console.log("SSE connection opened");
 			setConnectedToUpdateStream(true);
+			useNodeStore.setState((state) => ({
+				nodes: state.nodes.map((node) => ({
+					...node,
+					data: {
+						...node.data,
+						state: "initial",
+					},
+				})),
+			}));
 		});
 
 		eventSource.addEventListener("message", (event) => {
-			const queryData = event.data && JSON.parse(event.data);
+			let queryData: {
+				type: ProgressType;
+				payload: ProgressMessage;
+			};
+			try {
+				queryData = event.data && JSON.parse(event.data);
+			} catch (error) {
+				console.error("Failed to parse SSE message:", error);
+				return;
+			}
+
 			queryClient.setQueriesData({ queryKey: queryKey }, (old) => [
 				...(old as unknown[]),
 				queryData,
 			]);
-			if (queryData && ["result", "error", "done"].includes(queryData.type)) {
+			if (queryData.type === "progress_node") {
+				if (queryData.payload.payload?.nodeId) {
+					updateNode(queryData.payload.payload?.nodeId, {
+						state: "loading",
+					});
+				}
+			}
+			if (queryData.type === "success_node") {
+				if (queryData.payload.payload?.nodeId) {
+					console.log("Node success:", queryData.payload.payload.data);
+					updateNode(queryData.payload.payload.nodeId, {
+						state: "success",
+						...(queryData.payload.payload.data ?? undefined),
+					});
+				}
+			}
+			if (
+				queryData &&
+				["result_success", "result_fail", "error", "done"].includes(
+					queryData.type,
+				)
+			) {
+				const nodes = useNodeStore.getState().nodes;
+				useNodeStore.setState({
+					nodes: nodes.map((node) => ({
+						...node,
+						data: {
+							...node.data,
+							state:
+								node.data.state === "loading"
+									? queryData.type === "result_success"
+										? "success"
+										: "error"
+									: node.data.state,
+						},
+					})),
+				});
 				eventSource.close();
 				setConnectedToUpdateStream(false);
 				stopWorkflow();

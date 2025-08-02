@@ -2,10 +2,11 @@ import type { GoogleGenerativeAIProvider } from "@ai-sdk/google";
 import type { OpenAIProvider } from "@ai-sdk/openai";
 import { Inject, Injectable, Logger } from "@nestjs/common";
 import {
+	AssistantModelMessage,
 	generateObject,
 	generateText,
 	LanguageModel,
-	UserModelMessage,
+	ModelMessage,
 } from "ai";
 
 type SelectedOpenAiModel = "gpt-4.1-mini" | "gpt-4o-mini" | "gpt-4.1-nano";
@@ -51,32 +52,42 @@ export class AiService {
 
 	async getResponse({
 		modelConfig,
-		prompt,
+		messages,
 	}: {
 		modelConfig: LanguageModel;
-		prompt: UserModelMessage;
+		messages: ModelMessage[];
 	}) {
+		this.logger.log("Generating response with:", messages);
 		const response = await generateText({
 			model: modelConfig,
-			prompt: [prompt],
+			messages: messages,
 		});
-		this.logger.log("Generated response: ", response.content);
-		return response;
+		this.logger.log("Generated response: ", response.text);
+		const outputMessage: AssistantModelMessage = {
+			role: "assistant",
+			content: response.text,
+		};
+		return [...messages, outputMessage];
 	}
 
 	async getStructuredResponse({
 		modelConfig,
-		prompt,
+		messages,
 	}: {
 		modelConfig: LanguageModel;
-		prompt: UserModelMessage;
-	}): Promise<ReturnType<typeof generateObject>> {
+		messages: ModelMessage[];
+	}): Promise<ModelMessage[]> {
+		this.logger.log("Generating response with:", messages);
 		const response = await generateObject({
 			model: modelConfig,
-			prompt: [prompt],
+			messages: messages,
 			output: "no-schema",
 		});
 		this.logger.log("Generated response: ", response.object);
-		return response;
+		const outputMessage: AssistantModelMessage = {
+			role: "assistant",
+			content: JSON.stringify(response.object),
+		};
+		return [...messages, outputMessage];
 	}
 }

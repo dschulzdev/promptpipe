@@ -1,12 +1,20 @@
-import { NodeDataOutputDto } from "src/workflow/dto/nodes/node-data-output.dto";
-
-export type ProgressMessage = {
-	type: "progress" | "success_node" | "result";
-	payload?: NodeDataOutputDto;
+export type ProgressMessage<T = unknown> = {
+	payload?: {
+		nodeId: string;
+		data?: T;
+	};
 	log: string;
 };
 
-export type ResultMessage = ProgressMessage & {
-	type: "result";
-	result: "success" | "fail";
+export type ProgressMessageWithType = {
+	type: ProgressType;
+	payload: ProgressMessage;
 };
+
+export type ProgressType =
+	| "log"
+	| "progress_node"
+	| "success_node"
+	| "result_success"
+	| "result_fail"
+	| "fail_node";

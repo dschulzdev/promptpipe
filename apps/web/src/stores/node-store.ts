@@ -29,6 +29,10 @@ export type NodeState = {
 	edges: Edge[];
 };
 
+export type LoadingStateMixin = {
+	state: "initial" | "loading" | "success" | "error";
+};
+
 export type NodeActions = {
 	initData: (
 		nodes: PipelineNodeDto[],
@@ -58,7 +62,10 @@ const useNodeStore = create<NodeState & NodeActions>((set, get) => ({
 		const transformedNodes: AppNode[] = nodes.map((node) => ({
 			id: node.id,
 			type: node.type,
-			data: node.data,
+			data: {
+				...node.data,
+				state: "initial",
+			},
 			position: node.position,
 		}));
 		const transformedConnections: Edge[] = connections.map((connection) => ({
@@ -109,6 +116,7 @@ const useNodeStore = create<NodeState & NodeActions>((set, get) => ({
 			id: crypto.randomUUID(),
 			type: "text_input",
 			data: {
+				state: "initial",
 				prompt: "Why is the banana yellow?",
 			},
 			position: generateRandomStartPosition(),
@@ -121,7 +129,9 @@ const useNodeStore = create<NodeState & NodeActions>((set, get) => ({
 		const newNode: BasicStartNodeProps = {
 			id: crypto.randomUUID(),
 			type: "basic_start",
-			data: {},
+			data: {
+				state: "initial",
+			},
 			position: generateRandomStartPosition(),
 		};
 		set({
@@ -133,7 +143,8 @@ const useNodeStore = create<NodeState & NodeActions>((set, get) => ({
 			id: crypto.randomUUID(),
 			type: "text_output",
 			data: {
-				response: "",
+				state: "initial",
+				response: [],
 			},
 			position: generateRandomStartPosition(),
 		};
@@ -146,6 +157,7 @@ const useNodeStore = create<NodeState & NodeActions>((set, get) => ({
 			id: crypto.randomUUID(),
 			type: "text_generation",
 			data: {
+				state: "initial",
 				json_mode: false,
 			},
 			position: generateRandomStartPosition(),
@@ -159,6 +171,7 @@ const useNodeStore = create<NodeState & NodeActions>((set, get) => ({
 			id: crypto.randomUUID(),
 			type: "llm",
 			data: {
+				state: "initial",
 				llmProvider: provider,
 				llmModel: LLM_MODELS[provider][0], // Default to the first model for the provider],
 			},

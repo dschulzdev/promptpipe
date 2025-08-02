@@ -13,7 +13,8 @@ export class RunnerService {
 	private redisPublisher: Redis;
 	private redisSubscriber: Redis;
 	constructor(
-		@InjectQueue("workflow_runs") private readonly workflowRunsQueue: Queue,
+		@InjectQueue("workflow_runs")
+		private readonly workflowRunsQueue: Queue,
 		private readonly redisService: RedisService,
 	) {
 		// Initialize the Redis publisher using the RedisService
@@ -72,8 +73,20 @@ export class RunnerService {
 						`Replaying ${existingMessages.length} existing messages for job ${jobId}`,
 					);
 
-					for (const message of existingMessages) {
-						const data: ProgressMessage = JSON.parse(message);
+					for (const message of existingMessages.reverse()) {
+						const data: {
+							type:
+								| "log"
+								| "progress_node"
+								| "success_node"
+								| "result_success"
+								| "result_fail"
+								| "fail_node"
+								| "result"
+								| "error"
+								| "done";
+							payload: ProgressMessage;
+						} = JSON.parse(message);
 						subscriber.next({ data: message });
 
 						// If this is a final message, complete after replaying
@@ -98,7 +111,11 @@ export class RunnerService {
 							// The service is responsible for formatting the event correctly
 							subscriber.next({ data: message });
 
-							if (["result", "error", "done"].includes(data.type)) {
+							if (
+								["result_success", "result_fail", "error", "done"].includes(
+									data.type,
+								)
+							) {
 								subscriber.complete();
 							}
 						}
@@ -116,6 +133,7 @@ export class RunnerService {
 					`Stream for job ${jobId} ended. Cleaning up service resources.`,
 				);
 				this.redisSubscriber.unsubscribe(progressChannel);
+				this.cleanupWorkflowMessages(jobId);
 			};
 		});
 	}

@@ -8,9 +8,9 @@ import { NodeTypes } from "src/workflow/dto/nodes.dto";
 import { PipelineNodeDto } from "src/workflow/dto/pipeline-node.dto";
 import { RunWorkloadDto } from "src/workflow/dto/run-workflow.dto";
 import { AiService } from "../ai/ai.service";
-import { deleteUnlinkedNodes, isNextNodeAvailable } from "./graph-functions";
+import { deleteUnlinkedNodes } from "./graph-functions";
 import { processNode } from "./node-functions";
-import { ProgressMessage, ResultMessage } from "./progress-message";
+import { ProgressMessage, ProgressType } from "./progress-message";
 
 @Processor("workflow_runs")
 export class RunnerProcessor extends WorkerHost {
@@ -32,10 +32,9 @@ export class RunnerProcessor extends WorkerHost {
 
 	private publishProgress = (
 		jobId: string,
-		type: string,
-		payload: ProgressMessage | ResultMessage,
+		type: ProgressType,
+		payload: ProgressMessage,
 	) => {
-		MessageEvent;
 		const channel = `workflow-progress:${jobId}`;
 		const messagesKey = `workflow-messages:${jobId}`;
 		const message = JSON.stringify({ type, payload });
@@ -54,8 +53,8 @@ export class RunnerProcessor extends WorkerHost {
 
 	// This method is called when a new job is available
 	async process(
-		job: Job<RunWorkloadDto, ResultMessage, string>,
-	): Promise<ResultMessage> {
+		job: Job<RunWorkloadDto, ProgressMessage, string>,
+	): Promise<ProgressMessage> {
 		// biome-ignore lint/style/noNonNullAssertion: job id has to exist
 		const jobId: string = job.id!;
 		this.logger.log(`Worker processing job ${jobId} for workflow ${jobId}`);
@@ -69,21 +68,14 @@ export class RunnerProcessor extends WorkerHost {
 		}
 
 		this.publishProgress(jobId, "log", {
-			log: "Step 2: Processing data...",
-			type: "progress",
+			log: "Running graph...",
 		});
-		await new Promise((res) => setTimeout(res, 2000));
-
-		this.publishProgress(jobId, "log", {
-			log: "Step 3: Running graph...",
-			type: "progress",
-		});
-		await new Promise((res) => setTimeout(res, 1500));
 
 		await ResultAsync.fromPromise(
 			this.runGraph(startNode as PipelineNodeDto, jobId, cleanedPayload),
 			(error) => {
 				if (error instanceof Error) {
+					this.logger.error(error.stack);
 					this.logger.error(`Graph execution failed: ${error.message}`);
 				}
 				const finalResult = this.sendFinalResult(jobId, "fail");
@@ -107,9 +99,11 @@ export class RunnerProcessor extends WorkerHost {
 			this.logger.log(
 				`Processing node ${currentNode.id} of type ${currentNode.type}`,
 			);
-			this.publishProgress(jobId, "log", {
+			this.publishProgress(jobId, "progress_node", {
 				log: `Processing node ${currentNode.id}`,
-				type: "progress",
+				payload: {
+					nodeId: currentNode.id,
+				},
 			});
 			const results = await processNode(
 				currentNode,
@@ -125,9 +119,15 @@ export class RunnerProcessor extends WorkerHost {
 					data: entry.data,
 				});
 			}
-			this.publishProgress(jobId, "log", {
+			this.publishProgress(jobId, "success_node", {
 				log: `Node finished: ${currentNode.id}`,
-				type: "success_node",
+				payload: {
+					nodeId: currentNode.id,
+					data:
+						currentNode.type === "text_output"
+							? nodeHandleOutputMap.get(currentNode.id)?.data
+							: undefined,
+				},
 			});
 
 			const nextNode = this.getNextNode(currentNode.id, cleanedPayload);
@@ -154,7 +154,6 @@ export class RunnerProcessor extends WorkerHost {
 	private initializeTest(jobId: string, workflowData: RunWorkloadDto) {
 		this.publishProgress(jobId, "log", {
 			log: `Starting job ${jobId}`,
-			type: "progress",
 		});
 		const cleanedPayload = deleteUnlinkedNodes(workflowData);
 		const startNode = workflowData.nodes.find(
@@ -165,17 +164,15 @@ export class RunnerProcessor extends WorkerHost {
 
 	private sendFinalResult(
 		jobId: string,
-		result: ResultMessage["result"],
-	): ResultMessage {
-		const finalResult: ResultMessage = {
-			type: "result",
-			result: result,
+		result: "success" | "fail",
+	): ProgressMessage {
+		const finalResult: ProgressMessage = {
 			log:
 				result === "success"
 					? `Job ${jobId} completed successfully!`
 					: `Job ${jobId} failed!`,
 		};
-		this.publishProgress(jobId, "result", finalResult);
+		this.publishProgress(jobId, `result_${result}`, finalResult);
 		this.logger.log(`Job ${jobId} completed successfully!`);
 		return finalResult;
 	}

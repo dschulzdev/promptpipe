@@ -5,6 +5,12 @@ services:
     ports:
       - "6379:6379"
     restart: unless-stopped
+  redis-insights:
+    image: redis/redisinsight:latest
+    container_name: promptpipe-redis-insight
+    ports:
+      - "5540:5540"
+    restart: unless-stopped
   postgres:
     image: postgres:15.4
     container_name: promptpipe-postgres

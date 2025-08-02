@@ -10,6 +10,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import "../index.css";
 import { QueryClient } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { client } from "@/api-client/client.gen";
 
 export type RouterAppContext = {
@@ -54,6 +55,8 @@ function RootComponent() {
 				<Toaster richColors />
 			</ThemeProvider>
 			<Toaster />
+			<ReactQueryDevtools initialIsOpen={false} />
+
 			<TanStackRouterDevtools position="bottom-left" />
 		</>
 	);

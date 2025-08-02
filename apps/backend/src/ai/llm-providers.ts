@@ -13,9 +13,9 @@ export enum GOOGLE_GENAI_MODEL {
 export const google_genai_models = Object.values(GOOGLE_GENAI_MODEL);
 
 export enum OPENAI_MODEL {
-	openai_4_1_mini = "4.1-mini",
-	openai_4_1nano = "4.1-nano",
-	openai_4_omini = "4o-mini",
+	openai_4_1_mini = "gpt-4.1-mini",
+	openai_4_1nano = "gpt-4.1-nano",
+	openai_4_omini = "gpt-4o-mini",
 }
 
 export const openai_models = Object.values(OPENAI_MODEL);
