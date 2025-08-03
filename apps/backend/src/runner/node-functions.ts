@@ -1,10 +1,9 @@
-import { UserModelMessage } from "ai";
+import { ModelMessage } from "ai";
 import { AiService } from "src/ai/ai.service";
 import { NodeTypes } from "src/workflow/dto/nodes.dto";
 import {
 	LlmNodeDto,
 	PipelineNodeDto,
-	TextGenerationNodeDto,
 	TextInputNodeDto,
 	TextOutputNodeDto,
 } from "src/workflow/dto/pipeline-node.dto";
@@ -14,6 +13,15 @@ export type HandleDataResult = {
 	key: string;
 	// biome-ignore lint/suspicious/noExplicitAny: not typed yet
 	data: any;
+};
+
+type ProcessNodeParams = {
+	node: PipelineNodeDto;
+	workflowData: RunWorkloadDto;
+	nodeHandleOutputMap: NodeOutputMap;
+	aiService: AiService;
+	onStart?: (id?: string) => void;
+	onEnd?: (id?: string) => void;
 };
 
 export type NodeOutputMap = Map<
@@ -37,10 +45,10 @@ export function processLLMNodeHandles(node: LlmNodeDto) {
 export function processTextInputNodeHandles(node: TextInputNodeDto) {
 	return [
 		{
-			role: "user",
+			role: node.data.role,
 			content: node.data.prompt,
 		},
-	] satisfies UserModelMessage[];
+	] satisfies ModelMessage[];
 }
 
 export function processTextOutputNodeHandles(
@@ -60,12 +68,14 @@ export function processTextOutputNodeHandles(
 	};
 }
 
-export async function processTextGenerationNodeHandles(
-	node: TextGenerationNodeDto,
-	workflowData: RunWorkloadDto,
-	nodeHandleOutputMap: NodeOutputMap,
-	aiService: AiService,
-) {
+export async function processTextGenerationNodeHandles({
+	node,
+	workflowData,
+	nodeHandleOutputMap,
+	aiService,
+	onStart = () => {},
+	onEnd = () => {},
+}: ProcessNodeParams) {
 	const connectionTargetId = workflowData.connections
 		.filter((connection) => {
 			return connection.sourceNodeId === node.id;
@@ -77,21 +87,18 @@ export async function processTextGenerationNodeHandles(
 			if (!parentNode) {
 				throw new Error(`Parent node with ID ${targetId} not found`);
 			}
-			const results = await processNode(
-				parentNode,
+			await processNode({
+				node: parentNode,
 				workflowData,
 				nodeHandleOutputMap,
 				aiService,
-			);
-
-			for (const entry of results) {
-				if (!entry) {
-					continue;
-				}
-				nodeHandleOutputMap.set(entry.key, {
-					data: entry.data,
-				});
-			}
+				onStart: () => {
+					onStart(parentNode.id);
+				},
+				onEnd: () => {
+					onEnd(parentNode.id);
+				},
+			});
 		}
 	}
 	const llmProviderId = workflowData.connections.find((connection) => {
@@ -128,6 +135,11 @@ export async function processTextGenerationNodeHandles(
 		);
 	}
 
+	const lastMessage = messages.data.at(-1);
+	if (lastMessage.role !== "user") {
+		throw new Error("The last message must be from the user.");
+	}
+
 	const response = await aiService.getResponse({
 		modelConfig: aiService.getLLMProvider({ modelConfig: llmProvider.data }),
 		messages: messages.data,
@@ -136,51 +148,72 @@ export async function processTextGenerationNodeHandles(
 	return response;
 }
 
-export const processNode = async (
-	node: PipelineNodeDto,
-	workflowData: RunWorkloadDto,
-	nodeHandleOutputMap: NodeOutputMap,
-	aiService: AiService,
-): Promise<Array<HandleDataResult>> => {
+export const processNode = async ({
+	node,
+	workflowData,
+	nodeHandleOutputMap,
+	aiService,
+	onStart = () => {},
+	onEnd = () => {},
+}: ProcessNodeParams): Promise<void> => {
+	onStart(node.id);
+	const returnData: HandleDataResult[] = [];
 	switch (node.type) {
-		case NodeTypes.LLM:
-			return [
-				{
-					key: node.id,
-					data: processLLMNodeHandles(node),
-				},
-			];
-		case NodeTypes.TEXT_INPUT:
-			return [
-				{
-					key: node.id,
-					data: processTextInputNodeHandles(node),
-				},
-			];
-		case NodeTypes.TEXT_OUTPUT:
-			return [
-				{
-					key: node.id,
-					data: processTextOutputNodeHandles(
-						node,
-						workflowData,
-						nodeHandleOutputMap,
-					),
-				},
-			];
-		case NodeTypes.TEXT_GENERATION:
-			return [
-				{
-					key: node.id,
-					data: await processTextGenerationNodeHandles(
-						node,
-						workflowData,
-						nodeHandleOutputMap,
-						aiService,
-					),
-				},
-			];
-		default:
-			throw new Error(`Unsupported node type: ${node.type}`);
+		case NodeTypes.LLM: {
+			const data = processLLMNodeHandles(node);
+			returnData.push({
+				key: node.id,
+				data,
+			});
+			break;
+		}
+		case NodeTypes.TEXT_INPUT: {
+			const data = processTextInputNodeHandles(node);
+			returnData.push({
+				key: node.id,
+				data,
+			});
+			break;
+		}
+		case NodeTypes.TEXT_OUTPUT: {
+			const data = processTextOutputNodeHandles(
+				node,
+				workflowData,
+				nodeHandleOutputMap,
+			);
+			returnData.push({
+				key: node.id,
+				data,
+			});
+			break;
+		}
+		case NodeTypes.TEXT_GENERATION: {
+			const data = await processTextGenerationNodeHandles({
+				node,
+				workflowData,
+				nodeHandleOutputMap,
+				aiService,
+				onStart,
+				onEnd,
+			});
+			returnData.push({
+				key: node.id,
+				data,
+			});
+			break;
+		}
+		case NodeTypes.BASIC_START: {
+			// Start nodes typically don't have outputs, but we can return the base value
+			break;
+		}
 	}
+	for (const entry of returnData) {
+		if (!entry) {
+			continue;
+		}
+		nodeHandleOutputMap.set(entry.key, {
+			data: entry.data,
+		});
+	}
+	onEnd(node.id);
 };

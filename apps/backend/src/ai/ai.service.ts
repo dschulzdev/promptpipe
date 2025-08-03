@@ -1,6 +1,7 @@
 import type { GoogleGenerativeAIProvider } from "@ai-sdk/google";
 import type { OpenAIProvider } from "@ai-sdk/openai";
 import { Inject, Injectable, Logger } from "@nestjs/common";
+import { OpenRouterProvider } from "@openrouter/ai-sdk-provider";
 import {
 	AssistantModelMessage,
 	generateObject,
@@ -14,6 +15,11 @@ type SelectedGoogleGenAIModel =
 	| "gemini-2.0-flash"
 	| "gemini-2.5-flash"
 	| "gemini-2.0-flash-lite";
+type SelectedOpenRouterModel =
+	| "openrouter/horizon-beta"
+	| "z-ai/glm-4.5-air:free"
+	| "moonshotai/kimi-k2:free";
+type ModelWithSetup = LanguageModel;
 
 @Injectable()
 export class AiService {
@@ -21,6 +27,7 @@ export class AiService {
 	constructor(
 		@Inject("OPENAI_CLIENT") private openaiClient: OpenAIProvider,
 		@Inject("GOOGLE_CLIENT") private googleClient: GoogleGenerativeAIProvider,
+		@Inject("OPENROUTER_CLIENT") private openrouterClient: OpenRouterProvider,
 	) {}
 
 	getLLMProvider({
@@ -34,9 +41,16 @@ export class AiService {
 			| {
 					provider: "google_genai";
 					model: SelectedGoogleGenAIModel;
+			  }
+			| {
+					provider: "openrouter";
+					model: SelectedOpenRouterModel;
 			  };
-	}): LanguageModel {
-		let llm_client: GoogleGenerativeAIProvider | OpenAIProvider;
+	}): ModelWithSetup {
+		let llm_client:
+			| GoogleGenerativeAIProvider
+			| OpenAIProvider
+			| OpenRouterProvider;
 		switch (modelConfig.provider) {
 			case "openai":
 				llm_client = this.openaiClient;
@@ -44,6 +58,8 @@ export class AiService {
 			case "google_genai":
 				llm_client = this.googleClient;
 				break;
+			case "openrouter":
+				return this.openrouterClient(modelConfig.model); // Assuming OpenRouter uses OpenAI client
 			default:
 				throw new Error("Unsupported provider");
 		}
@@ -54,11 +70,13 @@ export class AiService {
 		modelConfig,
 		messages,
 	}: {
-		modelConfig: LanguageModel;
+		modelConfig: ModelWithSetup;
 		messages: ModelMessage[];
 	}) {
 		this.logger.log("Generating response with:", messages);
+		this.logger.log("Using model config:", modelConfig);
 		const response = await generateText({
+			// @ts-ignore FIX: Type 'ModelWithSetup' is not assignable to type 'LanguageModel'.
 			model: modelConfig,
 			messages: messages,
 		});

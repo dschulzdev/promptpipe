@@ -13,8 +13,7 @@ export class RunnerService {
 	private redisPublisher: Redis;
 	private redisSubscriber: Redis;
 	constructor(
-		@InjectQueue("workflow_runs")
-		private readonly workflowRunsQueue: Queue,
+		@InjectQueue("workflow_runs") private readonly workflowRunsQueue: Queue,
 		private readonly redisService: RedisService,
 	) {
 		// Initialize the Redis publisher using the RedisService

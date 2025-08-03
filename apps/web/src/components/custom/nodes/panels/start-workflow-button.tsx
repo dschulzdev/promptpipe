@@ -5,11 +5,16 @@ import { memo, useCallback } from "react";
 import { toast } from "sonner";
 import { useShallow } from "zustand/react/shallow";
 import { workflowControllerRunMutation } from "@/api-client/@tanstack/react-query.gen";
+import useSaveFileMutation from "@/hooks/mutations/use-save-file-mutation";
 import useRunnerStore from "@/stores/runner-store";
 import { Button } from "../../../ui/button";
 
 function StartWorkflowButton() {
 	const { id } = useParams({ strict: false });
+	const { isPending: isSaving } = useSaveFileMutation({
+		// biome-ignore lint/style/noNonNullAssertion: id has to exist, when being on this screen
+		id: id!,
+	});
 	const { mutate, isPending } = useMutation(workflowControllerRunMutation());
 	const { isRunning, setLocalWorkflowId } = useRunnerStore(
 		useShallow((state) => {
@@ -22,7 +27,7 @@ function StartWorkflowButton() {
 
 	const workflowInProgress = isRunning || isPending;
 
-	const handleStartWorkflow = useCallback(() => {
+	const handleStartWorkflow = useCallback(async () => {
 		if (!id) {
 			toast.error("Workflow ID is not available.");
 			return;
@@ -48,7 +53,7 @@ function StartWorkflowButton() {
 	return (
 		<Button
 			size={"icon"}
-			disabled={workflowInProgress}
+			disabled={isSaving || workflowInProgress}
 			onClick={handleStartWorkflow}
 		>
 			{workflowInProgress ? <Loader2 className="animate-spin" /> : <Play />}

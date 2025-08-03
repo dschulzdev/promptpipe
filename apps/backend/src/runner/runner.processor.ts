@@ -99,34 +99,28 @@ export class RunnerProcessor extends WorkerHost {
 			this.logger.log(
 				`Processing node ${currentNode.id} of type ${currentNode.type}`,
 			);
-			this.publishProgress(jobId, "progress_node", {
-				log: `Processing node ${currentNode.id}`,
-				payload: {
-					nodeId: currentNode.id,
-				},
-			});
-			const results = await processNode(
-				currentNode,
-				cleanedPayload,
+			await processNode({
+				node: currentNode,
+				aiService: this.aiService,
+				workflowData: cleanedPayload,
 				nodeHandleOutputMap,
-				this.aiService,
-			);
-			for (const entry of results) {
-				if (!entry) {
-					continue;
-				}
-				nodeHandleOutputMap.set(entry.key, {
-					data: entry.data,
-				});
-			}
-			this.publishProgress(jobId, "success_node", {
-				log: `Node finished: ${currentNode.id}`,
-				payload: {
-					nodeId: currentNode.id,
-					data:
-						currentNode.type === "text_output"
-							? nodeHandleOutputMap.get(currentNode.id)?.data
-							: undefined,
+				onStart: (nodeId: string) => {
+					this.publishProgress(jobId, "progress_node", {
+						log: `Starting node ${nodeId}`,
+						payload: { nodeId },
+					});
+				},
+				onEnd: (nodeId: string) => {
+					this.publishProgress(jobId, "success_node", {
+						log: `Node finished: ${nodeId}`,
+						payload: {
+							nodeId,
+							data:
+								currentNode?.type === "text_output"
+									? nodeHandleOutputMap.get(currentNode.id)?.data
+									: undefined,
+						},
+					});
 				},
 			});
 

@@ -2,6 +2,7 @@ import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { createOpenAI } from "@ai-sdk/openai";
 import { Module } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config/dist/config.service";
+import { createOpenRouter } from "@openrouter/ai-sdk-provider";
 import type { Configuration } from "src/configuration";
 import { AiService } from "./ai.service";
 
@@ -22,6 +23,15 @@ import { AiService } from "./ai.service";
 			useFactory: (configService: ConfigService<Configuration>) => {
 				return createGoogleGenerativeAI({
 					apiKey: configService.get("ai.google.apiKey", { infer: true }),
+				});
+			},
+			inject: [ConfigService],
+		},
+		{
+			provide: "OPENROUTER_CLIENT",
+			useFactory: (configService: ConfigService<Configuration>) => {
+				return createOpenRouter({
+					apiKey: configService.get("ai.openrouter", { infer: true }),
 				});
 			},
 			inject: [ConfigService],

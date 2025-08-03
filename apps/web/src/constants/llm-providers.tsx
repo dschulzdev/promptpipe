@@ -1,5 +1,6 @@
 import { RiGeminiFill, RiOpenaiFill } from "react-icons/ri";
 import type { SidebarButton } from "@/components/custom/block-sidebar";
+import OpenRouterIcon from "@/components/icon/openrouter-icon";
 import type { LLMProvider } from "~/ai/llm-providers";
 
 export const LLMProviderRenderMap: Record<LLMProvider, SidebarButton> = {
@@ -10,6 +11,10 @@ export const LLMProviderRenderMap: Record<LLMProvider, SidebarButton> = {
 	google_genai: {
 		title: "Google GenAI",
 		icon: RiGeminiFill,
+	},
+	openrouter: {
+		title: "OpenRouter",
+		icon: OpenRouterIcon,
 	},
 };
 
@@ -22,5 +27,9 @@ export const LLMProviderButtons: (SidebarButton & { provider: LLMProvider })[] =
 		{
 			provider: "google_genai",
 			...LLMProviderRenderMap.google_genai,
+		},
+		{
+			provider: "openrouter",
+			...LLMProviderRenderMap.openrouter,
 		},
 	];

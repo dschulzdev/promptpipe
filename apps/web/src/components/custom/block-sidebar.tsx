@@ -3,11 +3,6 @@ import {
 	Brain,
 	ChevronRight,
 	CirclePlay,
-	CloudDownload,
-	Database,
-	DatabaseZap,
-	FileArchive,
-	FileJson,
 	Loader,
 	type LucideIcon,
 	MessageSquare,
@@ -67,16 +62,6 @@ export default function BlockSidebar() {
 			title: "Text Input",
 			action: addTextInputNode,
 		},
-		{
-			icon: Database,
-			title: "Database Table Input",
-			action: () => {},
-		},
-		{
-			icon: FileJson,
-			title: "JSON Input",
-			action: () => {},
-		},
 	];
 
 	const outputButtons: SidebarButtonWithAction[] = [
@@ -84,21 +69,6 @@ export default function BlockSidebar() {
 			icon: TextQuote,
 			title: "Text Output",
 			action: addTextOutputNode,
-		},
-		{
-			icon: FileArchive,
-			title: "File Output",
-			action: () => {},
-		},
-		{
-			icon: DatabaseZap,
-			title: "Database Insert",
-			action: () => {},
-		},
-		{
-			icon: CloudDownload,
-			title: "Third-Party-Integration",
-			action: () => {},
 		},
 	];
 

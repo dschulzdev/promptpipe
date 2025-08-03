@@ -9,6 +9,7 @@ const configSchema = z.object({
 	frontend_url: z.string().min(1),
 	database_url: z.string().min(1),
 	ai: z.object({
+		openrouter: z.string().min(1).optional(),
 		openai: z.object({
 			apiKey: z.string().min(1).optional(),
 		}),
@@ -33,6 +34,7 @@ export const validateConfig = () => {
 		frontend_url: process.env.FRONTEND_URL,
 		database_url: process.env.DATABASE_URL,
 		ai: {
+			openrouter: process.env.OPENROUTER_KEY,
 			openai: {
 				apiKey: process.env.OPENAI_API_KEY,
 			},
