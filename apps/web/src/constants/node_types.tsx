@@ -1,5 +1,4 @@
 import type { NodeTypes } from "@xyflow/react";
-import type { PipelineNodeDto } from "@/api-client";
 import BasicStartNode, {
 	type BasicStartNodeProps,
 } from "@/components/custom/nodes/basic/start-node";
@@ -13,17 +12,23 @@ import LLMNode, { type LLMNodeProps } from "@/components/custom/nodes/llm-node";
 import TextOutputNode, {
 	type TextOutputNodeProps,
 } from "@/components/custom/nodes/output/text-output-node";
+import MergeNode, {
+	type MergeNodeProps,
+} from "@/components/custom/nodes/processing/merge-node";
+import type { MergeNodeData } from "~/workflow/dto/nodes/merge-node-data.dto";
+import type { TextGenerationNodeData } from "~/workflow/dto/nodes/text-generation-node-data.dto";
+import type { TextInputNodeData } from "~/workflow/dto/nodes/text-input-node-data.dto";
+import type { TextOutputNodeData } from "~/workflow/dto/nodes/text-output-node-data.dto";
 import type { NodeType } from "~/workflow/dto/nodes.dto";
-import type { TextGenerationNodeData } from "../../../backend/dist/src/workflow/dto/text-generation-node-data.dto";
-import type { TextOutputNodeData } from "../../../backend/dist/src/workflow/dto/text-output-node-data.dto";
+import type { PipelineNodeDto } from "~/workflow/dto/pipeline-node.dto";
 import type { LLMNodeData } from "../../../backend/src/workflow/dto/nodes/llm-node-data.dto";
-import type { TextInputNodeData } from "../../../backend/src/workflow/dto/text-input-node-data.dto";
 
 export type NodeInputData =
 	| LLMNodeData
 	| TextGenerationNodeData
 	| TextInputNodeData
 	| TextGenerationNodeData
+	| MergeNodeData
 	| TextOutputNodeData;
 
 export type PromptPipeNodeProps =
@@ -31,6 +36,7 @@ export type PromptPipeNodeProps =
 	| TextInputNodeProps
 	| TextGenerationNodeProps
 	| TextOutputNodeProps
+	| MergeNodeProps
 	| BasicStartNodeProps;
 
 export const nodeTypes = {
@@ -39,6 +45,7 @@ export const nodeTypes = {
 	text_generation: TextGenerationNode,
 	text_output: TextOutputNode,
 	basic_start: BasicStartNode,
+	merge: MergeNode,
 } satisfies NodeTypes;
 
 // Wow this is ugly as hell, but it works for now
@@ -62,6 +69,11 @@ export function mapToNodeTypeWithData(
 		case "text_generation":
 			return {
 				type: "text_generation",
+				data: data,
+			} as Omit<PipelineNodeDto, "id">;
+		case "merge":
+			return {
+				type: "merge",
 				data: data,
 			} as Omit<PipelineNodeDto, "id">;
 		case "text_output":

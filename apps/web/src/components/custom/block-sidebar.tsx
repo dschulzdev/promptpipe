@@ -3,6 +3,7 @@ import {
 	Brain,
 	ChevronRight,
 	CirclePlay,
+	GitMerge,
 	Loader,
 	type LucideIcon,
 	MessageSquare,
@@ -46,6 +47,7 @@ export default function BlockSidebar() {
 		addTextGenerationNode,
 		addTextOutputNode,
 		addBasicStartNode,
+		addMergeNode,
 	} = useNodeStore(
 		useShallow((state) => ({
 			addLLMNode: state.addLLMNode,
@@ -53,6 +55,7 @@ export default function BlockSidebar() {
 			addTextGenerationNode: state.addTextGenerationNode,
 			addTextOutputNode: state.addTextOutputNode,
 			addBasicStartNode: state.addBasicStartNode,
+			addMergeNode: state.addMergeNode,
 		})),
 	);
 
@@ -69,6 +72,14 @@ export default function BlockSidebar() {
 			icon: TextQuote,
 			title: "Text Output",
 			action: addTextOutputNode,
+		},
+	];
+
+	const processingButtons: SidebarButtonWithAction[] = [
+		{
+			icon: GitMerge,
+			title: "Merge",
+			action: addMergeNode,
 		},
 	];
 
@@ -166,6 +177,41 @@ export default function BlockSidebar() {
 							<SidebarGroupContent>
 								<SidebarMenuSub>
 									{outputButtons.map((item) => (
+										<SidebarMenuSubItem key={item.title}>
+											<SidebarMenuSubButton onClick={item.action}>
+												{item.icon && <item.icon />}
+												{item.title}
+											</SidebarMenuSubButton>
+										</SidebarMenuSubItem>
+									))}
+								</SidebarMenuSub>
+							</SidebarGroupContent>
+						</CollapsibleContent>
+					</SidebarGroup>
+				</Collapsible>
+				<Collapsible
+					key={"processing"}
+					title={"Processing blocks"}
+					defaultOpen
+					className="group/collapsible"
+				>
+					<SidebarGroup>
+						<SidebarGroupLabel
+							asChild
+							className="group/label text-sidebar-foreground text-sm hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+						>
+							<CollapsibleTrigger asChild>
+								<SidebarMenuButton>
+									<Blocks />
+									{"Processing blocks"}
+									<ChevronRight className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-90" />
+								</SidebarMenuButton>
+							</CollapsibleTrigger>
+						</SidebarGroupLabel>
+						<CollapsibleContent>
+							<SidebarGroupContent>
+								<SidebarMenuSub>
+									{processingButtons.map((item) => (
 										<SidebarMenuSubItem key={item.title}>
 											<SidebarMenuSubButton onClick={item.action}>
 												{item.icon && <item.icon />}

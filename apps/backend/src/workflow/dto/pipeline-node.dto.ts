@@ -3,6 +3,7 @@ import { Type, TypeHelpOptions } from "class-transformer";
 import { IsEnum, IsNumber, IsString, ValidateNested } from "class-validator";
 import { BasicStartNodeDataDto } from "./nodes/basic-start-node-data.dto";
 import { LLMNodeDataDto } from "./nodes/llm-node-data.dto";
+import { MergeNodeDataDto } from "./nodes/merge-node-data.dto";
 import { TextGenerationNodeDataDto } from "./nodes/text-generation-node-data.dto";
 import { TextInputNodeDataDto } from "./nodes/text-input-node-data.dto";
 import { TextOutputNodeDataDto } from "./nodes/text-output-node-data.dto";
@@ -73,12 +74,22 @@ export class TextGenerationNodeDto extends BasePipelineNodeDto {
 	data!: TextGenerationNodeDataDto;
 }
 
+export class MergeNodeDto extends BasePipelineNodeDto {
+	type: NodeTypes.MERGE = NodeTypes.MERGE;
+
+	@ValidateNested()
+	@Type(() => MergeNodeDataDto)
+	@ApiProperty({ type: MergeNodeDataDto })
+	data!: MergeNodeDataDto;
+}
+
 export type PipelineNodeDto =
 	| LlmNodeDto
 	| TextInputNodeDto
 	| TextOutputNodeDto
 	| BasicStartNodeDto
-	| TextGenerationNodeDto;
+	| TextGenerationNodeDto
+	| MergeNodeDto;
 
 export const PipelineNodeDtoDiscriminated = (
 	options?: TypeHelpOptions,
@@ -91,7 +102,11 @@ export const PipelineNodeDtoDiscriminated = (
 				{ value: TextInputNodeDto, name: NodeTypes.TEXT_INPUT },
 				{ value: TextOutputNodeDto, name: NodeTypes.TEXT_OUTPUT },
 				{ value: BasicStartNodeDto, name: NodeTypes.BASIC_START },
-				{ value: TextGenerationNodeDto, name: NodeTypes.TEXT_GENERATION },
+				{
+					value: TextGenerationNodeDto,
+					name: NodeTypes.TEXT_GENERATION,
+				},
+				{ value: MergeNodeDto, name: NodeTypes.MERGE },
 			],
 		},
 		...options,

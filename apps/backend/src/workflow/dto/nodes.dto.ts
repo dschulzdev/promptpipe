@@ -4,6 +4,7 @@ export enum NodeTypes {
 	TEXT_GENERATION = "text_generation",
 	BASIC_START = "basic_start",
 	LLM = "llm",
+	MERGE = "merge",
 }
 
 export type NodeType = `${NodeTypes}`;

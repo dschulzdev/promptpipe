@@ -3,6 +3,7 @@ import { AiService } from "src/ai/ai.service";
 import { NodeTypes } from "src/workflow/dto/nodes.dto";
 import {
 	LlmNodeDto,
+	MergeNodeDto,
 	PipelineNodeDto,
 	TextInputNodeDto,
 	TextOutputNodeDto,
@@ -66,6 +67,54 @@ export function processTextOutputNodeHandles(
 	return {
 		response: nodeHandleOutputMap.get(connectionTargetId)?.data || "",
 	};
+}
+
+export async function processMergeNodeHandles(
+	node: MergeNodeDto,
+	workflowData: RunWorkloadDto,
+	nodeHandleOutputMap: NodeOutputMap,
+	aiService: AiService,
+	onStart = (id?: string) => {},
+	onEnd = (id?: string) => {},
+) {
+	const handles = node.data.inputs;
+	const connectionTargets = handles.map((handle) => {
+		const connection = workflowData.connections.find(
+			(c) => c.sourceNodeHandleId === handle.id,
+		);
+		return connection?.targetNodeId;
+	});
+
+	for (const targetId of connectionTargets) {
+		if (targetId && !nodeHandleOutputMap.has(targetId)) {
+			const parentNode = workflowData.nodes.find((n) => n.id === targetId);
+			if (!parentNode) {
+				throw new Error(`Parent node with ID ${targetId} not found`);
+			}
+			await processNode({
+				node: parentNode,
+				workflowData,
+				nodeHandleOutputMap,
+				onStart: () => {
+					onStart(parentNode.id);
+				},
+				onEnd: () => {
+					onEnd(parentNode.id);
+				},
+				aiService,
+			});
+		}
+	}
+
+	const inputs = connectionTargets.flatMap((targetId) => {
+		if (!targetId) {
+			return [];
+		}
+		const output = nodeHandleOutputMap.get(targetId)?.data;
+		return output ? (Array.isArray(output) ? output : [output]) : [];
+	});
+
+	return inputs;
 }
 
 export async function processTextGenerationNodeHandles({
@@ -135,6 +184,7 @@ export async function processTextGenerationNodeHandles({
 		);
 	}
 
+	console.log("Messages:", messages);
 	const lastMessage = messages.data.at(-1);
 	if (lastMessage.role !== "user") {
 		throw new Error("The last message must be from the user.");
@@ -196,6 +246,21 @@ export const processNode = async ({
 				onStart,
 				onEnd,
 			});
+			returnData.push({
+				key: node.id,
+				data,
+			});
+			break;
+		}
+		case NodeTypes.MERGE: {
+			const data = await processMergeNodeHandles(
+				node as MergeNodeDto,
+				workflowData,
+				nodeHandleOutputMap,
+				aiService,
+				onStart,
+				onEnd,
+			);
 			returnData.push({
 				key: node.id,
 				data,

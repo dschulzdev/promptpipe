@@ -15,6 +15,7 @@ import type { TextGenerationNodeProps } from "@/components/custom/nodes/generati
 import type { TextInputNodeProps } from "@/components/custom/nodes/input/text-input-node";
 import type { LLMNodeProps } from "@/components/custom/nodes/llm-node";
 import type { TextOutputNodeProps } from "@/components/custom/nodes/output/text-output-node";
+import type { MergeNodeProps } from "@/components/custom/nodes/processing/merge-node";
 import type { NodeInputData } from "@/constants/node_types";
 import {
 	LLM_MODELS,
@@ -46,6 +47,7 @@ export type NodeActions = {
 	addBasicStartNode: () => void;
 	addTextGenerationNode: () => void;
 	addTextOutputNode: () => void;
+	addMergeNode: () => void;
 	updateNode: (id: string, data: NodeInputData) => void;
 	setNodes: (nodes: AppNode[]) => void;
 	setEdges: (edges: Edge[]) => void;
@@ -116,6 +118,7 @@ const useNodeStore = create<NodeState & NodeActions>((set, get) => ({
 			id: crypto.randomUUID(),
 			type: "text_input",
 			data: {
+				role: "user",
 				state: "initial",
 				prompt: "Why is the banana yellow?",
 			},
@@ -174,6 +177,20 @@ const useNodeStore = create<NodeState & NodeActions>((set, get) => ({
 				state: "initial",
 				llmProvider: provider,
 				llmModel: LLM_MODELS[provider][0], // Default to the first model for the provider],
+			},
+			position: generateRandomStartPosition(),
+		};
+		set({
+			nodes: [...get().nodes, newNode],
+		});
+	},
+	addMergeNode: () => {
+		const newNode: MergeNodeProps = {
+			id: crypto.randomUUID(),
+			type: "merge",
+			data: {
+				state: "initial",
+				inputs: [],
 			},
 			position: generateRandomStartPosition(),
 		};

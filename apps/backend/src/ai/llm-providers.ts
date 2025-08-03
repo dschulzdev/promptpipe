@@ -34,4 +34,8 @@ export const LLM_MODELS = {
 	openrouter: openrouter_models,
 };
 
-export const AllModels = [...google_genai_models, ...openai_models];
+export const AllModels = [
+	...google_genai_models,
+	...openai_models,
+	...openrouter_models,
+];
