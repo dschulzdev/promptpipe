@@ -42,7 +42,7 @@ function TextOutputNode(props: NodeProps<TextOutputNodeProps>) {
 					<div className="flex w-full flex-col items-start gap-2">
 						<LabeledHandle
 							title={"Response"}
-							type="source"
+							type="target"
 							position={Position.Left}
 						/>
 					</div>

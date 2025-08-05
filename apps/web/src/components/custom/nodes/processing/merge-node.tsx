@@ -21,7 +21,7 @@ function MergeNode({ id, data }: NodeProps<MergeNodeProps>) {
 
 	const addInput = () => {
 		const inputs = data.inputs ?? [];
-		const newInput = { id: `input-${inputs.length + 1}` };
+		const newInput = { id: `input-${Date.now()}` };
 		updateNode(id, { inputs: [...inputs, newInput] });
 	};
 
@@ -48,7 +48,7 @@ function MergeNode({ id, data }: NodeProps<MergeNodeProps>) {
 							<div key={input.id} className="flex items-center gap-2">
 								<LabeledHandle
 									title={`Input ${index + 1}`}
-									type="source"
+									type="target"
 									position={Position.Left}
 									id={input.id}
 								/>
@@ -65,7 +65,7 @@ function MergeNode({ id, data }: NodeProps<MergeNodeProps>) {
 					<div className="flex w-full flex-col items-end gap-2">
 						<LabeledHandle
 							title={"Output"}
-							type="target"
+							type="source"
 							position={Position.Right}
 						/>
 					</div>

@@ -115,7 +115,7 @@ function LLMNode({ id, data }: NodeProps<LLMNodeProps>) {
 					<div className="flex w-full flex-col items-end gap-2">
 						<LabeledHandle
 							title="LLM"
-							type="target"
+							type="source"
 							position={Position.Right}
 						/>
 					</div>

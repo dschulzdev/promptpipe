@@ -31,20 +31,20 @@ function TextGenerationNode({ data }: NodeProps<TextGenerationNodeProps>) {
 						<LabeledHandle
 							title="LLM"
 							id="llm"
-							type="source"
+							type="target"
 							position={Position.Left}
 						/>
 						<LabeledHandle
 							title="Prompt"
 							id="prompt"
-							type="source"
+							type="target"
 							position={Position.Left}
 						/>
 					</div>
 					<div className="flex w-full flex-col items-end gap-2">
 						<LabeledHandle
 							title="Output"
-							type="target"
+							type="source"
 							position={Position.Right}
 						/>
 					</div>

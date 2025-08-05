@@ -29,7 +29,7 @@ function BasicStartNode(props: NodeProps<BasicStartNodeProps>) {
 					<div className="flex w-full flex-col items-end gap-2">
 						<LabeledHandle
 							title={"Start"}
-							type="target"
+							type="source"
 							id="start"
 							position={Position.Right}
 						/>

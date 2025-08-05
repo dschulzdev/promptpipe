@@ -82,15 +82,18 @@ export async function processMergeNodeHandles(
 		const connection = workflowData.connections.find(
 			(c) => c.sourceNodeHandleId === handle.id,
 		);
-		return connection?.targetNodeId;
+		return connection?.targetNodeId || null;
 	});
 
 	for (const targetId of connectionTargets) {
-		if (targetId && !nodeHandleOutputMap.has(targetId)) {
+		if (!targetId) continue;
+
+		if (!nodeHandleOutputMap.has(targetId)) {
 			const parentNode = workflowData.nodes.find((n) => n.id === targetId);
 			if (!parentNode) {
 				throw new Error(`Parent node with ID ${targetId} not found`);
 			}
+			// TODO: Add cycle detection to prevent infinite recursion
 			await processNode({
 				node: parentNode,
 				workflowData,
@@ -106,13 +109,15 @@ export async function processMergeNodeHandles(
 		}
 	}
 
-	const inputs = connectionTargets.flatMap((targetId) => {
-		if (!targetId) {
-			return [];
-		}
-		const output = nodeHandleOutputMap.get(targetId)?.data;
-		return output ? (Array.isArray(output) ? output : [output]) : [];
-	});
+	const inputs = connectionTargets
+		.filter((targetId): targetId is string => targetId !== null)
+		.flatMap((targetId) => {
+			const output = nodeHandleOutputMap.get(targetId);
+			if (!output || output.data === undefined) {
+				return [];
+			}
+			return Array.isArray(output.data) ? output.data : [output.data];
+		});
 
 	return inputs;
 }
