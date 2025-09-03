@@ -57,15 +57,19 @@ export function processTextOutputNodeHandles(
 	workflowData: RunWorkloadDto,
 	nodeHandleOutputMap: NodeOutputMap,
 ) {
-	const connectionTargetId = workflowData.connections.find((connection) => {
-		return connection.sourceNodeId === node.id;
-	})?.targetNodeId;
+	const connection = workflowData.connections.find(
+		(connection) => connection.targetNodeId === node.id,
+	);
 
-	if (!connectionTargetId) {
-		return "";
+	if (!connection) {
+		return { response: [] };
 	}
+
+	const sourceNodeId = connection.sourceNodeId;
+	const output = nodeHandleOutputMap.get(sourceNodeId);
+
 	return {
-		response: nodeHandleOutputMap.get(connectionTargetId)?.data || "",
+		response: output?.data || [],
 	};
 }
 
@@ -80,18 +84,18 @@ export async function processMergeNodeHandles(
 	const handles = node.data.inputs;
 	const connectionTargets = handles.map((handle) => {
 		const connection = workflowData.connections.find(
-			(c) => c.sourceNodeHandleId === handle.id,
+			(c) => c.targetNodeHandleId === handle.id,
 		);
-		return connection?.targetNodeId || null;
+		return connection?.sourceNodeId || null;
 	});
 
-	for (const targetId of connectionTargets) {
-		if (!targetId) continue;
+	for (const sourceId of connectionTargets) {
+		if (!sourceId) continue;
 
-		if (!nodeHandleOutputMap.has(targetId)) {
-			const parentNode = workflowData.nodes.find((n) => n.id === targetId);
+		if (!nodeHandleOutputMap.has(sourceId)) {
+			const parentNode = workflowData.nodes.find((n) => n.id === sourceId);
 			if (!parentNode) {
-				throw new Error(`Parent node with ID ${targetId} not found`);
+				throw new Error(`Parent node with ID ${sourceId} not found`);
 			}
 			// TODO: Add cycle detection to prevent infinite recursion
 			await processNode({
@@ -110,9 +114,9 @@ export async function processMergeNodeHandles(
 	}
 
 	const inputs = connectionTargets
-		.filter((targetId): targetId is string => targetId !== null)
-		.flatMap((targetId) => {
-			const output = nodeHandleOutputMap.get(targetId);
+		.filter((sourceId): sourceId is string => sourceId !== null)
+		.flatMap((sourceId) => {
+			const output = nodeHandleOutputMap.get(sourceId);
 			if (!output || output.data === undefined) {
 				return [];
 			}
@@ -132,9 +136,9 @@ export async function processTextGenerationNodeHandles({
 }: ProcessNodeParams) {
 	const connectionTargetId = workflowData.connections
 		.filter((connection) => {
-			return connection.sourceNodeId === node.id;
+			return connection.targetNodeId === node.id;
 		})
-		?.map((connection) => connection.targetNodeId);
+		?.map((connection) => connection.sourceNodeId);
 	for (const targetId of connectionTargetId) {
 		if (!nodeHandleOutputMap.has(targetId)) {
 			const parentNode = workflowData.nodes.find((n) => n.id === targetId);
@@ -157,14 +161,14 @@ export async function processTextGenerationNodeHandles({
 	}
 	const llmProviderId = workflowData.connections.find((connection) => {
 		return (
-			connection.sourceNodeId === node.id &&
-			connection.sourceNodeHandleId === "llm"
+			connection.targetNodeId === node.id &&
+			connection.targetNodeHandleId === "llm"
 		);
 	});
 	const promptId = workflowData.connections.find((connection) => {
 		return (
-			connection.sourceNodeId === node.id &&
-			connection.sourceNodeHandleId === "prompt"
+			connection.targetNodeId === node.id &&
+			connection.targetNodeHandleId === "prompt"
 		);
 	});
 
@@ -175,17 +179,17 @@ export async function processTextGenerationNodeHandles({
 		throw new Error(`Prompt connection not found for node ${node.id}`);
 	}
 
-	const llmProvider = nodeHandleOutputMap.get(llmProviderId.targetNodeId);
-	const messages = nodeHandleOutputMap.get(promptId.targetNodeId);
+	const llmProvider = nodeHandleOutputMap.get(llmProviderId.sourceNodeId);
+	const messages = nodeHandleOutputMap.get(promptId.sourceNodeId);
 
 	if (!llmProvider || !llmProvider.data) {
 		throw new Error(
-			`LLM provider data not found for target ${llmProviderId.targetNodeId}`,
+			`LLM provider data not found for source ${llmProviderId.sourceNodeId}`,
 		);
 	}
 	if (!messages || !messages.data) {
 		throw new Error(
-			`Messages data not found for target ${promptId.targetNodeId}`,
+			`Messages data not found for source ${promptId.sourceNodeId}`,
 		);
 	}
 
@@ -212,38 +216,28 @@ export const processNode = async ({
 	onEnd = () => {},
 }: ProcessNodeParams): Promise<void> => {
 	onStart(node.id);
+
 	const returnData: HandleDataResult[] = [];
+	let data: any;
 	switch (node.type) {
 		case NodeTypes.LLM: {
-			const data = processLLMNodeHandles(node);
-			returnData.push({
-				key: node.id,
-				data,
-			});
+			data = processLLMNodeHandles(node);
 			break;
 		}
 		case NodeTypes.TEXT_INPUT: {
-			const data = processTextInputNodeHandles(node);
-			returnData.push({
-				key: node.id,
-				data,
-			});
+			data = processTextInputNodeHandles(node);
 			break;
 		}
 		case NodeTypes.TEXT_OUTPUT: {
-			const data = processTextOutputNodeHandles(
+			data = processTextOutputNodeHandles(
 				node,
 				workflowData,
 				nodeHandleOutputMap,
 			);
-			returnData.push({
-				key: node.id,
-				data,
-			});
 			break;
 		}
 		case NodeTypes.TEXT_GENERATION: {
-			const data = await processTextGenerationNodeHandles({
+			data = await processTextGenerationNodeHandles({
 				node,
 				workflowData,
 				nodeHandleOutputMap,
@@ -251,14 +245,10 @@ export const processNode = async ({
 				onStart,
 				onEnd,
 			});
-			returnData.push({
-				key: node.id,
-				data,
-			});
 			break;
 		}
 		case NodeTypes.MERGE: {
-			const data = await processMergeNodeHandles(
+			data = await processMergeNodeHandles(
 				node as MergeNodeDto,
 				workflowData,
 				nodeHandleOutputMap,
@@ -266,10 +256,6 @@ export const processNode = async ({
 				onStart,
 				onEnd,
 			);
-			returnData.push({
-				key: node.id,
-				data,
-			});
 			break;
 		}
 		case NodeTypes.BASIC_START: {
@@ -277,6 +263,10 @@ export const processNode = async ({
 			break;
 		}
 	}
+	returnData.push({
+		key: node.id,
+		data,
+	});
 	for (const entry of returnData) {
 		if (!entry) {
 			continue;

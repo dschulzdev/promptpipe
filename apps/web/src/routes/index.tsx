@@ -25,7 +25,7 @@ function HomeComponent() {
 
 function Navbar() {
 	return (
-		<nav className="w-full bg-neutral-300 p-4">
+		<nav className="w-full bg-sidebar p-4">
 			<h1>PromptPipe</h1>
 		</nav>
 	);

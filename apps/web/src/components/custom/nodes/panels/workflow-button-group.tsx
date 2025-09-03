@@ -15,7 +15,7 @@ export default WorkflowButtonGroup;
 
 export const WorkflowButtonGroupWrapper = ({ children }: PropsWithChildren) => {
 	return (
-		<div className="flex flex-row gap-4 rounded-2xl bg-neutral-200 p-4 shadow-2xl">
+		<div className="dark: flex flex-row gap-4 rounded-2xl bg-card bg-neu p-4 shadow-2xl">
 			{children}
 		</div>
 	);

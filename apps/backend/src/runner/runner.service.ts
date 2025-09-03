@@ -5,7 +5,7 @@ import { Queue } from "bullmq";
 import Redis from "ioredis";
 import { Observable } from "rxjs";
 import { RunWorkloadDto } from "src/workflow/dto/run-workflow.dto";
-import { hasCycle } from "./graph-functions";
+import { hasCycle } from "./graph-processing/graph-functions";
 import { ProgressMessage } from "./progress-message";
 
 @Injectable()

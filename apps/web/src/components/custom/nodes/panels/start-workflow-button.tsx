@@ -55,6 +55,7 @@ function StartWorkflowButton() {
 			size={"icon"}
 			disabled={isSaving || workflowInProgress}
 			onClick={handleStartWorkflow}
+			variant={"secondary"}
 		>
 			{workflowInProgress ? <Loader2 className="animate-spin" /> : <Play />}
 		</Button>

@@ -8,8 +8,8 @@ import { NodeTypes } from "src/workflow/dto/nodes.dto";
 import { PipelineNodeDto } from "src/workflow/dto/pipeline-node.dto";
 import { RunWorkloadDto } from "src/workflow/dto/run-workflow.dto";
 import { AiService } from "../ai/ai.service";
-import { deleteUnlinkedNodes } from "./graph-functions";
-import { processNode } from "./node-functions";
+import { deleteUnlinkedNodes } from "./graph-processing/graph-functions";
+import { processNode } from "./graph-processing/node-functions";
 import { ProgressMessage, ProgressType } from "./progress-message";
 
 @Processor("workflow_runs")
@@ -135,13 +135,14 @@ export class RunnerProcessor extends WorkerHost {
 		payload: RunWorkloadDto,
 	): PipelineNodeDto | undefined {
 		const nextConnection = payload.connections.find(
-			(connection) => connection.targetNodeId === currentNodeId,
+			(connection) => connection.sourceNodeId === currentNodeId,
 		);
 		if (!nextConnection) {
 			return undefined;
 		}
+		this.logger.log("Connection found");
 		return payload.nodes.find(
-			(node) => node.id === nextConnection.sourceNodeId,
+			(node) => node.id === nextConnection.targetNodeId,
 		);
 	}
 
