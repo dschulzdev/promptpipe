@@ -3,10 +3,12 @@ import { createOpenAI } from "@ai-sdk/openai";
 import { Module } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config/dist/config.service";
 import { createOpenRouter } from "@openrouter/ai-sdk-provider";
+import { AnalyticsModule } from "src/analytics/analytics.module";
 import type { Configuration } from "src/configuration";
 import { AiService } from "./ai.service";
 
 @Module({
+	imports: [AnalyticsModule],
 	controllers: [],
 	providers: [
 		{

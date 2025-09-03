@@ -28,6 +28,7 @@ async function bootstrap() {
 			forbidNonWhitelisted: true,
 		}),
 	);
+	app.enableShutdownHooks();
 
 	const config = new DocumentBuilder()
 		.setTitle("PromptPipe API")

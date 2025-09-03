@@ -2,6 +2,7 @@ import type { GoogleGenerativeAIProvider } from "@ai-sdk/google";
 import type { OpenAIProvider } from "@ai-sdk/openai";
 import { Inject, Injectable, Logger } from "@nestjs/common";
 import { OpenRouterProvider } from "@openrouter/ai-sdk-provider";
+import { withTracing } from "@posthog/ai";
 import {
 	AssistantModelMessage,
 	generateObject,
@@ -9,6 +10,7 @@ import {
 	LanguageModel,
 	ModelMessage,
 } from "ai";
+import { AnalyticsService } from "src/analytics/analytics.service";
 
 type SelectedOpenAiModel = "gpt-4.1-mini" | "gpt-4o-mini" | "gpt-4.1-nano";
 type SelectedGoogleGenAIModel =
@@ -28,6 +30,7 @@ export class AiService {
 		@Inject("OPENAI_CLIENT") private openaiClient: OpenAIProvider,
 		@Inject("GOOGLE_CLIENT") private googleClient: GoogleGenerativeAIProvider,
 		@Inject("OPENROUTER_CLIENT") private openrouterClient: OpenRouterProvider,
+		private readonly analyticsService: AnalyticsService,
 	) {}
 
 	getLLMProvider({
@@ -63,7 +66,11 @@ export class AiService {
 			default:
 				throw new Error("Unsupported provider");
 		}
-		return llm_client(modelConfig.model);
+		return withTracing(
+			llm_client(modelConfig.model),
+			this.analyticsService.getClient(),
+			{},
+		);
 	}
 
 	async getResponse({
