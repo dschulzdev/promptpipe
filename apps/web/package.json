@@ -42,7 +42,6 @@
 		"@tanstack/react-query": "^5.80.5",
 		"@tanstack/react-router": "^1.114.25",
 		"@xyflow/react": "^12.8.2",
-		"ai": "5.0.0-beta.18",
 		"class-variance-authority": "^0.7.1",
 		"clsx": "^2.1.1",
 		"lucide-react": "^0.473.0",
