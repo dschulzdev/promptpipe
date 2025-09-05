@@ -151,10 +151,16 @@ export class RunnerProcessor extends WorkerHost {
 			log: `Starting job ${jobId}`,
 		});
 		const cleanedPayload = deleteUnlinkedNodes(workflowData);
-		const startNode = workflowData.nodes.find(
+		const startNode = workflowData.nodes.filter(
 			(node) => node.type === NodeTypes.BASIC_START,
 		);
-		return { cleanedPayload, startNode };
+		if (!startNode) {
+			throw new Error("Start node not found");
+		}
+		if (startNode.length > 1) {
+			throw new Error("Multiple start nodes found");
+		}
+		return { cleanedPayload, startNode: startNode[0] };
 	}
 
 	private sendFinalResult(
