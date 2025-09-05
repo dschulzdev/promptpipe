@@ -6,6 +6,7 @@ const configSchema = z.object({
 		.enum(["development", "staging", "production"])
 		.default("development"),
 	port: z.coerce.number().int().positive().default(3000),
+	posthog_api_key: z.string().min(1),
 	frontend_url: z.string().min(1),
 	database_url: z.string().min(1),
 	ai: z.object({
@@ -31,6 +32,7 @@ export const validateConfig = () => {
 	const config = {
 		nodeEnv: process.env.NODE_ENV,
 		port: process.env.PORT,
+		posthog_api_key: process.env.POSTHOG_API_KEY,
 		frontend_url: process.env.FRONTEND_URL,
 		database_url: process.env.DATABASE_URL,
 		ai: {
