@@ -12,7 +12,7 @@ import {
 } from "./workflow/dto/pipeline-node.dto";
 
 async function bootstrap() {
-	const app = await NestFactory.create(AppModule);
+	const app = await NestFactory.create(AppModule, { bodyParser: false });
 
 	// Enable CORS
 	app.enableCors({

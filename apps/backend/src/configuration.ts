@@ -7,6 +7,7 @@ const configSchema = z.object({
 		.default("development"),
 	port: z.coerce.number().int().positive().default(3000),
 	posthog_api_key: z.string().min(1),
+
 	frontend_url: z.string().min(1),
 	database_url: z.string().min(1),
 	ai: z.object({
@@ -18,9 +19,15 @@ const configSchema = z.object({
 			apiKey: z.string().min(1).optional(),
 		}),
 	}),
-	jwt: z.object({
-		secret: z.string().min(1).default("your-secret-key"),
-		expiresIn: z.string().default("1d"),
+	auth: z.object({
+		betterAuthSecret: z.string().min(1),
+		betterAuthUrl: z.string().min(1),
+		socialProviders: z.object({
+			github: z.object({
+				clientId: z.string().min(1),
+				clientSecret: z.string().min(1),
+			}),
+		}),
 	}),
 });
 
@@ -44,9 +51,15 @@ export const validateConfig = () => {
 				apiKey: process.env.GOOGLE_API_KEY,
 			},
 		},
-		jwt: {
-			secret: process.env.JWT_SECRET,
-			expiresIn: process.env.JWT_EXPIRES_IN,
+		auth: {
+			betterAuthSecret: process.env.BETTER_AUTH_SECRET,
+			betterAuthUrl: process.env.BETTER_AUTH_URL,
+			socialProviders: {
+				github: {
+					clientId: process.env.GITHUB_CLIENT_ID,
+					clientSecret: process.env.GITHUB_CLIENT_SECRET,
+				},
+			},
 		},
 	};
 
