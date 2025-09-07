@@ -18,10 +18,20 @@ import {
 } from "../../../ui/table";
 
 export default function JobLogs() {
-	const { data, error } = useJobUpdates() as {
-		data: { type: string; payload: { log: string } }[];
+	// Define a proper interface for individual job log entries
+	interface JobLogData {
+		type: string;
+		payload: { log: string };
+	}
+
+	// Define the shape of the hook’s return value
+	interface UseJobUpdatesReturn {
+		data: JobLogData[];
 		error: Error | null;
-	};
+	}
+
+	// Replace the inline assertion with the named interface
+	const { data, error } = useJobUpdates() as UseJobUpdatesReturn;
 	const connectedToUpdateStream = useRunnerStore(
 		(state) => state.connectedToUpdateStream,
 	);
@@ -53,13 +63,15 @@ export default function JobLogs() {
 					{data.map((log, index) => (
 						// biome-ignore lint/suspicious/noArrayIndexKey: test
 						<TableRow key={index}>
-							<Popover>
-								<PopoverTrigger className="flex w-full flex-row items-center justify-start">
-									<TableCell>{iconMap[log.type]}</TableCell>
-									<TableCell>{log.payload.log}</TableCell>
-								</PopoverTrigger>
-								<PopoverContent>{log.payload.log}</PopoverContent>
-							</Popover>
+							<TableCell>{iconMap[log.type] || iconMap.default}</TableCell>
+							<TableCell>
+								<Popover>
+									<PopoverTrigger className="text-left">
+										{log.payload.log}
+									</PopoverTrigger>
+									<PopoverContent>{log.payload.log}</PopoverContent>
+								</Popover>
+							</TableCell>
 						</TableRow>
 					))}
 				</TableBody>
