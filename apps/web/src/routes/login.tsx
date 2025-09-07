@@ -24,7 +24,7 @@ function RouteComponent() {
 		try {
 			await auth.signIn.social({
 				provider: "github",
-				callbackURL: `${import.meta.env.VITE_BASE_URL}/${search.redirect}`, // Redirect here after success
+				callbackURL: `${import.meta.env.VITE_BASE_URL}/${search.redirect ?? ""}`, // Redirect here after success
 			});
 		} catch (error) {
 			console.error("Error signing in with Github:", error);
