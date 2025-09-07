@@ -1,11 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { SquareDashed } from "lucide-react";
 import { workflowControllerFindAllOptions } from "@/api-client/@tanstack/react-query.gen";
 import AddWorkflowDialog from "@/components/custom/add-workflow-dialog";
+import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
+import { auth } from "@/lib/auth";
 
-export const Route = createFileRoute("/")({
+export const Route = createFileRoute("/_authenticated/")({
 	component: HomeComponent,
 });
 function HomeComponent() {
@@ -24,9 +26,16 @@ function HomeComponent() {
 }
 
 function Navbar() {
+	const { signOut } = auth;
+	const navigate = useNavigate();
 	return (
-		<nav className="w-full bg-sidebar p-4">
-			<h1>PromptPipe</h1>
+		<nav className="flex w-full flex-row bg-sidebar p-4">
+			<h1 className="flex-1">PromptPipe</h1>
+			<Button
+				onClick={() => signOut({}, { onSuccess: () => navigate({ to: "/login" }) })}
+			>
+				Sign Out
+			</Button>
 		</nav>
 	);
 }

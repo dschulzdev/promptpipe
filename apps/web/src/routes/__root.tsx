@@ -19,6 +19,7 @@ export type RouterAppContext = {
 
 client.setConfig({
 	baseUrl: import.meta.env.VITE_SERVER_URL,
+	credentials: "include", // Add this to include cookies in all API requests
 });
 
 export const Route = createRootRouteWithContext<RouterAppContext>()({
@@ -50,7 +51,7 @@ function RootComponent() {
 	return (
 		<>
 			<HeadContent />
-			<ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+			<ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
 				{isFetching ? <Loader /> : <Outlet />}
 				<Toaster richColors />
 			</ThemeProvider>

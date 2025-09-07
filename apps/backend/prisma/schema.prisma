@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
   output   = "../node_modules/@generated/prisma"
@@ -19,12 +13,23 @@ datasource db {
 }
 
 model Workflow {
-  id          String   @id @default(cuid())
-  name        String
+  id                String          @id @default(cuid())
+  name              String
   /// [PipelineNodeDto]
-  nodes       Json[]
+  nodes             Json[]
   /// [PipelineConnectionDto]
-  connections Json[]
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  connections       Json[]
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+  ApplicationUser   ApplicationUser @relation(fields: [applicationUserId], references: [id])
+  applicationUserId String
+}
+
+model ApplicationUser {
+  id        String     @id @default(cuid())
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String     @unique
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  workflows Workflow[]
 }
