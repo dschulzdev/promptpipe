@@ -32,7 +32,7 @@ function Navbar() {
 		<nav className="flex w-full flex-row bg-sidebar p-4">
 			<h1 className="flex-1">PromptPipe</h1>
 			<Button
-				onClick={() => signOut({}, { onSuccess: () => navigate({ to: "/" }) })}
+				onClick={() => signOut({}, { onSuccess: () => navigate({ to: "/login" }) })}
 			>
 				Sign Out
 			</Button>
