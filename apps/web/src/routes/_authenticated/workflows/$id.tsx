@@ -12,7 +12,7 @@ import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import useNodeStore from "@/stores/node-store";
 import type { PipelineNodeDto } from "~/workflow/dto/pipeline-node.dto";
 
-export const Route = createFileRoute("/workflows/$id")({
+export const Route = createFileRoute("/_authenticated/workflows/$id")({
 	component: RouteComponent,
 	loader: async ({ context, params }) => {
 		context.queryClient.ensureQueryData(

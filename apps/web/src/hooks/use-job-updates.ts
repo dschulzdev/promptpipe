@@ -65,6 +65,7 @@ export const useJobUpdates = () => {
 
 		const eventSource = new EventSource(
 			`${import.meta.env.VITE_SERVER_URL}/workflow/stream/${currentRunId}`,
+			{ withCredentials: true },
 		);
 
 		eventSource.addEventListener("open", () => {

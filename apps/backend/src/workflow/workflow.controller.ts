@@ -9,6 +9,7 @@ import {
 	Post,
 	Sse,
 } from "@nestjs/common";
+import { Session, UserSession } from "@thallesp/nestjs-better-auth";
 import { Observable } from "rxjs";
 import { CreateWorkflowDto } from "./dto/create-workflow.dto";
 import { UpdateWorkflowDto } from "./dto/update-workflow.dto";
@@ -47,15 +48,17 @@ export class WorkflowController {
 	@Post()
 	async create(
 		@Body() createWorkflowDto: CreateWorkflowDto,
+		@Session() session: UserSession,
 	): Promise<WorkflowDto> {
-		return this.workflowService.create(createWorkflowDto);
+		return this.workflowService.create(createWorkflowDto, session.user);
 	}
 
 	@Patch(":id")
 	async update(
 		@Param("id") id: string,
+		@Session() session: UserSession,
 		@Body() updateWorkflowDto: UpdateWorkflowDto,
 	): Promise<WorkflowDto> {
-		return this.workflowService.update(id, updateWorkflowDto);
+		return this.workflowService.update(id, updateWorkflowDto, session.user);
 	}
 }
