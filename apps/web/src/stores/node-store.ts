@@ -11,6 +11,7 @@ import {
 import { create } from "zustand";
 import type { PipelineConnectionDto } from "@/api-client";
 import type { BasicStartNodeProps } from "@/components/custom/nodes/basic/start-node";
+import type { StructuredOutputNodeProps } from "@/components/custom/nodes/generation/structured-output-node";
 import type { TextGenerationNodeProps } from "@/components/custom/nodes/generation/text-generation-node";
 import type { TextInputNodeProps } from "@/components/custom/nodes/input/text-input-node";
 import type { LLMNodeProps } from "@/components/custom/nodes/llm-node";
@@ -46,6 +47,7 @@ export type NodeActions = {
 	addTextInputNode: () => void;
 	addBasicStartNode: () => void;
 	addTextGenerationNode: () => void;
+	addStructuredOutputNode: () => void;
 	addTextOutputNode: () => void;
 	addMergeNode: () => void;
 	updateNode: (id: string, data: NodeInputData) => void;
@@ -159,6 +161,20 @@ const useNodeStore = create<NodeState & NodeActions>((set, get) => ({
 		const newNode: TextGenerationNodeProps = {
 			id: crypto.randomUUID(),
 			type: "text_generation",
+			data: {
+				state: "initial",
+				json_mode: false,
+			},
+			position: generateRandomStartPosition(),
+		};
+		set({
+			nodes: [...get().nodes, newNode],
+		});
+	},
+	addStructuredOutputNode: () => {
+		const newNode: StructuredOutputNodeProps = {
+			id: crypto.randomUUID(),
+			type: "structured_output",
 			data: {
 				state: "initial",
 				json_mode: false,

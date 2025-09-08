@@ -2,6 +2,9 @@ import type { NodeTypes } from "@xyflow/react";
 import BasicStartNode, {
 	type BasicStartNodeProps,
 } from "@/components/custom/nodes/basic/start-node";
+import StructuredOutputNode, {
+	type StructuredOutputNodeProps,
+} from "@/components/custom/nodes/generation/structured-output-node";
 import TextGenerationNode, {
 	type TextGenerationNodeProps,
 } from "@/components/custom/nodes/generation/text-generation-node";
@@ -16,6 +19,7 @@ import MergeNode, {
 	type MergeNodeProps,
 } from "@/components/custom/nodes/processing/merge-node";
 import type { MergeNodeData } from "~/workflow/dto/nodes/merge-node-data.dto";
+import type { StructuredOutputNodeData } from "~/workflow/dto/nodes/structured-output-node-data.dto";
 import type { TextGenerationNodeData } from "~/workflow/dto/nodes/text-generation-node-data.dto";
 import type { TextInputNodeData } from "~/workflow/dto/nodes/text-input-node-data.dto";
 import type { TextOutputNodeData } from "~/workflow/dto/nodes/text-output-node-data.dto";
@@ -29,6 +33,7 @@ export type NodeInputData =
 	| TextInputNodeData
 	| TextGenerationNodeData
 	| MergeNodeData
+	| StructuredOutputNodeData
 	| TextOutputNodeData;
 
 export type PromptPipeNodeProps =
@@ -37,6 +42,7 @@ export type PromptPipeNodeProps =
 	| TextGenerationNodeProps
 	| TextOutputNodeProps
 	| MergeNodeProps
+	| StructuredOutputNodeProps
 	| BasicStartNodeProps;
 
 export const nodeTypes = {
@@ -46,6 +52,7 @@ export const nodeTypes = {
 	text_output: TextOutputNode,
 	basic_start: BasicStartNode,
 	merge: MergeNode,
+	structured_output: StructuredOutputNode,
 } satisfies NodeTypes;
 
 // Wow this is ugly as hell, but it works for now
@@ -69,6 +76,11 @@ export function mapToNodeTypeWithData(
 		case "text_generation":
 			return {
 				type: "text_generation",
+				data: data,
+			} as Omit<PipelineNodeDto, "id">;
+		case "structured_output":
+			return {
+				type: "structured_output",
 				data: data,
 			} as Omit<PipelineNodeDto, "id">;
 		case "merge":
