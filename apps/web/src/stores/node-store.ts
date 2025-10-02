@@ -177,7 +177,7 @@ const useNodeStore = create<NodeState & NodeActions>((set, get) => ({
 			type: "structured_output",
 			data: {
 				state: "initial",
-				json_mode: false,
+				jsonSchema: "",
 			},
 			position: generateRandomStartPosition(),
 		};

@@ -11,10 +11,10 @@ import {
 import { LabeledHandle } from "@/components/labeled-handle";
 import { NodeStatusIndicator } from "@/components/node-status-indicator";
 import { type LoadingStateMixin } from "@/stores/node-store";
-import type { TextGenerationNodeData } from "~/workflow/dto/nodes/text-generation-node-data.dto";
+import type { StructuredOutputNodeData } from "~/workflow/dto/nodes/structured-output-node-data.dto";
 
 export type StructuredOutputNodeProps = Node<
-	TextGenerationNodeData & LoadingStateMixin,
+	StructuredOutputNodeData & LoadingStateMixin,
 	"structured_output"
 >;
 

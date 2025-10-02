@@ -218,6 +218,7 @@ export const processNode = async ({
 	onStart(node.id);
 
 	const returnData: HandleDataResult[] = [];
+	// biome-ignore lint/suspicious/noExplicitAny: Should be typed at some point
 	let data: any;
 	switch (node.type) {
 		case NodeTypes.LLM: {
@@ -256,6 +257,17 @@ export const processNode = async ({
 				onStart,
 				onEnd,
 			);
+			break;
+		}
+		case NodeTypes.STRUCTURED_OUTPUT: {
+			data = await processTextGenerationNodeHandles({
+				node,
+				workflowData,
+				nodeHandleOutputMap,
+				aiService,
+				onStart,
+				onEnd,
+			});
 			break;
 		}
 		case NodeTypes.BASIC_START: {
