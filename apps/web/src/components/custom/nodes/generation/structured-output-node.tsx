@@ -1,6 +1,6 @@
 import { type Node, type NodeProps, Position } from "@xyflow/react";
 import { MessageSquare } from "lucide-react";
-import { memo } from "react";
+import { memo, useState } from "react";
 import {
 	BaseNode,
 	BaseNodeContent,
@@ -10,7 +10,10 @@ import {
 } from "@/components/base-node";
 import { LabeledHandle } from "@/components/labeled-handle";
 import { NodeStatusIndicator } from "@/components/node-status-indicator";
-import { type LoadingStateMixin } from "@/stores/node-store";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { isValidJsonSchema } from "@/lib/nodes/json-utils";
+import useNodeStore, { type LoadingStateMixin } from "@/stores/node-store";
 import type { StructuredOutputNodeData } from "~/workflow/dto/nodes/structured-output-node-data.dto";
 
 export type StructuredOutputNodeProps = Node<
@@ -18,7 +21,12 @@ export type StructuredOutputNodeProps = Node<
 	"structured_output"
 >;
 
-function StructuredOutputNode({ data }: NodeProps<StructuredOutputNodeProps>) {
+function StructuredOutputNode({
+	id,
+	data,
+}: NodeProps<StructuredOutputNodeProps>) {
+	const updateNode = useNodeStore((state) => state.updateNode);
+	const [validSchema, setValidSchema] = useState(true);
 	return (
 		<NodeStatusIndicator status={data.state} variant="border">
 			<BaseNode className="w-80">
@@ -28,11 +36,22 @@ function StructuredOutputNode({ data }: NodeProps<StructuredOutputNodeProps>) {
 				</BaseNodeHeader>
 				<BaseNodeContent>
 					<div className="flex flex-col gap-2">
-						<p className="text-muted-foreground text-sm">
-							{
-								"This node generates structured output based on the provided prompt."
+						<Label htmlFor="prompt">JSON Schema</Label>
+						<Input
+							value={data.jsonSchema}
+							onChange={(e) =>
+								updateNode(id, {
+									jsonSchema: e.target.value,
+								})
 							}
-						</p>
+							onBlur={() => {
+								const validSchema = isValidJsonSchema(data.prompt);
+								setValidSchema(validSchema);
+							}}
+						/>
+						{!validSchema && (
+							<p className="text-red-500 text-xs">Invalid JSON Schema</p>
+						)}
 					</div>
 				</BaseNodeContent>
 				<BaseNodeFooter className="w-full px-0">

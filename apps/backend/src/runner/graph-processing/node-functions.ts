@@ -199,11 +199,26 @@ export async function processTextGenerationNodeHandles({
 		throw new Error("The last message must be from the user.");
 	}
 
-	const response = await aiService.getResponse({
-		modelConfig: aiService.getLLMProvider({ modelConfig: llmProvider.data }),
-		messages: messages.data,
-	});
-	nodeHandleOutputMap.set(node.id, response);
+	if (node.type === NodeTypes.STRUCTURED_OUTPUT && !node.data.jsonSchema) {
+		console.log(node.data);
+		throw new Error("Structured output node missing output schema");
+	}
+
+	let response: ModelMessage[];
+	if (node.type === NodeTypes.STRUCTURED_OUTPUT) {
+		response = await aiService.getStructuredResponse({
+			modelConfig: aiService.getLLMProvider({ modelConfig: llmProvider.data }),
+			messages: messages.data,
+			jsonSchema: node.data.jsonSchema,
+		});
+	} else {
+		response = await aiService.getResponse({
+			modelConfig: aiService.getLLMProvider({ modelConfig: llmProvider.data }),
+			messages: messages.data,
+		});
+	}
+	nodeHandleOutputMap.set(node.id, { data: response });
+
 	return response;
 }
 
