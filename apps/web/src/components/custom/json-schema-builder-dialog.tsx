@@ -79,7 +79,7 @@ const JsonSchemaBuilderDialog = ({
 				}
 
 				return {
-					id: Math.random().toString(), // Generate a random ID for now
+					id: crypto.randomUUID(), // Generate a guaranteed unique ID
 					name,
 					type,
 					isArray,
