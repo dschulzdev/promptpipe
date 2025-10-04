@@ -112,7 +112,7 @@ const JsonSchemaBuilderDialog = ({
 		if (activeTab === "code") {
 			try {
 				const parsedSchema = JSON.parse(codeSchema);
-				if (isValidJsonSchema(parsedSchema)) {
+				if (!isValidJsonSchema(parsedSchema)) {
 					throw new Error("Schema must be a valid JSON Schema object");
 				}
 				onSave(parsedSchema);
