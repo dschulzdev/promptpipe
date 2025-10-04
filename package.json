@@ -16,12 +16,11 @@
 		"dev:web": "turbo -F web dev",
 		"dev:server": "turbo -F server dev"
 	},
-	"dependencies": {},
 	"devDependencies": {
-		"turbo": "^2.5.4",
-		"@biomejs/biome": "^2.0.0",
+		"@biomejs/biome": "^2.2.5",
 		"husky": "^9.1.7",
-		"lint-staged": "^15.5.0"
+		"lint-staged": "^15.5.2",
+		"turbo": "^2.5.8"
 	},
 	"packageManager": "pnpm@10.13.1"
 }

@@ -8,12 +8,24 @@ import { AiModule } from "./ai/ai.module";
 import { AnalyticsModule } from "./analytics/analytics.module";
 import { auth } from "./auth";
 import { validateConfig } from "./configuration";
+import { PrismaModule } from "./prisma/prisma.module";
+import { PrismaService } from "./prisma/prisma.service";
 import { RunnerModule } from "./runner/runner.module";
 import { WorkflowModule } from "./workflow/workflow.module";
 
 @Module({
 	imports: [
-		AuthModule.forRoot(auth),
+		PrismaModule,
+		AuthModule.forRootAsync({
+			imports: [PrismaModule],
+			useFactory: (prisma: PrismaService) => {
+				return {
+					auth: auth(prisma),
+					disableTrustedOriginsCors: true,
+				};
+			},
+			inject: [PrismaService],
+		}),
 		ConfigModule.forRoot({
 			isGlobal: true,
 			load: [validateConfig],
