@@ -1,6 +1,7 @@
 import { type Node, type NodeProps, Position } from "@xyflow/react";
-import { MessageSquare } from "lucide-react";
+import { MessageSquare, Pencil, RefreshCcw } from "lucide-react";
 import { memo, useState } from "react";
+import { useShallow } from "zustand/react/shallow";
 import {
 	BaseNode,
 	BaseNodeContent,
@@ -10,11 +11,17 @@ import {
 } from "@/components/base-node";
 import { LabeledHandle } from "@/components/labeled-handle";
 import { NodeStatusIndicator } from "@/components/node-status-indicator";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { isValidJsonSchema } from "@/lib/nodes/json-utils";
+import { Button } from "@/components/ui/button";
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuLabel,
+	DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import useNodeStore, { type LoadingStateMixin } from "@/stores/node-store";
 import type { StructuredOutputNodeData } from "~/workflow/dto/nodes/structured-output-node-data.dto";
+import JsonSchemaBuilderDialog from "../../json-schema-builder-dialog";
 
 export type StructuredOutputNodeProps = Node<
 	StructuredOutputNodeData & LoadingStateMixin,
@@ -25,30 +32,55 @@ function StructuredOutputNode({
 	id,
 	data,
 }: NodeProps<StructuredOutputNodeProps>) {
-	const updateNode = useNodeStore((state) => state.updateNode);
+	const { updateNode, replaceNode } = useNodeStore(
+		useShallow((state) => ({
+			updateNode: state.updateNode,
+			replaceNode: state.replaceNode,
+		})),
+	);
 	const [validSchema, setValidSchema] = useState(true);
+	const [isBuilderOpen, setIsBuilderOpen] = useState(false);
+
 	return (
 		<NodeStatusIndicator status={data.state} variant="border">
 			<BaseNode className="w-80">
 				<BaseNodeHeader>
 					<MessageSquare className="h-4 w-4 text-neutral-500" />
 					<BaseNodeHeaderTitle>{"Structured Output"}</BaseNodeHeaderTitle>
+					<DropdownMenu>
+						<DropdownMenuTrigger asChild>
+							<Button size={"icon"} variant="ghost">
+								<RefreshCcw />
+							</Button>
+						</DropdownMenuTrigger>
+						<DropdownMenuContent align="end">
+							<DropdownMenuLabel className="font-bold">
+								Swap with
+							</DropdownMenuLabel>
+							<DropdownMenuItem
+								onClick={() => {
+									replaceNode(id, "text_generation");
+								}}
+							>
+								<MessageSquare className="mr-2 h-4 w-4 text-neutral-500" />
+								Text Generation
+							</DropdownMenuItem>
+						</DropdownMenuContent>
+					</DropdownMenu>
 				</BaseNodeHeader>
 				<BaseNodeContent>
 					<div className="flex flex-col gap-2">
-						<Label htmlFor="prompt">JSON Schema</Label>
-						<Input
-							value={data.jsonSchema}
-							onChange={(e) =>
-								updateNode(id, {
-									jsonSchema: e.target.value,
-								})
-							}
-							onBlur={() => {
-								const validSchema = isValidJsonSchema(data.prompt);
-								setValidSchema(validSchema);
-							}}
-						/>
+						<div className="flex items-center justify-between">
+							<Button
+								variant="outline"
+								className="w-full"
+								size="sm"
+								onClick={() => setIsBuilderOpen(true)}
+							>
+								<Pencil className="mr-2 h-4 w-4" />
+								Edit Schema
+							</Button>
+						</div>
 						{!validSchema && (
 							<p className="text-red-500 text-xs">Invalid JSON Schema</p>
 						)}
@@ -78,6 +110,15 @@ function StructuredOutputNode({
 					</div>
 				</BaseNodeFooter>
 			</BaseNode>
+			<JsonSchemaBuilderDialog
+				open={isBuilderOpen}
+				onOpenChange={setIsBuilderOpen}
+				onSave={(schema) => {
+					updateNode(id, { jsonSchema: JSON.stringify(schema, null, 2) });
+				}}
+				onError={(b) => setValidSchema(!b)}
+				initialSchema={data.jsonSchema}
+			/>
 		</NodeStatusIndicator>
 	);
 }

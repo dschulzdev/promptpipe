@@ -1,6 +1,7 @@
 import { type Node, type NodeProps, Position } from "@xyflow/react";
-import { MessageSquare } from "lucide-react";
+import { MessageSquare, RefreshCcw } from "lucide-react";
 import { memo } from "react";
+import { useShallow } from "zustand/react/shallow";
 import {
 	BaseNode,
 	BaseNodeContent,
@@ -10,7 +11,15 @@ import {
 } from "@/components/base-node";
 import { LabeledHandle } from "@/components/labeled-handle";
 import { NodeStatusIndicator } from "@/components/node-status-indicator";
-import { type LoadingStateMixin } from "@/stores/node-store";
+import { Button } from "@/components/ui/button";
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuLabel,
+	DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import useNodeStore, { type LoadingStateMixin } from "@/stores/node-store";
 import type { TextGenerationNodeData } from "~/workflow/dto/nodes/text-generation-node-data.dto";
 
 export type TextGenerationNodeProps = Node<
@@ -18,14 +27,42 @@ export type TextGenerationNodeProps = Node<
 	"text_generation"
 >;
 
-function TextGenerationNode({ data }: NodeProps<TextGenerationNodeProps>) {
+function TextGenerationNode({ id, data }: NodeProps<TextGenerationNodeProps>) {
+	const { updateNode, replaceNode } = useNodeStore(
+		useShallow((state) => ({
+			updateNode: state.updateNode,
+			replaceNode: state.replaceNode,
+		})),
+	);
+
 	return (
 		<NodeStatusIndicator status={data.state} variant="border">
 			<BaseNode className="w-80">
 				<BaseNodeHeader>
 					<MessageSquare className="h-4 w-4 text-neutral-500" />
 					<BaseNodeHeaderTitle>{"Text generation"}</BaseNodeHeaderTitle>
+					<DropdownMenu>
+						<DropdownMenuTrigger asChild>
+							<Button size={"icon"} variant="ghost">
+								<RefreshCcw />
+							</Button>
+						</DropdownMenuTrigger>
+						<DropdownMenuContent align="end">
+							<DropdownMenuLabel className="font-bold">
+								Swap with
+							</DropdownMenuLabel>
+							<DropdownMenuItem
+								onClick={() => {
+									replaceNode(id, "structured_output");
+								}}
+							>
+								<MessageSquare className="mr-2 h-4 w-4 text-neutral-500" />
+								Structured Output
+							</DropdownMenuItem>
+						</DropdownMenuContent>
+					</DropdownMenu>
 				</BaseNodeHeader>
+				<BaseNodeContent />
 				<BaseNodeFooter className="w-full px-0">
 					<div className="flex w-full flex-col items-start gap-2">
 						<LabeledHandle

@@ -40,7 +40,6 @@ export const useJobUpdates = () => {
 		queryKey,
 		initialData: [],
 		queryFn: () => {
-			console.log("Fetching job updates for run ID:", currentRunId);
 			return [] as ProgressMessageWithType[];
 		},
 	});
@@ -57,9 +56,6 @@ export const useJobUpdates = () => {
 					data[data.length - 1]?.type,
 				))
 		) {
-			console.log(
-				"No current run ID or already running, skipping SSE connection and reading from cache.",
-			);
 			return;
 		}
 
@@ -107,7 +103,6 @@ export const useJobUpdates = () => {
 			}
 			if (queryData.type === "success_node") {
 				if (queryData.payload.payload?.nodeId) {
-					console.log("Node success:", queryData.payload.payload.data);
 					updateNode(queryData.payload.payload.nodeId, {
 						state: "success",
 						...(queryData.payload.payload.data ?? undefined),

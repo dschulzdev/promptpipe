@@ -22,6 +22,9 @@ type SelectedGoogleGenAIModel =
 type SelectedOpenRouterModel =
 	| "openrouter/horizon-beta"
 	| "z-ai/glm-4.5-air:free"
+	| "x-ai/grok-4-fast:free"
+	| "deepseek/deepseek-chat-v3.1:free"
+	| "openai/gpt-oss-20b:free"
 	| "moonshotai/kimi-k2:free";
 type ModelWithSetup = LanguageModel;
 
