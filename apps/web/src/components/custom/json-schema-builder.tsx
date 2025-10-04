@@ -126,7 +126,7 @@ const JsonSchemaBuilder = ({
 	const addProperty = () => {
 		setProperties([
 			...properties,
-			{ id: Date.now().toString(), name: "", type: "string", isArray: false },
+			{ id: crypto.randomUUID(), name: "", type: "string", isArray: false },
 		]);
 	};
 
