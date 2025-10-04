@@ -8,7 +8,14 @@ export function isValidJsonSchema(schemaString: string): boolean {
 		ajv.compile(schema);
 		return true;
 	} catch (error) {
-		console.error("Invalid schema:", error);
+		if (error && typeof error === "object" && "errors" in error && Array.isArray((error as any).errors)) {
+			console.error("Invalid schema. Validation errors:");
+			for (const err of (error as any).errors) {
+				console.error(`- ${err.instancePath || err.dataPath}: ${err.message}`);
+			}
+		} else {
+			console.error("Invalid schema:", error);
+		}
 		return false;
 	}
 }
