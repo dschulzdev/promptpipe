@@ -181,7 +181,7 @@ const JsonSchemaBuilder = ({
 						properties: [
 							...(p.properties || []),
 							{
-								id: Date.now().toString(),
+								id: crypto.randomUUID().toString(),
 								name: "",
 								type: "string",
 								isArray: false,
