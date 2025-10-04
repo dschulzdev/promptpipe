@@ -79,6 +79,7 @@ export default function PromptpipeWhiteboard() {
 			onConnect={onConnect}
 			isValidConnection={isValidConnection}
 			fitView
+			proOptions={{ hideAttribution: true }}
 		>
 			<Controls />
 			<Panel position={"top-left"}>

@@ -7,9 +7,11 @@ import {
 	AssistantModelMessage,
 	generateObject,
 	generateText,
+	jsonSchema,
 	LanguageModel,
 	ModelMessage,
 } from "ai";
+import Ajv from "ajv";
 import { AnalyticsService } from "src/analytics/analytics.service";
 
 type SelectedOpenAiModel = "gpt-4.1-mini" | "gpt-4o-mini" | "gpt-4.1-nano";
@@ -20,6 +22,9 @@ type SelectedGoogleGenAIModel =
 type SelectedOpenRouterModel =
 	| "openrouter/horizon-beta"
 	| "z-ai/glm-4.5-air:free"
+	| "x-ai/grok-4-fast:free"
+	| "deepseek/deepseek-chat-v3.1:free"
+	| "openai/gpt-oss-20b:free"
 	| "moonshotai/kimi-k2:free";
 type ModelWithSetup = LanguageModel;
 
@@ -98,15 +103,23 @@ export class AiService {
 	async getStructuredResponse({
 		modelConfig,
 		messages,
+		jsonSchema: schema,
 	}: {
 		modelConfig: LanguageModel;
 		messages: ModelMessage[];
+		jsonSchema: string;
 	}): Promise<ModelMessage[]> {
 		this.logger.log("Generating response with:", messages);
+		const ajv = new Ajv();
+		const validate = ajv.compile(JSON.parse(schema));
+		if (!validate) {
+			throw new Error("Invalid JSON schema");
+		}
+
 		const response = await generateObject({
 			model: modelConfig,
 			messages: messages,
-			output: "no-schema",
+			schema: jsonSchema(JSON.parse(schema)),
 		});
 		this.logger.log("Generated response: ", response.object);
 		const outputMessage: AssistantModelMessage = {

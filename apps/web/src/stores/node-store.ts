@@ -11,12 +11,13 @@ import {
 import { create } from "zustand";
 import type { PipelineConnectionDto } from "@/api-client";
 import type { BasicStartNodeProps } from "@/components/custom/nodes/basic/start-node";
+import type { StructuredOutputNodeProps } from "@/components/custom/nodes/generation/structured-output-node";
 import type { TextGenerationNodeProps } from "@/components/custom/nodes/generation/text-generation-node";
 import type { TextInputNodeProps } from "@/components/custom/nodes/input/text-input-node";
 import type { LLMNodeProps } from "@/components/custom/nodes/llm-node";
 import type { TextOutputNodeProps } from "@/components/custom/nodes/output/text-output-node";
 import type { MergeNodeProps } from "@/components/custom/nodes/processing/merge-node";
-import type { NodeInputData } from "@/constants/node_types";
+import { type NodeInputData, nodeTypes } from "@/constants/node_types";
 import {
 	LLM_MODELS,
 	type LLMProvider,
@@ -46,11 +47,13 @@ export type NodeActions = {
 	addTextInputNode: () => void;
 	addBasicStartNode: () => void;
 	addTextGenerationNode: () => void;
+	addStructuredOutputNode: () => void;
 	addTextOutputNode: () => void;
 	addMergeNode: () => void;
 	updateNode: (id: string, data: NodeInputData) => void;
 	setNodes: (nodes: AppNode[]) => void;
 	setEdges: (edges: Edge[]) => void;
+	replaceNode: (oldNodeId: string, newNodeType: keyof typeof nodeTypes) => void;
 };
 
 const initialNodes: AppNode[] = [];
@@ -169,6 +172,20 @@ const useNodeStore = create<NodeState & NodeActions>((set, get) => ({
 			nodes: [...get().nodes, newNode],
 		});
 	},
+	addStructuredOutputNode: () => {
+		const newNode: StructuredOutputNodeProps = {
+			id: crypto.randomUUID(),
+			type: "structured_output",
+			data: {
+				state: "initial",
+				jsonSchema: "{}",
+			},
+			position: generateRandomStartPosition(),
+		};
+		set({
+			nodes: [...get().nodes, newNode],
+		});
+	},
 	addLLMNode: (provider) => {
 		const newNode: LLMNodeProps = {
 			id: crypto.randomUUID(),
@@ -203,6 +220,63 @@ const useNodeStore = create<NodeState & NodeActions>((set, get) => ({
 	},
 	setEdges: (edges) => {
 		set({ edges });
+	},
+	replaceNode: (oldNodeId, newNodeType) => {
+		set((state) => {
+			const oldNode = state.nodes.find((node) => node.id === oldNodeId);
+			if (!oldNode) {
+				return state;
+			}
+
+			const newNodeId = crypto.randomUUID();
+			let newNode: AppNode;
+
+			switch (newNodeType) {
+				case "structured_output":
+					newNode = {
+						id: newNodeId,
+						type: "structured_output",
+						data: {
+							state: "initial",
+							jsonSchema: "{}",
+						},
+						position: oldNode.position,
+					};
+					break;
+				case "text_generation":
+					newNode = {
+						id: newNodeId,
+						type: "text_generation",
+						data: {
+							state: "initial",
+							json_mode: false,
+						},
+						position: oldNode.position,
+					};
+					break;
+				default:
+					console.error("Unknown node type for replacement:", newNodeType);
+					return state;
+			}
+
+			const newNodes = state.nodes.filter((node) => node.id !== oldNodeId);
+			newNodes.push(newNode);
+
+			const newEdges = state.edges.map((edge) => {
+				if (edge.source === oldNodeId) {
+					return { ...edge, source: newNodeId };
+				}
+				if (edge.target === oldNodeId) {
+					return { ...edge, target: newNodeId };
+				}
+				return edge;
+			});
+
+			return {
+				nodes: newNodes,
+				edges: newEdges,
+			};
+		});
 	},
 }));
 

@@ -48,6 +48,7 @@ export default function BlockSidebar() {
 		addTextOutputNode,
 		addBasicStartNode,
 		addMergeNode,
+		addStructuredOutputNode,
 	} = useNodeStore(
 		useShallow((state) => ({
 			addLLMNode: state.addLLMNode,
@@ -56,6 +57,7 @@ export default function BlockSidebar() {
 			addTextOutputNode: state.addTextOutputNode,
 			addBasicStartNode: state.addBasicStartNode,
 			addMergeNode: state.addMergeNode,
+			addStructuredOutputNode: state.addStructuredOutputNode,
 		})),
 	);
 
@@ -291,6 +293,16 @@ export default function BlockSidebar() {
 										>
 											<MessageSquare />
 											{"Text generation"}
+										</SidebarMenuSubButton>
+									</SidebarMenuSubItem>
+									<SidebarMenuSubItem key={"Structured output"}>
+										<SidebarMenuSubButton
+											onClick={() => {
+												addStructuredOutputNode();
+											}}
+										>
+											<MessageSquare />
+											{"Structured output"}
 										</SidebarMenuSubButton>
 									</SidebarMenuSubItem>
 								</SidebarMenuSub>
