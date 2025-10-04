@@ -200,7 +200,7 @@ export async function processTextGenerationNodeHandles({
 	}
 
 	if (node.type === NodeTypes.STRUCTURED_OUTPUT && !node.data.jsonSchema) {
-		console.log(node.data);
+		this.logger.error("Structured output node missing output schema", { nodeData: node.data });
 		throw new Error("Structured output node missing output schema");
 	}
 
