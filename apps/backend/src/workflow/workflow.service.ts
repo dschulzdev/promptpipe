@@ -6,7 +6,7 @@ import {
 } from "@nestjs/common";
 import { UserSession } from "@thallesp/nestjs-better-auth";
 import { instanceToPlain } from "class-transformer";
-import { ok, ResultAsync } from "neverthrow";
+import { ResultAsync } from "neverthrow";
 import { Observable } from "rxjs";
 import { PrismaService } from "src/prisma/prisma.service";
 import { RunnerService } from "src/runner/runner.service";
@@ -54,12 +54,12 @@ export class WorkflowService {
 	async deleteOne(id: string, user: UserSession["user"]) {
 		const applicationUser =
 			await this.checkApplicationUserAndAccessControl(user);
-		const workflow = await this.prismaService.workflow.delete({
-			where: { id, applicationUserId: applicationUser.id },
-		});
-		if (!workflow) {
-			throw new NotFoundException(`Workflow with id ${id} not found`);
-		}
+		await ResultAsync.fromPromise(
+			this.prismaService.workflow.delete({
+				where: { id, applicationUserId: applicationUser.id },
+			}),
+			() => new NotFoundException(`Workflow with id ${id} not found`),
+		);
 	}
 
 	public async create(

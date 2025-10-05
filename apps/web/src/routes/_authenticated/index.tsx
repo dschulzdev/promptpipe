@@ -10,13 +10,7 @@ import {
 } from "@/api-client/@tanstack/react-query.gen";
 import AddWorkflowDialog from "@/components/custom/add-workflow-dialog";
 import { Button } from "@/components/ui/button";
-import {
-	Card,
-	CardAction,
-	CardFooter,
-	CardHeader,
-	CardTitle,
-} from "@/components/ui/card";
+import { Card, CardAction, CardHeader, CardTitle } from "@/components/ui/card";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -101,7 +95,7 @@ function WorkflowCard(workflow: WorkflowDto) {
 			queryClient.invalidateQueries({
 				queryKey: workflowControllerFindAllQueryKey(),
 			});
-			toast.success("Workflow delete successfully!");
+			toast.success("Workflow deleted successfully!");
 		},
 		onError: (error) => {
 			toast.error(`Failed to delete workflow: ${error.message}`);
