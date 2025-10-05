@@ -1,10 +1,28 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { SquareDashed } from "lucide-react";
-import { workflowControllerFindAllOptions } from "@/api-client/@tanstack/react-query.gen";
+import { MoreHorizontal, SquareDashed, Trash } from "lucide-react";
+import { toast } from "sonner";
+import type { WorkflowDto } from "@/api-client";
+import {
+	workflowControllerDeleteOneMutation,
+	workflowControllerFindAllOptions,
+	workflowControllerFindAllQueryKey,
+} from "@/api-client/@tanstack/react-query.gen";
 import AddWorkflowDialog from "@/components/custom/add-workflow-dialog";
 import { Button } from "@/components/ui/button";
-import { Card, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+	Card,
+	CardAction,
+	CardFooter,
+	CardHeader,
+	CardTitle,
+} from "@/components/ui/card";
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { auth } from "@/lib/auth";
 
 export const Route = createFileRoute("/_authenticated/")({
@@ -32,7 +50,9 @@ function Navbar() {
 		<nav className="flex w-full flex-row bg-sidebar p-4">
 			<h1 className="flex-1">PromptPipe</h1>
 			<Button
-				onClick={() => signOut({}, { onSuccess: () => navigate({ to: "/login" }) })}
+				onClick={() =>
+					signOut({}, { onSuccess: () => navigate({ to: "/login" }) })
+				}
 			>
 				Sign Out
 			</Button>
@@ -53,20 +73,7 @@ function WorkflowList() {
 	return (
 		<div className="container flex flex-row flex-wrap gap-4">
 			{data?.length ? (
-				data.map((workflow) => (
-					<Link
-						className="w-80"
-						key={workflow.id}
-						to={"/workflows/$id"}
-						params={{ id: workflow.id }}
-					>
-						<Card>
-							<CardHeader>
-								<CardTitle>{workflow.name}</CardTitle>
-							</CardHeader>
-						</Card>
-					</Link>
-				))
+				data.map((workflow) => <WorkflowCard key={workflow.id} {...workflow} />)
 			) : (
 				<NoWorkflows />
 			)}
@@ -83,5 +90,60 @@ function NoWorkflows() {
 				Create your first workflow to get started.
 			</p>
 		</div>
+	);
+}
+
+function WorkflowCard(workflow: WorkflowDto) {
+	const queryClient = useQueryClient();
+	const { mutate } = useMutation({
+		...workflowControllerDeleteOneMutation({ path: { id: workflow.id } }),
+		onSuccess: () => {
+			queryClient.invalidateQueries({
+				queryKey: workflowControllerFindAllQueryKey(),
+			});
+			toast.success("Workflow delete successfully!");
+		},
+		onError: (error) => {
+			toast.error(`Failed to delete workflow: ${error.message}`);
+		},
+	});
+
+	return (
+		<Link className="w-80" to={"/workflows/$id"} params={{ id: workflow.id }}>
+			<Card>
+				<CardHeader>
+					<CardTitle>{workflow.name}</CardTitle>
+					<CardAction>
+						<DropdownMenu>
+							<DropdownMenuTrigger asChild>
+								<Button
+									variant={"secondary"}
+									size={"icon"}
+									onClick={(e) => {
+										e.preventDefault();
+										e.stopPropagation();
+									}}
+								>
+									<MoreHorizontal />
+								</Button>
+							</DropdownMenuTrigger>
+							<DropdownMenuContent>
+								<DropdownMenuItem
+									className="text-destructive"
+									onClick={(e) => {
+										e.preventDefault();
+										e.stopPropagation();
+										mutate({ path: { id: workflow.id } });
+									}}
+								>
+									<Trash className="text-destructive" />
+									Delete
+								</DropdownMenuItem>
+							</DropdownMenuContent>
+						</DropdownMenu>
+					</CardAction>
+				</CardHeader>
+			</Card>
+		</Link>
 	);
 }

@@ -1,6 +1,7 @@
 import {
 	Body,
 	Controller,
+	Delete,
 	Get,
 	MessageEvent,
 	NotFoundException,
@@ -43,6 +44,11 @@ export class WorkflowController {
 			throw new NotFoundException(`Workflow with id ${id} not found`);
 		}
 		return workflow;
+	}
+
+	@Delete(":id")
+	async deleteOne(@Param("id") id: string, @Session() session: UserSession) {
+		await this.workflowService.deleteOne(id, session.user);
 	}
 
 	@Post()

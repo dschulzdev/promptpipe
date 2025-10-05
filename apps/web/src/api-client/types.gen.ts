@@ -30,8 +30,8 @@ export type UpdateWorkflowDto = {
 };
 
 export type LlmNodeDataDto = {
-    llmProvider: 'openai' | 'google_genai';
-    llmModel: 'gemini-2.5-flash' | 'gemini-2.0-flash' | 'gemini-2.0-flash-lite' | '4.1-mini' | '4.1-nano' | '4o-mini';
+    llmProvider: 'openai' | 'google_genai' | 'openrouter';
+    llmModel: 'gemini-2.5-flash' | 'gemini-2.5-flash-lite' | 'gemini-2.0-flash' | 'gemini-2.0-flash-lite' | 'gpt-5-nano' | 'gpt-4.1-mini' | 'gpt-4.1-nano' | 'gpt-4o-mini';
 };
 
 export type Position = {
@@ -41,7 +41,7 @@ export type Position = {
 
 export type LlmNodeDto = {
     id: string;
-    type: 'text_input' | 'text_output' | 'text_generation' | 'basic_start' | 'llm';
+    type: 'text_input' | 'text_output' | 'text_generation' | 'basic_start' | 'llm' | 'merge' | 'structured_output';
     data: LlmNodeDataDto;
     position: Position;
 };
@@ -52,40 +52,45 @@ export type BasicStartNodeDataDto = {
 
 export type BasicStartNodeDto = {
     id: string;
-    type: 'text_input' | 'text_output' | 'text_generation' | 'basic_start' | 'llm';
+    type: 'text_input' | 'text_output' | 'text_generation' | 'basic_start' | 'llm' | 'merge' | 'structured_output';
     data: BasicStartNodeDataDto;
     position: Position;
 };
 
 export type TextInputNodeDataDto = {
+    role: {
+        [key: string]: unknown;
+    };
     prompt: string;
 };
 
 export type TextInputNodeDto = {
     id: string;
-    type: 'text_input' | 'text_output' | 'text_generation' | 'basic_start' | 'llm';
+    type: 'text_input' | 'text_output' | 'text_generation' | 'basic_start' | 'llm' | 'merge' | 'structured_output';
     data: TextInputNodeDataDto;
     position: Position;
 };
 
 export type TextOutputNodeDataDto = {
-    [key: string]: unknown;
+    response: Array<{
+        [key: string]: unknown;
+    }>;
 };
 
 export type TextOutputNodeDto = {
     id: string;
-    type: 'text_input' | 'text_output' | 'text_generation' | 'basic_start' | 'llm';
+    type: 'text_input' | 'text_output' | 'text_generation' | 'basic_start' | 'llm' | 'merge' | 'structured_output';
     data: TextOutputNodeDataDto;
     position: Position;
 };
 
 export type TextGenerationNodeDataDto = {
-    json_mode: boolean;
+    [key: string]: unknown;
 };
 
 export type TextGenerationNodeDto = {
     id: string;
-    type: 'text_input' | 'text_output' | 'text_generation' | 'basic_start' | 'llm';
+    type: 'text_input' | 'text_output' | 'text_generation' | 'basic_start' | 'llm' | 'merge' | 'structured_output';
     data: TextGenerationNodeDataDto;
     position: Position;
 };
@@ -147,6 +152,19 @@ export type WorkflowControllerCreateResponses = {
 };
 
 export type WorkflowControllerCreateResponse = WorkflowControllerCreateResponses[keyof WorkflowControllerCreateResponses];
+
+export type WorkflowControllerDeleteOneData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/workflow/{id}';
+};
+
+export type WorkflowControllerDeleteOneResponses = {
+    200: unknown;
+};
 
 export type WorkflowControllerFindOneData = {
     body?: never;
