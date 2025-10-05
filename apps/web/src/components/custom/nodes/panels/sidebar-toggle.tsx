@@ -1,8 +1,14 @@
 import { SidebarClose, SidebarOpen } from "lucide-react";
 import { memo } from "react";
 import { Button } from "@/components/ui/button";
+import { Kbd } from "@/components/ui/kbd";
 import { useSidebar } from "@/components/ui/sidebar";
-import { useSimpleHotkey } from "@/hooks/hotkeys";
+import {
+	Tooltip,
+	TooltipContent,
+	TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { hotkeyMap, useSimpleHotkey } from "@/hooks/hotkeys";
 
 function SidebarToggle() {
 	const { open, toggleSidebar } = useSidebar();
@@ -15,9 +21,19 @@ function SidebarToggle() {
 		[toggleSidebar],
 	);
 	return (
-		<Button variant="outline" size="icon" onClick={toggleSidebar}>
-			{open ? <SidebarClose /> : <SidebarOpen />}
-		</Button>
+		<Tooltip>
+			<TooltipTrigger asChild>
+				<Button variant="outline" size="icon" onClick={toggleSidebar}>
+					{open ? <SidebarClose /> : <SidebarOpen />}
+				</Button>
+			</TooltipTrigger>
+			<TooltipContent>
+				<p>
+					{open ? "Close Sidebar " : "Open Sidebar "}
+					<Kbd>{hotkeyMap.toggle_sidebar.visualRepresentation}</Kbd>
+				</p>
+			</TooltipContent>
+		</Tooltip>
 	);
 }
 

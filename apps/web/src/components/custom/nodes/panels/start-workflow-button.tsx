@@ -5,7 +5,13 @@ import { memo, useCallback } from "react";
 import { toast } from "sonner";
 import { useShallow } from "zustand/react/shallow";
 import { workflowControllerRunMutation } from "@/api-client/@tanstack/react-query.gen";
-import { useSimpleHotkey } from "@/hooks/hotkeys";
+import { Kbd } from "@/components/ui/kbd";
+import {
+	Tooltip,
+	TooltipContent,
+	TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { hotkeyMap, useSimpleHotkey } from "@/hooks/hotkeys";
 import useSaveFileMutation from "@/hooks/mutations/use-save-file-mutation";
 import useRunnerStore from "@/stores/runner-store";
 import { Button } from "../../../ui/button";
@@ -50,7 +56,7 @@ function StartWorkflowButton() {
 				},
 			},
 		);
-	}, [mutate, setLocalWorkflowId, id, workflowInProgress]);
+	}, [mutate, setLocalWorkflowId, id]);
 
 	useSimpleHotkey(
 		"run_workflow",
@@ -64,19 +70,28 @@ function StartWorkflowButton() {
 	);
 
 	return (
-		<Button
-			size={"icon"}
-			disabled={isSaving || workflowInProgress}
-			onClick={handleStartWorkflow}
-			variant={"secondary"}
-		>
-			{workflowInProgress ? (
-				<Loader2 className="h-full w-full animate-spin" />
-			) : (
-				<Play />
-			)}
-			{isRunning && <span className="ml-2 text-muted text-sm">Running...</span>}
-		</Button>
+		<Tooltip>
+			<TooltipTrigger asChild>
+				<Button
+					size={"icon"}
+					disabled={isSaving || workflowInProgress}
+					onClick={handleStartWorkflow}
+					variant={"secondary"}
+				>
+					{workflowInProgress ? (
+						<Loader2 className="h-full w-full animate-spin" />
+					) : (
+						<Play />
+					)}
+				</Button>
+			</TooltipTrigger>
+			<TooltipContent>
+				<p>
+					{"Start Workflow "}
+					<Kbd>{hotkeyMap.run_workflow.visualRepresentation}</Kbd>
+				</p>
+			</TooltipContent>
+		</Tooltip>
 	);
 }
 
