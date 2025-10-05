@@ -1,5 +1,7 @@
 import { Logs } from "lucide-react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { useSimpleHotkey } from "@/hooks/hotkeys";
 import {
 	Sheet,
 	SheetContent,
@@ -11,14 +13,25 @@ import {
 import JobLogs from "./job-logs";
 
 export default function LogSheet() {
+	const [open, setOpen] = useState(false);
+
+	useSimpleHotkey(
+		"toggle_logs",
+		() => {
+			setOpen((prev) => !prev);
+		},
+		{},
+		[setOpen],
+	);
+
 	return (
-		<Sheet>
+		<Sheet open={open} onOpenChange={setOpen}>
 			<SheetTrigger asChild>
 				<Button variant={"outline"}>
 					<Logs />
 				</Button>
 			</SheetTrigger>
-			<SheetContent className="flex h-full w-full flex-col">
+			<SheetContent className="flex h-full w-full flex-col outline-0">
 				<SheetHeader>
 					<SheetTitle>Logs of your current run</SheetTitle>
 					<SheetDescription>

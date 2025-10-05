@@ -5,6 +5,7 @@ import { memo, useCallback } from "react";
 import { toast } from "sonner";
 import { useShallow } from "zustand/react/shallow";
 import { workflowControllerRunMutation } from "@/api-client/@tanstack/react-query.gen";
+import { useSimpleHotkey } from "@/hooks/hotkeys";
 import useSaveFileMutation from "@/hooks/mutations/use-save-file-mutation";
 import useRunnerStore from "@/stores/runner-store";
 import { Button } from "../../../ui/button";
@@ -32,6 +33,7 @@ function StartWorkflowButton() {
 			toast.error("Workflow ID is not available.");
 			return;
 		}
+		console.log(workflowInProgress);
 		mutate(
 			{
 				path: {
@@ -49,7 +51,19 @@ function StartWorkflowButton() {
 				},
 			},
 		);
-	}, [mutate, setLocalWorkflowId, id]);
+	}, [mutate, setLocalWorkflowId, id, workflowInProgress]);
+
+	useSimpleHotkey(
+		"run_workflow",
+		() => {
+			if (!isSaving && !isRunning && !isPending) {
+				handleStartWorkflow();
+			}
+		},
+		{},
+		[isRunning, isPending, isSaving, handleStartWorkflow],
+	);
+
 	return (
 		<Button
 			size={"icon"}
@@ -57,7 +71,12 @@ function StartWorkflowButton() {
 			onClick={handleStartWorkflow}
 			variant={"secondary"}
 		>
-			{workflowInProgress ? <Loader2 className="animate-spin" /> : <Play />}
+			{workflowInProgress ? (
+				<Loader2 className="h-full w-full animate-spin" />
+			) : (
+				<Play />
+			)}
+			{isRunning && <span className="ml-2 text-muted text-sm">Running...</span>}
 		</Button>
 	);
 }
