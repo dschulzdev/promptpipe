@@ -8,7 +8,7 @@ export const hotkeyMap = {
 	},
 	toggle_sidebar: {
 		hotkey: "shift+m",
-		visualRepresentation: "⇧+B",
+		visualRepresentation: "⇧+M",
 	},
 	toggle_logs: {
 		hotkey: "shift+l",
