@@ -8,6 +8,7 @@
 		"build": "vite build",
 		"serve": "vite preview",
 		"start": "vite",
+		"openapi-ts": "openapi-ts",
 		"check": "biome check --write .",
 		"check-types": "tsc --noEmit"
 	},

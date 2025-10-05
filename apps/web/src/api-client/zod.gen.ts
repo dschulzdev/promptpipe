@@ -13,15 +13,18 @@ export const zPipelineConnectionDto = z.object({
 export const zLlmNodeDataDto = z.object({
     llmProvider: z.enum([
         'openai',
-        'google_genai'
+        'google_genai',
+        'openrouter'
     ]),
     llmModel: z.enum([
         'gemini-2.5-flash',
+        'gemini-2.5-flash-lite',
         'gemini-2.0-flash',
         'gemini-2.0-flash-lite',
-        '4.1-mini',
-        '4.1-nano',
-        '4o-mini'
+        'gpt-5-nano',
+        'gpt-4.1-mini',
+        'gpt-4.1-nano',
+        'gpt-4o-mini'
     ])
 });
 
@@ -37,13 +40,16 @@ export const zLlmNodeDto = z.object({
         'text_output',
         'text_generation',
         'basic_start',
-        'llm'
+        'llm',
+        'merge',
+        'structured_output'
     ]),
     data: zLlmNodeDataDto,
     position: zPosition
 });
 
 export const zTextInputNodeDataDto = z.object({
+    role: z.object({}),
     prompt: z.string()
 });
 
@@ -54,13 +60,17 @@ export const zTextInputNodeDto = z.object({
         'text_output',
         'text_generation',
         'basic_start',
-        'llm'
+        'llm',
+        'merge',
+        'structured_output'
     ]),
     data: zTextInputNodeDataDto,
     position: zPosition
 });
 
-export const zTextOutputNodeDataDto = z.object({});
+export const zTextOutputNodeDataDto = z.object({
+    response: z.array(z.object({})).default([])
+});
 
 export const zTextOutputNodeDto = z.object({
     id: z.string(),
@@ -69,7 +79,9 @@ export const zTextOutputNodeDto = z.object({
         'text_output',
         'text_generation',
         'basic_start',
-        'llm'
+        'llm',
+        'merge',
+        'structured_output'
     ]),
     data: zTextOutputNodeDataDto,
     position: zPosition
@@ -84,15 +96,15 @@ export const zBasicStartNodeDto = z.object({
         'text_output',
         'text_generation',
         'basic_start',
-        'llm'
+        'llm',
+        'merge',
+        'structured_output'
     ]),
     data: zBasicStartNodeDataDto,
     position: zPosition
 });
 
-export const zTextGenerationNodeDataDto = z.object({
-    json_mode: z.boolean()
-});
+export const zTextGenerationNodeDataDto = z.object({});
 
 export const zTextGenerationNodeDto = z.object({
     id: z.string(),
@@ -101,7 +113,9 @@ export const zTextGenerationNodeDto = z.object({
         'text_output',
         'text_generation',
         'basic_start',
-        'llm'
+        'llm',
+        'merge',
+        'structured_output'
     ]),
     data: zTextGenerationNodeDataDto,
     position: zPosition
@@ -181,6 +195,14 @@ export const zWorkflowControllerCreateData = z.object({
 });
 
 export const zWorkflowControllerCreateResponse = zWorkflowDto;
+
+export const zWorkflowControllerDeleteOneData = z.object({
+    body: z.never().optional(),
+    path: z.object({
+        id: z.string()
+    }),
+    query: z.never().optional()
+});
 
 export const zWorkflowControllerFindOneData = z.object({
     body: z.never().optional(),
