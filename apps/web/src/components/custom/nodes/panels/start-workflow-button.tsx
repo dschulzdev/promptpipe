@@ -33,7 +33,6 @@ function StartWorkflowButton() {
 			toast.error("Workflow ID is not available.");
 			return;
 		}
-		console.log(workflowInProgress);
 		mutate(
 			{
 				path: {
