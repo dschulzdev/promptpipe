@@ -61,10 +61,10 @@ export class RunnerService {
 		userId: string,
 	): Promise<Observable<MessageEvent>> {
 		const job = await this.workflowRunsQueue.getJob(jobId);
-		console.log("Fetched job:", job.data);
-		console.log(userId);
 		if (!job || job.data.userId !== userId) {
-			throw new UnauthorizedException(`Job with id ${jobId} not found`);
+			throw new UnauthorizedException(
+				`Unauthorized access for job with id ${jobId} `,
+			);
 		}
 		return new Observable((subscriber) => {
 			const progressChannel = `workflow-progress:${jobId}`;
