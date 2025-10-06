@@ -1,6 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { Type } from "class-transformer";
-import { IsArray, ValidateNested } from "class-validator";
+import { IsArray, IsString, ValidateNested } from "class-validator";
 import { PipelineConnectionDto } from "./pipeline-connection.dto";
 import {
 	PipelineNodeDto,
@@ -27,4 +27,7 @@ export class RunWorkloadDto {
 	@Type(() => PipelineConnectionDto)
 	@ApiProperty({ type: [PipelineConnectionDto] })
 	connections: PipelineConnectionDto[];
+
+	@IsString()
+	userId: string;
 }
