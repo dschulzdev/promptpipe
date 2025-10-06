@@ -1,6 +1,11 @@
 import { RedisService } from "@liaoliaots/nestjs-redis";
 import { InjectQueue } from "@nestjs/bullmq";
-import { BadRequestException, Injectable, MessageEvent } from "@nestjs/common";
+import {
+	BadRequestException,
+	Injectable,
+	MessageEvent,
+	UnauthorizedException,
+} from "@nestjs/common";
 import { Queue } from "bullmq";
 import Redis from "ioredis";
 import { Observable } from "rxjs";
@@ -51,7 +56,16 @@ export class RunnerService {
 		return job.id;
 	}
 
-	getJobStream(jobId: string): Observable<MessageEvent> {
+	async getJobStream(
+		jobId: string,
+		userId: string,
+	): Promise<Observable<MessageEvent>> {
+		const job = await this.workflowRunsQueue.getJob(jobId);
+		console.log("Fetched job:", job.data);
+		console.log(userId);
+		if (!job || job.data.userId !== userId) {
+			throw new UnauthorizedException(`Job with id ${jobId} not found`);
+		}
 		return new Observable((subscriber) => {
 			const progressChannel = `workflow-progress:${jobId}`;
 			const messagesKey = `workflow-messages:${jobId}`;

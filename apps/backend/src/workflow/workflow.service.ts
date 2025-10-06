@@ -22,10 +22,22 @@ export class WorkflowService {
 		private readonly prismaService: PrismaService,
 	) {}
 
-	public async runWorkflow(workflowId: string): Promise<string | undefined> {
+	public async runWorkflow(
+		workflowId: string,
+		user: UserSession["user"],
+	): Promise<string | undefined> {
 		const workflowData = await this.prismaService.workflow.findUnique({
-			where: { id: workflowId },
+			where: { id: workflowId, ApplicationUser: { user: { id: user.id } } },
 		});
+		const applicationUser = await getApplicationUser(
+			user.id,
+			this.prismaService,
+		);
+		if (!applicationUser) {
+			throw new UnauthorizedException(
+				"You are not allowed to perform this action",
+			);
+		}
 		if (!workflowData) {
 			throw new NotFoundException(`Workflow with id ${workflowId} not found`);
 		}
@@ -33,21 +45,36 @@ export class WorkflowService {
 		return this.runnerService.runWorkflow({
 			nodes: workflowData.nodes,
 			connections: workflowData.connections,
+			userId: applicationUser.id,
 		});
 	}
-	public getJobStream(jobId: string): Observable<MessageEvent> {
+	public async getJobStream(
+		jobId: string,
+		user: UserSession["user"],
+	): Promise<Observable<MessageEvent>> {
 		// Implementation to get the job stream
-		const stream = this.runnerService.getJobStream(jobId);
+		const applicationUser = await getApplicationUser(
+			user.id,
+			this.prismaService,
+		);
+		if (!applicationUser) {
+			throw new UnauthorizedException(
+				"You are not allowed to perform this action",
+			);
+		}
+		const stream = this.runnerService.getJobStream(jobId, applicationUser.id);
 		return stream;
 	}
 
-	public async findAll() {
-		return await this.prismaService.workflow.findMany();
+	public async findAll(user: UserSession["user"]) {
+		return await this.prismaService.workflow.findMany({
+			where: { ApplicationUser: { user: { id: user.id } } },
+		});
 	}
-	public async findOne(id: string) {
-		//await new Promise((resolve) => setTimeout(resolve, 10000)); // Simulate delay
+
+	public async findOne(id: string, user: UserSession["user"]) {
 		return await this.prismaService.workflow.findUnique({
-			where: { id },
+			where: { id, ApplicationUser: { user: { id: user.id } } },
 		});
 	}
 

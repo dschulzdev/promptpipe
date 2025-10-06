@@ -22,24 +22,33 @@ export class WorkflowController {
 	constructor(private readonly workflowService: WorkflowService) {}
 
 	@Post("run/:workflowId")
-	async run(@Param("workflowId") workflowId: string) {
+	async run(
+		@Param("workflowId") workflowId: string,
+		@Session() session: UserSession,
+	) {
 		console.log("Running workflow with id:", workflowId);
-		return await this.workflowService.runWorkflow(workflowId);
+		return await this.workflowService.runWorkflow(workflowId, session.user);
 	}
 
 	@Sse("stream/:runId")
-	streamUpdates(@Param("runId") runId: string): Observable<MessageEvent> {
-		return this.workflowService.getJobStream(runId);
+	async streamUpdates(
+		@Param("runId") runId: string,
+		@Session() session: UserSession,
+	) {
+		return this.workflowService.getJobStream(runId, session.user);
 	}
 
 	@Get()
-	async findAll(): Promise<WorkflowDto[]> {
-		return await this.workflowService.findAll();
+	async findAll(@Session() session: UserSession): Promise<WorkflowDto[]> {
+		return await this.workflowService.findAll(session.user);
 	}
 
 	@Get(":id")
-	async findOne(@Param("id") id: string): Promise<WorkflowDto> {
-		const workflow = await this.workflowService.findOne(id);
+	async findOne(
+		@Param("id") id: string,
+		@Session() session: UserSession,
+	): Promise<WorkflowDto> {
+		const workflow = await this.workflowService.findOne(id, session.user);
 		if (!workflow) {
 			throw new NotFoundException(`Workflow with id ${id} not found`);
 		}
