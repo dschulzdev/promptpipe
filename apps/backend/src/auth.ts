@@ -8,7 +8,7 @@ const isProd = process.env.NODE_ENV === "production";
 
 const authConfig = (prisma: PrismaClient) =>
 	({
-		trustedOrigins: ["http://localhost:3001"],
+		trustedOrigins: [process.env.FRONTEND_URL as string],
 		database: prismaAdapter(prisma, {
 			provider: "postgresql", // or "mysql", "sqlite"
 		}),
