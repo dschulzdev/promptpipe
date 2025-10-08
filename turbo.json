@@ -5,7 +5,19 @@
     "build": {
       "dependsOn": ["^build"],
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
-      "outputs": ["dist/**"]
+      "outputs": ["dist/**"],
+      "env": [
+        "GOOGLE_GENERATIVE_AI_API_KEY",
+        "OPENAI_API_KEY",
+        "FRONTEND_URL",
+        "OPENROUTER_KEY",
+        "DATABASE_URL",
+        "POSTHOG_API_KEY",
+        "BETTER_AUTH_SECRET",
+        "BETTER_AUTH_URL",
+        "GITHUB_CLIENT_SECRET",
+        "GITHUB_CLIENT_ID"
+      ]
     },
     "lint": {
       "dependsOn": ["^lint"]
