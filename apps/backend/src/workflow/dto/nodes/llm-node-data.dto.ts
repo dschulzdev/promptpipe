@@ -5,7 +5,7 @@ import {
 	LLMProvider,
 	LLMProviderArray,
 	OPENAI_MODEL,
-} from "src/ai/llm-providers";
+} from "../../../ai/llm-providers";
 import { NodeDataDto } from "../nodes.dto";
 
 // biome-ignore lint/suspicious/noExplicitAny: needed for react flow compat

@@ -12,7 +12,7 @@ import {
 	ModelMessage,
 } from "ai";
 import Ajv from "ajv";
-import { AnalyticsService } from "src/analytics/analytics.service";
+import { AnalyticsService } from "../analytics/analytics.service";
 
 type SelectedOpenAiModel = "gpt-4.1-mini" | "gpt-4o-mini" | "gpt-4.1-nano";
 type SelectedGoogleGenAIModel =
@@ -88,7 +88,6 @@ export class AiService {
 		this.logger.log("Generating response with:", messages);
 		this.logger.log("Using model config:", modelConfig);
 		const response = await generateText({
-			// @ts-ignore FIX: Type 'ModelWithSetup' is not assignable to type 'LanguageModel'.
 			model: modelConfig,
 			messages: messages,
 		});

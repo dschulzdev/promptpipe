@@ -1,7 +1,7 @@
 import { instanceToInstance } from "class-transformer";
-import { PipelineConnectionDto } from "src/workflow/dto/pipeline-connection.dto";
-import { PipelineNodeDto } from "src/workflow/dto/pipeline-node.dto";
-import { RunWorkloadDto } from "src/workflow/dto/run-workflow.dto";
+import { PipelineConnectionDto } from "../../workflow/dto/pipeline-connection.dto";
+import { PipelineNodeDto } from "../../workflow/dto/pipeline-node.dto";
+import { RunWorkloadDto } from "../../workflow/dto/run-workflow.dto";
 
 /**
  * Checks if a graph, represented by a list of edges, contains a cycle.

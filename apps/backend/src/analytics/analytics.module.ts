@@ -1,7 +1,7 @@
 import { Module } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { PostHog } from "posthog-node";
-import { Configuration } from "src/configuration";
+import { Configuration } from "../configuration";
 import { AnalyticsService } from "./analytics.service";
 
 @Module({

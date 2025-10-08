@@ -1,14 +1,14 @@
 import { ModelMessage } from "ai";
-import { AiService } from "src/ai/ai.service";
-import { NodeTypes } from "src/workflow/dto/nodes.dto";
+import { AiService } from "../../ai/ai.service";
+import { NodeTypes } from "../../workflow/dto/nodes.dto";
 import {
 	LlmNodeDto,
 	MergeNodeDto,
 	PipelineNodeDto,
 	TextInputNodeDto,
 	TextOutputNodeDto,
-} from "src/workflow/dto/pipeline-node.dto";
-import { RunWorkloadDto } from "src/workflow/dto/run-workflow.dto";
+} from "../../workflow/dto/pipeline-node.dto";
+import { RunWorkloadDto } from "../../workflow/dto/run-workflow.dto";
 
 export type HandleDataResult = {
 	key: string;
@@ -200,7 +200,9 @@ export async function processTextGenerationNodeHandles({
 	}
 
 	if (node.type === NodeTypes.STRUCTURED_OUTPUT && !node.data.jsonSchema) {
-		this.logger.error("Structured output node missing output schema", { nodeData: node.data });
+		this.logger.error("Structured output node missing output schema", {
+			nodeData: node.data,
+		});
 		throw new Error("Structured output node missing output schema");
 	}
 
