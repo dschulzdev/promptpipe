@@ -2,8 +2,8 @@ import { INestApplication, ValidationPipe } from "@nestjs/common";
 import { NestFactory } from "@nestjs/core";
 import { ExpressAdapter } from "@nestjs/platform-express";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
-import type { Express } from "express";
-import * as express from "express";
+import type { Express, Request, Response } from "express";
+import express from "express";
 import { AppModule } from "./app.module";
 import "reflect-metadata";
 import {
@@ -73,7 +73,7 @@ export class AppFactory {
 			});
 
 		// IMPORTANT This express application-level middleware makes sure the NestJS app is fully initialized
-		expressApp.use((_req: express.Request, _res: express.Response, next) => {
+		expressApp.use((_req: Request, _res: Response, next) => {
 			appPromise
 				.then(async (app) => {
 					await app.init();
