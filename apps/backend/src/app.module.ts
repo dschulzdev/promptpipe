@@ -6,6 +6,7 @@ import { APP_GUARD } from "@nestjs/core";
 import { AuthGuard, AuthModule } from "@thallesp/nestjs-better-auth";
 import { AiModule } from "./ai/ai.module";
 import { AnalyticsModule } from "./analytics/analytics.module";
+import { AppController } from "./app.controller";
 import { auth } from "./auth";
 import { validateConfig } from "./configuration";
 import { PrismaModule } from "./prisma/prisma.module";
@@ -61,5 +62,6 @@ import { WorkflowModule } from "./workflow/workflow.module";
 			useClass: AuthGuard,
 		},
 	],
+	controllers: [AppController],
 })
 export class AppModule {}
