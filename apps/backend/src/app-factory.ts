@@ -3,7 +3,6 @@ import { NestFactory } from "@nestjs/core";
 import { ExpressAdapter } from "@nestjs/platform-express";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import type { Express, Request, Response } from "express";
-import express from "express";
 import { AppModule } from "./app.module";
 import "reflect-metadata";
 import {
@@ -20,8 +19,7 @@ export class AppFactory {
 		appPromise: Promise<INestApplication<any>>;
 		expressApp: Express;
 	} {
-		const expressApp = express();
-		const adapter = new ExpressAdapter(expressApp);
+		const adapter = new ExpressAdapter();
 		const appPromise = NestFactory.create(AppModule, adapter, {
 			bodyParser: false,
 		});
@@ -73,7 +71,8 @@ export class AppFactory {
 			});
 
 		// IMPORTANT This express application-level middleware makes sure the NestJS app is fully initialized
-		expressApp.use((_req: Request, _res: Response, next) => {
+		// @ts-expect-error
+		adapter.getInstance().use((_req: Request, _res: Response, next) => {
 			appPromise
 				.then(async (app) => {
 					await app.init();
@@ -82,6 +81,6 @@ export class AppFactory {
 				.catch((err) => next(err));
 		});
 
-		return { appPromise, expressApp };
+		return { appPromise, expressApp: adapter.getInstance() };
 	}
 }
