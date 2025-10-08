@@ -6,7 +6,7 @@
 	"private": true,
 	"license": "UNLICENSED",
 	"scripts": {
-		"build": "prisma generate && prisma migrate deploy && nest build",
+		"build": "prisma generate --schema=./prisma && prisma migrate deploy --schema=./prisma && nest build",
 		"check": "biome check --write .",
 		"start": "nest start",
 		"dev": "nest start --watch",

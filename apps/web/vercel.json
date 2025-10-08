@@ -1,0 +1,10 @@
+{
+	"$schema": "https://openapi.vercel.sh/vercel.json",
+	"framework": "vite",
+	"rewrites": [
+		{
+			"source": "^/backend(?:/([A-Za-z0-9]+(?:/[A-Za-z0-9]+)*))?/?$",
+			"destination": "https://promptpipe-backend.vercel.app/$1"
+		}
+	]
+}
