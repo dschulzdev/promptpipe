@@ -31,8 +31,14 @@ export class AppFactory {
 				app.enableCors({
 					origin: process.env.FRONTEND_URL, // Default Vite dev server port
 					credentials: true,
-					methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-					allowedHeaders: ["Content-Type", "Authorization"],
+					methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS", "HEAD"],
+					allowedHeaders: [
+						"Content-Type",
+						"Authorization",
+						"Origin",
+						"X-Requested-With",
+						"Accept",
+					],
 				});
 				app.useGlobalPipes(
 					new ValidationPipe({
