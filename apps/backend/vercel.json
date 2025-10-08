@@ -1,12 +1,5 @@
 {
 	"$schema": "https://openapi.vercel.sh/vercel.json",
 	"framework": null,
-	"outputDirectory": "apps/backend/dist",
-	"buildCommand": "pnpm --filter ./apps/backend run vercel-build",
-	"rewrites": [
-		{
-			"source": "/(.*)",
-			"destination": "/api"
-		}
-	]
+	"outputDirectory": "dist"
 }
