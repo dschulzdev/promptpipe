@@ -8,7 +8,7 @@ import "@xyflow/react/dist/style.css";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 scan({
-	enabled: true,
+	enabled: import.meta.env.NODE_ENV === "development",
 });
 
 const queryClient = new QueryClient();

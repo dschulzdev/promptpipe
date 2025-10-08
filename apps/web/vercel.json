@@ -3,8 +3,12 @@
 	"framework": "vite",
 	"rewrites": [
 		{
-			"source": "^/backend(?:/([A-Za-z0-9]+(?:/[A-Za-z0-9]+)*))?/?$",
-			"destination": "https://promptpipe-backend.vercel.app/$1"
+			"source": "/backend",
+			"destination": "https://promptpipe-backend.vercel.app/"
+		},
+		{
+			"source": "/backend/:rest([A-Za-z0-9]+(?:/[A-Za-z0-9]+)*)",
+			"destination": "https://promptpipe-backend.vercel.app/:rest"
 		}
 	]
 }
