@@ -28,15 +28,6 @@ export class AppFactory {
 
 		appPromise
 			.then((app) => {
-				// You can add all required app configurations here
-
-				/**
-				 * Enable cross-origin resource sharing (CORS) to allow resources to be requested from another domain.
-				 * @see {@link https://docs.nestjs.com/security/cors}
-				 */
-				app.enableCors({
-					exposedHeaders: "*",
-				});
 				app.enableCors({
 					origin: process.env.FRONTEND_URL, // Default Vite dev server port
 					credentials: true,
