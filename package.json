@@ -14,7 +14,8 @@
 		"check-types": "turbo check-types",
 		"dev:native": "turbo -F native dev",
 		"dev:web": "turbo -F web dev",
-		"dev:server": "turbo -F server dev"
+		"dev:server": "turbo -F server dev",
+		"db:migrate": "turbo -F server db:migrate:prod"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "^2.2.5",
