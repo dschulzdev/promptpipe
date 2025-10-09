@@ -45,6 +45,8 @@ export class AppFactory {
 						"Cookie",
 					],
 				});
+				const expressApp = app.getHttpAdapter().getInstance();
+				expressApp.set("trust proxy", true);
 				app.useGlobalPipes(
 					new ValidationPipe({
 						whitelist: true,
