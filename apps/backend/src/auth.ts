@@ -3,9 +3,6 @@ import { BetterAuthOptions, betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { APIError } from "better-auth/api";
 
-// TODO: Implement using Async Injection in the future
-const isProd = process.env.NODE_ENV === "production";
-
 const authConfig = (prisma: PrismaClient) =>
 	({
 		trustedOrigins: [process.env.FRONTEND_URL as string],
@@ -50,14 +47,9 @@ const authConfig = (prisma: PrismaClient) =>
 		},
 		// Cookie setup for backend-frontend authentication in production and development
 		advanced: {
-			cookies: {
-				session_token: {
-					attributes: {
-						sameSite: isProd ? "none" : "lax",
-						secure: isProd,
-						httpOnly: true,
-					},
-				},
+			crossSubDomainCookies: {
+				domain: ".dschulz.dev", // Use the parent domain with leading dot for cross-subdomain cookies
+				enabled: true,
 			},
 		},
 	}) satisfies BetterAuthOptions;
