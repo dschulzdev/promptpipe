@@ -22,7 +22,7 @@ import { WorkflowModule } from "./workflow/workflow.module";
 			useFactory: (prisma: PrismaService) => {
 				return {
 					auth: auth(prisma),
-					disableTrustedOriginsCors: true,
+					disableTrustedOriginsCors: false, // Enable CORS handling by Better Auth
 				};
 			},
 			inject: [PrismaService],

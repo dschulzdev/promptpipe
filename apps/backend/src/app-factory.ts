@@ -27,7 +27,13 @@ export class AppFactory {
 		appPromise
 			.then((app) => {
 				app.enableCors({
-					origin: process.env.FRONTEND_URL, // Default Vite dev server port
+					origin:
+						process.env.NODE_ENV === "production"
+							? [
+									"https://promptpipe.dschulz.dev",
+									"https://promptpipe-backend.dschulz.dev",
+								]
+							: process.env.FRONTEND_URL, // Default Vite dev server port
 					credentials: true,
 					methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS", "HEAD"],
 					allowedHeaders: [
@@ -36,6 +42,7 @@ export class AppFactory {
 						"Origin",
 						"X-Requested-With",
 						"Accept",
+						"Cookie",
 					],
 				});
 				app.useGlobalPipes(

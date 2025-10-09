@@ -7,8 +7,16 @@ const authConfig = (prisma: PrismaClient) =>
 	({
 		trustedOrigins:
 			process.env.NODE_ENV === "production"
-				? ["https://*.dschulz.dev"]
-				: [process.env.FRONTEND_URL as string],
+				? [
+						"https://promptpipe.dschulz.dev",
+						"https://promptpipe-backend.dschulz.dev",
+						"https://*.dschulz.dev",
+					]
+				: [
+						process.env.FRONTEND_URL as string,
+						"http://localhost:3000",
+						"http://localhost:3001",
+					],
 		database: prismaAdapter(prisma, {
 			provider: "postgresql", // or "mysql", "sqlite"
 		}),
@@ -20,6 +28,10 @@ const authConfig = (prisma: PrismaClient) =>
 				enabled: true,
 				clientId: process.env.GITHUB_CLIENT_ID as string,
 				clientSecret: process.env.GITHUB_CLIENT_SECRET as string,
+				redirectURI:
+					process.env.NODE_ENV === "production"
+						? "https://promptpipe-backend.dschulz.dev/api/auth/callback/github"
+						: undefined, // Use default for development
 			},
 		},
 		databaseHooks: {
