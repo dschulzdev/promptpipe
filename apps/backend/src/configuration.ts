@@ -7,7 +7,7 @@ const configSchema = z.object({
 		.default("development"),
 	port: z.coerce.number().int().positive().default(3000),
 	posthog_api_key: z.string().min(1),
-
+	redis_url: z.string().min(1),
 	frontend_url: z.string().min(1),
 	database_url: z.string().min(1),
 	ai: z.object({
@@ -40,6 +40,7 @@ export const validateConfig = () => {
 		nodeEnv: process.env.NODE_ENV,
 		port: process.env.PORT,
 		posthog_api_key: process.env.POSTHOG_API_KEY,
+		redis_url: process.env.REDIS_URL,
 		frontend_url: process.env.FRONTEND_URL,
 		database_url: process.env.DATABASE_URL,
 		ai: {

@@ -21,6 +21,7 @@ const configSchema = z.object({
     password: z.string().min(1).default('password'),
     database: z.string().min(1).default('promptpipe'),
   }),
+  redis_url: z.string.min(1),
   ai: z.object({
     openai: z.object({
       apiKey: z.string().min(1).optional(),

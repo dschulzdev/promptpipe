@@ -34,20 +34,17 @@ import { WorkflowModule } from "./workflow/workflow.module";
 		}),
 		BullModule.forRoot({
 			connection: {
-				host: "localhost",
-				port: 6379,
+				url: process.env.REDIS_URL,
 			},
 		}),
 		RedisModule.forRoot({
 			config: [
 				{
-					host: "localhost",
-					port: 6379,
+					url: process.env.REDIS_URL,
 				},
 				{
 					namespace: "runner-subscriber",
-					host: "localhost",
-					port: 6379,
+					url: process.env.REDIS_URL,
 				},
 			],
 		}),
