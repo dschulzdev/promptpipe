@@ -11,7 +11,6 @@ const authConfig = (prisma: PrismaClient) =>
 				? [
 						"https://promptpipe.dschulz.dev",
 						"https://promptpipe-backend.dschulz.dev",
-						"https://*.dschulz.dev",
 					]
 				: [
 						process.env.FRONTEND_URL as string,
@@ -76,21 +75,6 @@ const authConfig = (prisma: PrismaClient) =>
 				sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
 				secure: process.env.NODE_ENV === "production",
 				httpOnly: true,
-				domain:
-					process.env.NODE_ENV === "production" ? ".dschulz.dev" : undefined,
-			},
-			cookies: {
-				session_token: {
-					attributes: {
-						sameSite: "none",
-						secure: true,
-						httpOnly: true,
-						domain:
-							process.env.NODE_ENV === "production"
-								? ".dschulz.dev"
-								: undefined,
-					},
-				},
 			},
 		},
 	}) satisfies BetterAuthOptions;

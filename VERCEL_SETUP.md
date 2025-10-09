@@ -76,17 +76,20 @@ https://github.com/settings/developers
 
 The authentication flow uses cookies with the following settings for production:
 
-- **Domain**: `.dschulz.dev` (allows cookies to be shared across subdomains)
+- **Domain**: `.dschulz.dev` (set via `crossSubDomainCookies.domain` - allows cookies to be shared across subdomains)
 - **SameSite**: `none` (required for cross-origin requests)
 - **Secure**: `true` (HTTPS only)
 - **HttpOnly**: `true` (prevents JavaScript access)
+
+**Important**: The domain should ONLY be set in `crossSubDomainCookies.domain`, not in individual cookie attributes. Better Auth will handle cookie domain inheritance automatically.
 
 ## CORS Configuration
 
 The backend is configured to accept requests from:
 - `https://promptpipe.dschulz.dev`
 - `https://promptpipe-backend.dschulz.dev`
-- Any subdomain ending with `.dschulz.dev`
+
+**Note**: Better Auth `trustedOrigins` does not support wildcard patterns like `https://*.dschulz.dev`. Each subdomain must be listed explicitly.
 
 ## Deployment Steps
 
