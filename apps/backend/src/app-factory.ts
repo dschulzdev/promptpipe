@@ -2,7 +2,7 @@ import { INestApplication, ValidationPipe } from "@nestjs/common";
 import { NestFactory } from "@nestjs/core";
 import { ExpressAdapter } from "@nestjs/platform-express";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
-import type { Express, Request, Response } from "express";
+import type { Express, NextFunction, Request, Response } from "express";
 import { AppModule } from "./app.module";
 import "reflect-metadata";
 import {
@@ -20,6 +20,43 @@ export class AppFactory {
 		expressApp: Express;
 	} {
 		const adapter = new ExpressAdapter();
+		const expressApp = adapter.getInstance();
+
+		// Apply CORS middleware directly to Express instance for Vercel serverless
+		const allowedOrigins =
+			process.env.NODE_ENV === "production"
+				? [
+						"https://promptpipe.dschulz.dev",
+						"https://promptpipe-backend.dschulz.dev",
+					]
+				: [process.env.FRONTEND_URL || "http://localhost:5173"];
+
+		expressApp.use((req: Request, res: Response, next: NextFunction) => {
+			const origin = req.headers.origin;
+			if (origin && allowedOrigins.includes(origin)) {
+				res.setHeader("Access-Control-Allow-Origin", origin);
+			}
+			res.setHeader("Access-Control-Allow-Credentials", "true");
+			res.setHeader(
+				"Access-Control-Allow-Methods",
+				"GET, POST, PUT, DELETE, PATCH, OPTIONS, HEAD",
+			);
+			res.setHeader(
+				"Access-Control-Allow-Headers",
+				"Content-Type, Authorization, Origin, X-Requested-With, Accept, Cookie",
+			);
+
+			// Handle preflight requests
+			if (req.method === "OPTIONS") {
+				res.status(204).end();
+				return;
+			}
+
+			next();
+		});
+
+		expressApp.set("trust proxy", true);
+
 		const appPromise = NestFactory.create(AppModule, adapter, {
 			bodyParser: false,
 		});
@@ -45,8 +82,6 @@ export class AppFactory {
 						"Cookie",
 					],
 				});
-				const expressApp = app.getHttpAdapter().getInstance();
-				expressApp.set("trust proxy", true);
 				app.useGlobalPipes(
 					new ValidationPipe({
 						whitelist: true,
