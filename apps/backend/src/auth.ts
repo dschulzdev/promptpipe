@@ -5,7 +5,10 @@ import { APIError } from "better-auth/api";
 
 const authConfig = (prisma: PrismaClient) =>
 	({
-		trustedOrigins: [process.env.FRONTEND_URL as string],
+		trustedOrigins:
+			process.env.NODE_ENV === "production"
+				? ["https://*.dschulz.dev"]
+				: [process.env.FRONTEND_URL as string],
 		database: prismaAdapter(prisma, {
 			provider: "postgresql", // or "mysql", "sqlite"
 		}),
@@ -48,8 +51,18 @@ const authConfig = (prisma: PrismaClient) =>
 		// Cookie setup for backend-frontend authentication in production and development
 		advanced: {
 			crossSubDomainCookies: {
-				domain: ".dschulz.dev", // Use the parent domain with leading dot for cross-subdomain cookies
+				// Use parent domain for production, undefined for localhost (allows different ports)
+				domain:
+					process.env.NODE_ENV === "production" ? ".dschulz.dev" : undefined,
 				enabled: true,
+			},
+			// Force secure cookies in production
+			useSecureCookies: process.env.NODE_ENV === "production",
+			// Default cookie attributes for cross-domain support
+			defaultCookieAttributes: {
+				sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+				secure: process.env.NODE_ENV === "production",
+				httpOnly: true,
 			},
 		},
 	}) satisfies BetterAuthOptions;
