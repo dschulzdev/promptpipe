@@ -1,4 +1,4 @@
-import { IsString } from "class-validator";
+import { IsOptional, IsString } from "class-validator";
 
 export class PipelineConnectionDto {
 	@IsString()
@@ -10,5 +10,6 @@ export class PipelineConnectionDto {
 	@IsString()
 	sourceNodeHandleId: string;
 	@IsString()
-	targetNodeHandleId: string;
+	@IsOptional()
+	targetNodeHandleId?: string;
 }

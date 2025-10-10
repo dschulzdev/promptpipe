@@ -27,6 +27,8 @@ export class BasePipelineNodeDto {
 	type!: NodeTypes;
 
 	@ValidateNested()
+	@Type(() => Position)
+	@ApiProperty({ type: Position })
 	position: Position;
 }
 
