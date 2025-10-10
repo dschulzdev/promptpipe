@@ -6,17 +6,7 @@ import { APIError } from "better-auth/api";
 const authConfig = (prisma: PrismaClient) =>
 	({
 		baseURL: process.env.BETTER_AUTH_URL as string,
-		trustedOrigins:
-			process.env.NODE_ENV === "production"
-				? [
-						"https://promptpipe.dschulz.dev",
-						"https://promptpipe-backend.dschulz.dev",
-					]
-				: [
-						process.env.FRONTEND_URL as string,
-						"http://localhost:3000",
-						"http://localhost:3001",
-					],
+		trustedOrigins: [process.env.FRONTEND_URL as string],
 		database: prismaAdapter(prisma, {
 			provider: "postgresql", // or "mysql", "sqlite"
 		}),
@@ -28,10 +18,6 @@ const authConfig = (prisma: PrismaClient) =>
 				enabled: true,
 				clientId: process.env.GITHUB_CLIENT_ID as string,
 				clientSecret: process.env.GITHUB_CLIENT_SECRET as string,
-				redirectURI:
-					process.env.NODE_ENV === "production"
-						? "https://promptpipe-backend.dschulz.dev/api/auth/callback/github"
-						: undefined, // Use default for development
 			},
 		},
 		databaseHooks: {

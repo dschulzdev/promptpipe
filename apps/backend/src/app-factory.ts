@@ -5,7 +5,6 @@ import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import type { Express, Request, Response } from "express";
 import { AppModule } from "./app.module";
 import "reflect-metadata";
-import { StructuredOutputNodeDataDto } from "./workflow/dto/nodes/structured-output-node-data.dto";
 import {
 	BasicStartNodeDto,
 	LlmNodeDto,
@@ -30,13 +29,7 @@ export class AppFactory {
 		appPromise
 			.then((app) => {
 				app.enableCors({
-					origin:
-						process.env.NODE_ENV === "production"
-							? [
-									"https://promptpipe.dschulz.dev",
-									"https://promptpipe-backend.dschulz.dev",
-								]
-							: process.env.FRONTEND_URL, // Default Vite dev server port
+					origin: process.env.FRONTEND_URL,
 					credentials: true,
 					methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS", "HEAD"],
 					allowedHeaders: [
