@@ -9,12 +9,12 @@ export type PipelineConnectionDto = {
 };
 
 export type WorkflowDto = {
-    nodes: Array<LlmNodeDto | TextInputNodeDto | TextOutputNodeDto | BasicStartNodeDto | TextGenerationNodeDto>;
+    nodes: Array<LlmNodeDto | TextInputNodeDto | TextOutputNodeDto | BasicStartNodeDto | TextGenerationNodeDto | MergeNodeDto | StructuredOutputNodeDto>;
+    connections: Array<PipelineConnectionDto>;
     id: string;
     name: string;
     createdAt: string;
     updatedAt: string;
-    connections: Array<PipelineConnectionDto>;
 };
 
 export type CreateWorkflowDto = {
@@ -24,9 +24,9 @@ export type CreateWorkflowDto = {
 };
 
 export type UpdateWorkflowDto = {
-    nodes?: Array<LlmNodeDto | TextInputNodeDto | TextOutputNodeDto | BasicStartNodeDto | TextGenerationNodeDto>;
-    name?: string;
+    nodes?: Array<LlmNodeDto | TextInputNodeDto | TextOutputNodeDto | BasicStartNodeDto | TextGenerationNodeDto | MergeNodeDto | StructuredOutputNodeDto>;
     connections?: Array<PipelineConnectionDto>;
+    name?: string;
 };
 
 export type LlmNodeDataDto = {
@@ -94,6 +94,43 @@ export type TextGenerationNodeDto = {
     data: TextGenerationNodeDataDto;
     position: Position;
 };
+
+export type StructuredOutputNodeDataDto = {
+    jsonSchema: string;
+};
+
+export type StructuredOutputNodeDto = {
+    id: string;
+    type: 'text_input' | 'text_output' | 'text_generation' | 'basic_start' | 'llm' | 'merge' | 'structured_output';
+    data: StructuredOutputNodeDataDto;
+    position: Position;
+};
+
+export type MergeNodeDataDto = {
+    inputs: Array<{
+        id: string;
+    }>;
+};
+
+export type MergeNodeDto = {
+    id: string;
+    type: 'text_input' | 'text_output' | 'text_generation' | 'basic_start' | 'llm' | 'merge' | 'structured_output';
+    data: MergeNodeDataDto;
+    position: Position;
+};
+
+export type AppControllerGetHelloData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/';
+};
+
+export type AppControllerGetHelloResponses = {
+    200: string;
+};
+
+export type AppControllerGetHelloResponse = AppControllerGetHelloResponses[keyof AppControllerGetHelloResponses];
 
 export type WorkflowControllerRunData = {
     body?: never;

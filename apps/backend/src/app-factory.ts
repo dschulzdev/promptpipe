@@ -5,9 +5,12 @@ import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import type { Express, Request, Response } from "express";
 import { AppModule } from "./app.module";
 import "reflect-metadata";
+import { StructuredOutputNodeDataDto } from "./workflow/dto/nodes/structured-output-node-data.dto";
 import {
 	BasicStartNodeDto,
 	LlmNodeDto,
+	MergeNodeDto,
+	StructuredOutputNodeDto,
 	TextGenerationNodeDto,
 	TextInputNodeDto,
 	TextOutputNodeDto,
@@ -70,6 +73,8 @@ export class AppFactory {
 							TextInputNodeDto,
 							TextOutputNodeDto,
 							TextGenerationNodeDto,
+							StructuredOutputNodeDto,
+							MergeNodeDto,
 						],
 					});
 					SwaggerModule.setup("api", app, document);

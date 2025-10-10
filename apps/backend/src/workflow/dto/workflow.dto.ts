@@ -1,4 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
+import { Type } from "class-transformer";
+import { IsArray, ValidateNested } from "class-validator";
 import { PipelineConnectionDto } from "./pipeline-connection.dto";
 import {
 	PipelineNodeDto,
@@ -10,6 +12,8 @@ export class WorkflowDto {
 	name: string;
 	createdAt: Date;
 	updatedAt: Date;
+	@ValidateNested({ each: true })
+	@IsArray()
 	@PipelineNodeDtoDiscriminated()
 	@ApiProperty({
 		oneOf: [
@@ -18,8 +22,14 @@ export class WorkflowDto {
 			{ $ref: "#/components/schemas/TextOutputNodeDto" },
 			{ $ref: "#/components/schemas/BasicStartNodeDto" },
 			{ $ref: "#/components/schemas/TextGenerationNodeDto" },
+			{ $ref: "#/components/schemas/MergeNodeDto" },
+			{ $ref: "#/components/schemas/StructuredOutputNodeDto" },
 		],
 	})
 	nodes: Array<PipelineNodeDto>;
+	@ValidateNested({ each: true })
+	@IsArray()
+	@Type(() => PipelineConnectionDto)
+	@ApiProperty({ type: [PipelineConnectionDto] })
 	connections: PipelineConnectionDto[];
 }

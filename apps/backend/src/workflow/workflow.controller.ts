@@ -3,7 +3,6 @@ import {
 	Controller,
 	Delete,
 	Get,
-	MessageEvent,
 	NotFoundException,
 	Param,
 	Patch,
@@ -11,7 +10,6 @@ import {
 	Sse,
 } from "@nestjs/common";
 import { Session, UserSession } from "@thallesp/nestjs-better-auth";
-import { Observable } from "rxjs";
 import { CreateWorkflowDto } from "./dto/create-workflow.dto";
 import { UpdateWorkflowDto } from "./dto/update-workflow.dto";
 import { WorkflowDto } from "./dto/workflow.dto";

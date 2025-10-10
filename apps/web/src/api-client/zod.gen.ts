@@ -121,19 +121,61 @@ export const zTextGenerationNodeDto = z.object({
     position: zPosition
 });
 
+export const zMergeNodeDataDto = z.object({
+    inputs: z.array(z.object({
+        id: z.string()
+    }))
+});
+
+export const zMergeNodeDto = z.object({
+    id: z.string(),
+    type: z.enum([
+        'text_input',
+        'text_output',
+        'text_generation',
+        'basic_start',
+        'llm',
+        'merge',
+        'structured_output'
+    ]),
+    data: zMergeNodeDataDto,
+    position: zPosition
+});
+
+export const zStructuredOutputNodeDataDto = z.object({
+    jsonSchema: z.string()
+});
+
+export const zStructuredOutputNodeDto = z.object({
+    id: z.string(),
+    type: z.enum([
+        'text_input',
+        'text_output',
+        'text_generation',
+        'basic_start',
+        'llm',
+        'merge',
+        'structured_output'
+    ]),
+    data: zStructuredOutputNodeDataDto,
+    position: zPosition
+});
+
 export const zWorkflowDto = z.object({
     nodes: z.array(z.union([
         zLlmNodeDto,
         zTextInputNodeDto,
         zTextOutputNodeDto,
         zBasicStartNodeDto,
-        zTextGenerationNodeDto
+        zTextGenerationNodeDto,
+        zMergeNodeDto,
+        zStructuredOutputNodeDto
     ])),
+    connections: z.array(zPipelineConnectionDto),
     id: z.string(),
     name: z.string(),
     createdAt: z.string().datetime(),
-    updatedAt: z.string().datetime(),
-    connections: z.array(zPipelineConnectionDto)
+    updatedAt: z.string().datetime()
 });
 
 export const zCreateWorkflowDto = z.object({
@@ -154,11 +196,21 @@ export const zUpdateWorkflowDto = z.object({
         zTextInputNodeDto,
         zTextOutputNodeDto,
         zBasicStartNodeDto,
-        zTextGenerationNodeDto
+        zTextGenerationNodeDto,
+        zMergeNodeDto,
+        zStructuredOutputNodeDto
     ])).optional(),
-    name: z.string().optional(),
-    connections: z.array(zPipelineConnectionDto).optional()
+    connections: z.array(zPipelineConnectionDto).optional(),
+    name: z.string().optional()
 });
+
+export const zAppControllerGetHelloData = z.object({
+    body: z.never().optional(),
+    path: z.never().optional(),
+    query: z.never().optional()
+});
+
+export const zAppControllerGetHelloResponse = z.string();
 
 export const zWorkflowControllerRunData = z.object({
     body: z.never().optional(),
