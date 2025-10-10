@@ -1,5 +1,6 @@
 {
 	"extends": "./tsconfig.json",
+	"esModuleInterop": true,
 	"rewriteRelativeImportExtensions": true,
 	"exclude": ["node_modules", "test", "dist", "**/*spec.ts"]
 }
