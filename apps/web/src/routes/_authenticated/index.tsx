@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { MoreHorizontal, SquareDashed, Trash } from "lucide-react";
+import { Edit, MoreHorizontal, SquareDashed, Trash } from "lucide-react";
+import { useState } from "react";
 import { toast } from "sonner";
 import type { WorkflowDto } from "@/api-client";
 import {
@@ -9,6 +10,7 @@ import {
 	workflowControllerFindAllQueryKey,
 } from "@/api-client/@tanstack/react-query.gen";
 import AddWorkflowDialog from "@/components/custom/add-workflow-dialog";
+import EditWorkflowDialog from "@/components/custom/edit-workflow-dialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardAction, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -88,6 +90,7 @@ function NoWorkflows() {
 }
 
 function WorkflowCard(workflow: WorkflowDto) {
+	const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 	const queryClient = useQueryClient();
 	const { mutate } = useMutation({
 		...workflowControllerDeleteOneMutation({ path: { id: workflow.id } }),
@@ -103,41 +106,58 @@ function WorkflowCard(workflow: WorkflowDto) {
 	});
 
 	return (
-		<Link className="w-80" to={"/workflows/$id"} params={{ id: workflow.id }}>
-			<Card>
-				<CardHeader>
-					<CardTitle>{workflow.name}</CardTitle>
-					<CardAction>
-						<DropdownMenu>
-							<DropdownMenuTrigger asChild>
-								<Button
-									variant={"secondary"}
-									size={"icon"}
-									onClick={(e) => {
-										e.preventDefault();
-										e.stopPropagation();
-									}}
-								>
-									<MoreHorizontal />
-								</Button>
-							</DropdownMenuTrigger>
-							<DropdownMenuContent>
-								<DropdownMenuItem
-									className="text-destructive"
-									onClick={(e) => {
-										e.preventDefault();
-										e.stopPropagation();
-										mutate({ path: { id: workflow.id } });
-									}}
-								>
-									<Trash className="text-destructive" />
-									Delete
-								</DropdownMenuItem>
-							</DropdownMenuContent>
-						</DropdownMenu>
-					</CardAction>
-				</CardHeader>
-			</Card>
-		</Link>
+		<>
+			<Link className="w-80" to={"/workflows/$id"} params={{ id: workflow.id }}>
+				<Card>
+					<CardHeader>
+						<CardTitle>{workflow.name}</CardTitle>
+						<CardAction>
+							<DropdownMenu>
+								<DropdownMenuTrigger asChild>
+									<Button
+										variant={"secondary"}
+										size={"icon"}
+										onClick={(e) => {
+											e.preventDefault();
+											e.stopPropagation();
+										}}
+									>
+										<MoreHorizontal />
+									</Button>
+								</DropdownMenuTrigger>
+								<DropdownMenuContent>
+									<DropdownMenuItem
+										onClick={(e) => {
+											e.preventDefault();
+											e.stopPropagation();
+											setIsEditDialogOpen(true);
+										}}
+									>
+										<Edit />
+										Edit
+									</DropdownMenuItem>
+									<DropdownMenuItem
+										className="text-destructive"
+										onClick={(e) => {
+											e.preventDefault();
+											e.stopPropagation();
+											mutate({ path: { id: workflow.id } });
+										}}
+									>
+										<Trash className="text-destructive" />
+										Delete
+									</DropdownMenuItem>
+								</DropdownMenuContent>
+							</DropdownMenu>
+						</CardAction>
+					</CardHeader>
+				</Card>
+			</Link>
+			<EditWorkflowDialog
+				workflow={workflow}
+				open={isEditDialogOpen}
+				onOpenChange={setIsEditDialogOpen}
+			/>
+		</>
 	);
 }
