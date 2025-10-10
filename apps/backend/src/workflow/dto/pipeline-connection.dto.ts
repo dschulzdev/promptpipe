@@ -8,7 +8,8 @@ export class PipelineConnectionDto {
 	@IsString()
 	targetNodeId: string;
 	@IsString()
-	sourceNodeHandleId: string;
+	@IsOptional()
+	sourceNodeHandleId?: string;
 	@IsString()
 	@IsOptional()
 	targetNodeHandleId?: string;

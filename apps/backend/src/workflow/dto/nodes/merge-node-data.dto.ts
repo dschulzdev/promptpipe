@@ -1,5 +1,11 @@
-import { IsArray } from "class-validator";
+import { Type } from "class-transformer";
+import { IsArray, IsString, ValidateNested } from "class-validator";
 import { NodeDataDto } from "../nodes.dto";
+
+class MergeInput {
+	@IsString()
+	id: string;
+}
 
 // biome-ignore lint/suspicious/noExplicitAny: needed
 export interface MergeNodeData extends Record<string, any> {
@@ -8,5 +14,7 @@ export interface MergeNodeData extends Record<string, any> {
 
 export class MergeNodeDataDto extends NodeDataDto implements MergeNodeData {
 	@IsArray()
-	inputs: { id: string }[];
+	@ValidateNested({ each: true })
+	@Type(() => MergeInput)
+	inputs: MergeInput[];
 }
