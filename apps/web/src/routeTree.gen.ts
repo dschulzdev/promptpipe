@@ -10,63 +10,59 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as LoginRouteImport } from './routes/login'
-import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
-import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
-import { Route as AuthenticatedWorkflowsIdRouteImport } from './routes/_authenticated/workflows/$id'
+import { Route as AppRouteImport } from './routes/app'
+import { Route as AppIndexRouteImport } from './routes/app/index'
+import { Route as AppWorkflowsIdRouteImport } from './routes/app/workflows/$id'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedRoute = AuthenticatedRouteImport.update({
-  id: '/_authenticated',
+const AppRoute = AppRouteImport.update({
+  id: '/app',
+  path: '/app',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
+const AppIndexRoute = AppIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => AuthenticatedRoute,
+  getParentRoute: () => AppRoute,
 } as any)
-const AuthenticatedWorkflowsIdRoute =
-  AuthenticatedWorkflowsIdRouteImport.update({
-    id: '/workflows/$id',
-    path: '/workflows/$id',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
+const AppWorkflowsIdRoute = AppWorkflowsIdRouteImport.update({
+  id: '/workflows/$id',
+  path: '/workflows/$id',
+  getParentRoute: () => AppRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
+  '/app': typeof AppRouteWithChildren
   '/login': typeof LoginRoute
-  '/': typeof AuthenticatedIndexRoute
-  '/workflows/$id': typeof AuthenticatedWorkflowsIdRoute
+  '/app/': typeof AppIndexRoute
+  '/app/workflows/$id': typeof AppWorkflowsIdRoute
 }
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
-  '/': typeof AuthenticatedIndexRoute
-  '/workflows/$id': typeof AuthenticatedWorkflowsIdRoute
+  '/app': typeof AppIndexRoute
+  '/app/workflows/$id': typeof AppWorkflowsIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/_authenticated': typeof AuthenticatedRouteWithChildren
+  '/app': typeof AppRouteWithChildren
   '/login': typeof LoginRoute
-  '/_authenticated/': typeof AuthenticatedIndexRoute
-  '/_authenticated/workflows/$id': typeof AuthenticatedWorkflowsIdRoute
+  '/app/': typeof AppIndexRoute
+  '/app/workflows/$id': typeof AppWorkflowsIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/login' | '/' | '/workflows/$id'
+  fullPaths: '/app' | '/login' | '/app/' | '/app/workflows/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/login' | '/' | '/workflows/$id'
-  id:
-    | '__root__'
-    | '/_authenticated'
-    | '/login'
-    | '/_authenticated/'
-    | '/_authenticated/workflows/$id'
+  to: '/login' | '/app' | '/app/workflows/$id'
+  id: '__root__' | '/app' | '/login' | '/app/' | '/app/workflows/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
+  AppRoute: typeof AppRouteWithChildren
   LoginRoute: typeof LoginRoute
 }
 
@@ -79,46 +75,44 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authenticated': {
-      id: '/_authenticated'
-      path: ''
-      fullPath: ''
-      preLoaderRoute: typeof AuthenticatedRouteImport
+    '/app': {
+      id: '/app'
+      path: '/app'
+      fullPath: '/app'
+      preLoaderRoute: typeof AppRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/': {
-      id: '/_authenticated/'
+    '/app/': {
+      id: '/app/'
       path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof AuthenticatedIndexRouteImport
-      parentRoute: typeof AuthenticatedRoute
+      fullPath: '/app/'
+      preLoaderRoute: typeof AppIndexRouteImport
+      parentRoute: typeof AppRoute
     }
-    '/_authenticated/workflows/$id': {
-      id: '/_authenticated/workflows/$id'
+    '/app/workflows/$id': {
+      id: '/app/workflows/$id'
       path: '/workflows/$id'
-      fullPath: '/workflows/$id'
-      preLoaderRoute: typeof AuthenticatedWorkflowsIdRouteImport
-      parentRoute: typeof AuthenticatedRoute
+      fullPath: '/app/workflows/$id'
+      preLoaderRoute: typeof AppWorkflowsIdRouteImport
+      parentRoute: typeof AppRoute
     }
   }
 }
 
-interface AuthenticatedRouteChildren {
-  AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
-  AuthenticatedWorkflowsIdRoute: typeof AuthenticatedWorkflowsIdRoute
+interface AppRouteChildren {
+  AppIndexRoute: typeof AppIndexRoute
+  AppWorkflowsIdRoute: typeof AppWorkflowsIdRoute
 }
 
-const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
-  AuthenticatedIndexRoute: AuthenticatedIndexRoute,
-  AuthenticatedWorkflowsIdRoute: AuthenticatedWorkflowsIdRoute,
+const AppRouteChildren: AppRouteChildren = {
+  AppIndexRoute: AppIndexRoute,
+  AppWorkflowsIdRoute: AppWorkflowsIdRoute,
 }
 
-const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
-  AuthenticatedRouteChildren,
-)
+const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
-  AuthenticatedRoute: AuthenticatedRouteWithChildren,
+  AppRoute: AppRouteWithChildren,
   LoginRoute: LoginRoute,
 }
 export const routeTree = rootRouteImport

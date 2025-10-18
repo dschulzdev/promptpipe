@@ -45,6 +45,7 @@ export class WorkflowService {
 		return this.runnerService.runWorkflow({
 			nodes: workflowData.nodes,
 			connections: workflowData.connections,
+			workflowId: workflowData.id,
 			userId: applicationUser.id,
 		});
 	}

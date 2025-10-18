@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { auth } from "@/lib/auth";
 
-export const Route = createFileRoute("/_authenticated/")({
+export const Route = createFileRoute("/app/")({
 	component: HomeComponent,
 });
 function HomeComponent() {
@@ -107,7 +107,11 @@ function WorkflowCard(workflow: WorkflowDto) {
 
 	return (
 		<>
-			<Link className="w-80" to={"/workflows/$id"} params={{ id: workflow.id }}>
+			<Link
+				className="w-80"
+				to={"/app/workflows/$id"}
+				params={{ id: workflow.id }}
+			>
 				<Card>
 					<CardHeader>
 						<CardTitle>{workflow.name}</CardTitle>

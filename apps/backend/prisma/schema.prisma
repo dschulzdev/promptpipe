@@ -23,6 +23,19 @@ model Workflow {
   updatedAt         DateTime        @updatedAt
   ApplicationUser   ApplicationUser @relation(fields: [applicationUserId], references: [id])
   applicationUserId String
+  WorkflowRun       WorkflowRun[]
+}
+
+model WorkflowRun {
+  id           String    @id @default(cuid())
+  status       String
+  errorMessage String?
+  startedAt    DateTime  @default(now())
+  completedAt  DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  workflow     Workflow  @relation(fields: [workflowId], references: [id])
+  workflowId   String
 }
 
 model ApplicationUser {

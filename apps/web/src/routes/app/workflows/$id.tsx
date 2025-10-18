@@ -1,4 +1,3 @@
-import { DndContext } from "@dnd-kit/core";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { ReactFlowProvider } from "@xyflow/react";
@@ -7,12 +6,16 @@ import { useEffect } from "react";
 import { workflowControllerFindOneOptions } from "@/api-client/@tanstack/react-query.gen";
 import BlockSidebar from "@/components/custom/block-sidebar";
 import PromptpipeWhiteboard from "@/components/custom/promptpipe-whiteboard";
+import WorkflowEditorMenubar from "@/components/custom/workflow-editor-menubar";
+import HistoryLayout from "@/components/layouts/history-layout";
 import { Button } from "@/components/ui/button";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
+import { Tabs, TabsContent } from "@/components/ui/tabs";
+import useEditorState from "@/stores/editor-store";
 import useNodeStore from "@/stores/node-store";
 import type { PipelineNodeDto } from "~/workflow/dto/pipeline-node.dto";
 
-export const Route = createFileRoute("/_authenticated/workflows/$id")({
+export const Route = createFileRoute("/app/workflows/$id")({
 	component: RouteComponent,
 	loader: async ({ context, params }) => {
 		context.queryClient.ensureQueryData(
@@ -27,20 +30,34 @@ export const Route = createFileRoute("/_authenticated/workflows/$id")({
 
 function RouteComponent() {
 	const params = Route.useParams();
+	const { selectedTab, setSelectedTab } = useEditorState();
 	return (
-		<>
-			<ReactFlowProvider>
-				<div className="h-max w-full">
-					<SidebarProvider>
-						<BlockSidebar />
-						<SidebarInset>
-							<PromptpipeWhiteboard />
-						</SidebarInset>
-					</SidebarProvider>
+		<Tabs value={selectedTab} onValueChange={setSelectedTab}>
+			<div className="flex h-full w-full flex-col">
+				<WorkflowEditorMenubar />
+				<div className="relative flex-1 overflow-hidden">
+					<ReactFlowProvider>
+						<TabsContent value="editor">
+							<SidebarProvider>
+								<BlockSidebar />
+								<SidebarInset>
+									<PromptpipeWhiteboard />
+								</SidebarInset>
+							</SidebarProvider>
+						</TabsContent>
+					</ReactFlowProvider>
+					<TabsContent value="history">
+						<HistoryLayout />
+					</TabsContent>
+					<TabsContent value="evaluations">
+						<div className="flex h-full w-full items-center justify-center">
+							<p>Evaluations content goes here.</p>
+						</div>
+					</TabsContent>
 				</div>
-			</ReactFlowProvider>
+			</div>
 			<Backdrop id={params.id} />
-		</>
+		</Tabs>
 	);
 }
 
@@ -56,7 +73,6 @@ function Backdrop({ id }: { id: string }) {
 
 	useEffect(() => {
 		if (isSuccess && data) {
-			// TODO: Fix types
 			initData(data.nodes as unknown as PipelineNodeDto[], data.connections);
 		}
 	}, [isSuccess, initData, data]);

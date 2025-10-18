@@ -27,11 +27,11 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
 	head: () => ({
 		meta: [
 			{
-				title: "My App",
+				title: "PromptPipe",
 			},
 			{
 				name: "description",
-				content: "My App is a web application",
+				content: "The easiest way to build and run AI workflows.",
 			},
 		],
 		links: [

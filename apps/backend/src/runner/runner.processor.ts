@@ -5,9 +5,11 @@ import { Job } from "bullmq";
 import Redis from "ioredis";
 import { ResultAsync } from "neverthrow";
 import { AiService } from "../ai/ai.service";
+import { PrismaService } from "../prisma/prisma.service";
 import { NodeTypes } from "../workflow/dto/nodes.dto";
 import { PipelineNodeDto } from "../workflow/dto/pipeline-node.dto";
 import { RunWorkloadDto } from "../workflow/dto/run-workflow.dto";
+import { WorkflowRunStatus } from "./dto/workflow-run-status";
 import { deleteUnlinkedNodes } from "./graph-processing/graph-functions";
 import { processNode } from "./graph-processing/node-functions";
 import { ProgressMessage, ProgressType } from "./progress-message";
@@ -24,6 +26,7 @@ export class RunnerProcessor extends WorkerHost {
 	constructor(
 		private readonly redisService: RedisService,
 		private readonly aiService: AiService,
+		private readonly prismaService: PrismaService,
 	) {
 		super();
 		// Initialize the Redis publisher using the RedisService
@@ -58,10 +61,20 @@ export class RunnerProcessor extends WorkerHost {
 		// biome-ignore lint/style/noNonNullAssertion: job id has to exist
 		const jobId: string = job.id!;
 		this.logger.log(`Worker processing job ${jobId} for workflow ${jobId}`);
+		const workflowRun = await this.prismaService.workflowRun.create({
+			data: {
+				workflowId: job.data.workflowId,
+				status: "running",
+			},
+		});
 
 		const { cleanedPayload, startNode } = this.initializeTest(jobId, job.data);
 
 		if (!startNode) {
+			await this.prismaService.workflowRun.update({
+				where: { id: workflowRun.id },
+				data: { status: "failed", errorMessage: "No start node found" },
+			});
 			throw new BadRequestException(
 				"No start node found in the workflow data.",
 			);
@@ -73,16 +86,24 @@ export class RunnerProcessor extends WorkerHost {
 
 		await ResultAsync.fromPromise(
 			this.runGraph(startNode as PipelineNodeDto, jobId, cleanedPayload),
-			(error) => {
+			async (error) => {
 				if (error instanceof Error) {
 					this.logger.error(error.stack);
 					this.logger.error(`Graph execution failed: ${error.message}`);
 				}
 				const finalResult = this.sendFinalResult(jobId, "fail");
+				await this.prismaService.workflowRun.update({
+					where: { id: workflowRun.id },
+					data: { status: "failed", errorMessage: error?.toString() },
+				});
 				return finalResult;
 			},
 		);
 
+		await this.prismaService.workflowRun.update({
+			where: { id: workflowRun.id },
+			data: { status: WorkflowRunStatus.COMPLETED },
+		});
 		const finalResult = this.sendFinalResult(jobId, "success");
 		return finalResult; // This is the return value of the job
 	}
