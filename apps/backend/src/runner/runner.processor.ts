@@ -6,6 +6,7 @@ import Redis from "ioredis";
 import { ResultAsync } from "neverthrow";
 import { AiService } from "../ai/ai.service";
 import { PrismaService } from "../prisma/prisma.service";
+import { StorageService } from "../storage/storage.service";
 import { NodeTypes } from "../workflow/dto/nodes.dto";
 import { PipelineNodeDto } from "../workflow/dto/pipeline-node.dto";
 import { RunWorkloadDto } from "../workflow/dto/run-workflow.dto";
@@ -27,6 +28,7 @@ export class RunnerProcessor extends WorkerHost {
 		private readonly redisService: RedisService,
 		private readonly aiService: AiService,
 		private readonly prismaService: PrismaService,
+		private readonly storageService: StorageService,
 	) {
 		super();
 		// Initialize the Redis publisher using the RedisService
@@ -105,6 +107,17 @@ export class RunnerProcessor extends WorkerHost {
 			data: { status: WorkflowRunStatus.COMPLETED },
 		});
 		const finalResult = this.sendFinalResult(jobId, "success");
+		const messagesKey = `workflow-messages:${job.id}`;
+		const existingMessages = await this.redisPublisher.lrange(
+			messagesKey,
+			0,
+			-1,
+		);
+		await this.storageService.storeLog({
+			id: workflowRun.id,
+			userId: job.data.userId,
+			content: existingMessages.map((msg) => JSON.parse(msg)),
+		});
 		return finalResult; // This is the return value of the job
 	}
 

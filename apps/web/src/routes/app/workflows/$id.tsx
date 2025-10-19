@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { ReactFlowProvider } from "@xyflow/react";
 import { Loader2 } from "lucide-react";
-import { useEffect } from "react";
+import { Suspense, useEffect } from "react";
 import { workflowControllerFindOneOptions } from "@/api-client/@tanstack/react-query.gen";
 import BlockSidebar from "@/components/custom/block-sidebar";
 import PromptpipeWhiteboard from "@/components/custom/promptpipe-whiteboard";
@@ -47,7 +47,9 @@ function RouteComponent() {
 						</TabsContent>
 					</ReactFlowProvider>
 					<TabsContent value="history">
-						<HistoryLayout />
+						<Suspense fallback={<div>Loading...</div>}>
+							<HistoryLayout />
+						</Suspense>
 					</TabsContent>
 					<TabsContent value="evaluations">
 						<div className="flex h-full w-full items-center justify-center">

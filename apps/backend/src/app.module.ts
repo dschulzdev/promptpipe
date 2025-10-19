@@ -12,6 +12,8 @@ import { validateConfig } from "./configuration";
 import { PrismaModule } from "./prisma/prisma.module";
 import { PrismaService } from "./prisma/prisma.service";
 import { RunnerModule } from "./runner/runner.module";
+import { StorageModule } from "./storage/storage.module";
+import { StorageService } from "./storage/storage.service";
 import { WorkflowModule } from "./workflow/workflow.module";
 
 @Module({
@@ -52,6 +54,7 @@ import { WorkflowModule } from "./workflow/workflow.module";
 		AiModule,
 		WorkflowModule,
 		AnalyticsModule,
+		StorageModule,
 	],
 	providers: [
 		{

@@ -68,15 +68,29 @@ export class WorkflowService {
 	}
 
 	public async findAll(user: UserSession["user"]) {
-		return await this.prismaService.workflow.findMany({
+		return this.prismaService.workflow.findMany({
 			where: { ApplicationUser: { user: { id: user.id } } },
 		});
 	}
 
 	public async findOne(id: string, user: UserSession["user"]) {
-		return await this.prismaService.workflow.findUnique({
+		return this.prismaService.workflow.findUnique({
 			where: { id, ApplicationUser: { user: { id: user.id } } },
 		});
+	}
+
+	public async findHistory(id: string, user: UserSession["user"]) {
+		const historyEntries = await this.prismaService.workflow.findUnique({
+			where: { id, ApplicationUser: { user: { id: user.id } } },
+			select: {
+				WorkflowRun: true,
+			},
+		});
+		return historyEntries?.WorkflowRun;
+	}
+
+	downloadLogForSingleHistory(runId: string, user: UserSession["user"]) {
+		return this.runnerService.getLogForWorkflowRun(runId, user.id);
 	}
 
 	async deleteOne(id: string, user: UserSession["user"]) {

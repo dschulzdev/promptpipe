@@ -9,6 +9,9 @@ import {
 import { Queue } from "bullmq";
 import Redis from "ioredis";
 import { Observable } from "rxjs";
+import { PrismaService } from "../prisma/prisma.service";
+import { StorageService } from "../storage/storage.service";
+import { getApplicationUser } from "../utils/get-application-user";
 import { RunWorkloadDto } from "../workflow/dto/run-workflow.dto";
 import { hasCycle } from "./graph-processing/graph-functions";
 import { ProgressMessage } from "./progress-message";
@@ -20,10 +23,29 @@ export class RunnerService {
 	constructor(
 		@InjectQueue("workflow_runs") private readonly workflowRunsQueue: Queue,
 		private readonly redisService: RedisService,
+		private readonly storageService: StorageService,
+		private readonly prismaService: PrismaService,
 	) {
 		// Initialize the Redis publisher using the RedisService
 		this.redisPublisher = this.redisService.getOrThrow();
 		this.redisSubscriber = this.redisService.getOrThrow("runner-subscriber");
+	}
+
+	async getLogForWorkflowRun(runId: string, betterAuthUserId: string) {
+		// Get the ApplicationUser ID from the Better Auth user ID
+		const applicationUser = await getApplicationUser(
+			betterAuthUserId,
+			this.prismaService,
+		);
+		if (!applicationUser) {
+			throw new UnauthorizedException(
+				"You are not allowed to perform this action",
+			);
+		}
+		return this.storageService.getSignedLogUrl({
+			id: runId,
+			userId: applicationUser.id,
+		});
 	}
 
 	public async runWorkflow(
