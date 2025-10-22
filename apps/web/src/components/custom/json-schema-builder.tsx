@@ -119,10 +119,6 @@ const JsonSchemaBuilder = ({
 		setProperties(initialProperties);
 	}, [initialProperties]);
 
-	useEffect(() => {
-		onSchemaChange(generateSchema(properties));
-	}, [properties]);
-
 	const addProperty = () => {
 		setProperties([
 			...properties,
@@ -236,6 +232,9 @@ const JsonSchemaBuilder = ({
 		return schema;
 	};
 
+	useEffect(() => {
+		onSchemaChange(generateSchema(properties));
+	}, [properties, generateSchema, onSchemaChange]);
 	return (
 		<div>
 			{properties.map((p) => (

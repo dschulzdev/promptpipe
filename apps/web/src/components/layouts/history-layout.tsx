@@ -1,19 +1,14 @@
-import { useMutation, useQuery, useSuspenseQuery } from "@tanstack/react-query";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { useParams } from "@tanstack/react-router";
-import { Download, MoreVertical } from "lucide-react";
-import {
-	workflowControllerDownloadHistoryOptions,
-	workflowControllerFindHistoryOptions,
-} from "@/api-client/@tanstack/react-query.gen";
-import { useLogDownload } from "@/hooks/use-log-download";
+import { workflowControllerFindHistoryOptions } from "@/api-client/@tanstack/react-query.gen";
 import { EmptyPreviousRuns } from "../custom/empty/empty-previous-runs";
-import { Button } from "../ui/button";
+import HistoryRunContent from "../custom/history/history-run-content";
+import HistoryRunItem from "../custom/history/history-run-item";
 import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuItem,
-	DropdownMenuTrigger,
-} from "../ui/dropdown-menu";
+	ResizableHandle,
+	ResizablePanel,
+	ResizablePanelGroup,
+} from "../ui/resizable";
 
 export default function HistoryLayout() {
 	const { id } = useParams({ strict: false });
@@ -26,48 +21,23 @@ export default function HistoryLayout() {
 	}
 
 	return (
-		<div>
-			{workflowHistory?.map((historyItem) => (
-				<div key={historyItem.id} className="mb-2 rounded border p-4">
-					<h3 className="font-bold">Run ID: {historyItem.id}</h3>
-					<p>Status: {historyItem.status}</p>
-					<p>Started At: {new Date(historyItem.startedAt).toLocaleString()}</p>
-					{historyItem.completedAt && (
-						<p>
-							Completed At: {new Date(historyItem.completedAt).toLocaleString()}
-						</p>
-					)}
-					<DropdownMenu>
-						<DropdownMenuTrigger asChild>
-							<Button variant="secondary" size="sm">
-								<MoreVertical />
-							</Button>
-						</DropdownMenuTrigger>
-						<DropdownMenuContent>
-							<DownloadLogButton runId={historyItem.id} />
-						</DropdownMenuContent>
-					</DropdownMenu>
+		<ResizablePanelGroup direction="horizontal" className="h-full flex-1">
+			<ResizablePanel
+				minSize={15}
+				defaultSize={25}
+				maxSize={40}
+				className="h-full"
+			>
+				<div className="flex h-full flex-col gap-2 overflow-y-scroll p-2">
+					{workflowHistory?.map((historyItem) => (
+						<HistoryRunItem key={historyItem.id} historyItem={historyItem} />
+					))}
 				</div>
-			))}
-		</div>
-	);
-}
-
-export function DownloadLogButton({ runId }: { runId: string }) {
-	const { id } = useParams({ strict: false });
-	const { refetch: downloadLog } = useLogDownload(
-		// biome-ignore lint/style/noNonNullAssertion: id should exist here
-		id!,
-		runId,
-	);
-	return (
-		<DropdownMenuItem
-			onClick={() => {
-				downloadLog();
-			}}
-		>
-			<Download />
-			Download logs
-		</DropdownMenuItem>
+			</ResizablePanel>
+			<ResizableHandle withHandle />
+			<ResizablePanel>
+				<HistoryRunContent />
+			</ResizablePanel>
+		</ResizablePanelGroup>
 	);
 }

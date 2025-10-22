@@ -8,6 +8,7 @@ export class WorkflowHistoryDto {
 	@IsDate()
 	updatedAt: Date;
 	@IsString()
+	//TODO: Typing enum properly
 	status: string;
 	@IsString()
 	@IsOptional()

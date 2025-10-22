@@ -1,9 +1,10 @@
-import { CheckCheck, CheckCircle, Loader2, Logs } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import {
 	Popover,
 	PopoverContent,
 	PopoverTrigger,
 } from "@/components/ui/popover";
+import { logsIconMap as iconMap } from "@/constants/log-icon-map";
 import { useJobUpdates } from "@/hooks/use-job-updates";
 import useRunnerStore from "@/stores/runner-store";
 import { ScrollArea } from "../../../ui/scroll-area";
@@ -42,13 +43,6 @@ export default function JobLogs() {
 			</SheetDescription>
 		);
 	}
-
-	const iconMap: Record<string, React.ReactNode> = {
-		log: <Logs className="h-4 w-4 text-blue-400" />,
-		progress_node: <Loader2 className="h-4 w-4 text-yellow-600" />,
-		success_node: <CheckCircle className="h-4 w-4 text-green-400" />,
-		result_success: <CheckCheck className="h-4 w-4 text-green-700" />,
-	};
 
 	return (
 		<ScrollArea className="h-full">

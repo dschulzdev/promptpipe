@@ -88,12 +88,14 @@ function StructuredOutputNode({
 				</BaseNodeContent>
 				<BaseNodeFooter className="w-full px-0">
 					<div className="flex w-full flex-col items-start gap-2">
+						{/** biome-ignore lint/correctness/useUniqueElementIds: id is used by react flow, not by react itself */}
 						<LabeledHandle
 							title="LLM"
 							id="llm"
 							type="target"
 							position={Position.Left}
 						/>
+						{/** biome-ignore lint/correctness/useUniqueElementIds: id is used by react flow, not by react itself */}
 						<LabeledHandle
 							title="Prompt"
 							id="prompt"

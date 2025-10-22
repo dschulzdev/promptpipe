@@ -5,6 +5,7 @@ import {
 	LLMProvider,
 	LLMProviderArray,
 	OPENAI_MODEL,
+	OPENROUTER_MODEL,
 } from "../../../ai/llm-providers";
 import { NodeDataDto } from "../nodes.dto";
 
@@ -18,7 +19,11 @@ export class LLMNodeDataDto extends NodeDataDto implements LLMNodeData {
 	@IsEnum(LLMProviderArray)
 	@IsDefined()
 	llmProvider: LLMProviderArray;
-	@IsIn([...Object.values(GOOGLE_GENAI_MODEL), ...Object.values(OPENAI_MODEL)])
+	@IsIn([
+		...Object.values(GOOGLE_GENAI_MODEL),
+		...Object.values(OPENAI_MODEL),
+		...Object.values(OPENROUTER_MODEL),
+	])
 	@IsDefined()
 	llmModel: (typeof AllModels)[number];
 }

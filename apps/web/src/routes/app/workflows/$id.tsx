@@ -33,7 +33,7 @@ function RouteComponent() {
 	const { selectedTab, setSelectedTab } = useEditorState();
 	return (
 		<Tabs value={selectedTab} onValueChange={setSelectedTab}>
-			<div className="flex h-full w-full flex-col">
+			<div className="flex h-screen w-full flex-col">
 				<WorkflowEditorMenubar />
 				<div className="relative flex-1 overflow-hidden">
 					<ReactFlowProvider>
@@ -46,7 +46,7 @@ function RouteComponent() {
 							</SidebarProvider>
 						</TabsContent>
 					</ReactFlowProvider>
-					<TabsContent value="history">
+					<TabsContent value="history" className="h-full">
 						<Suspense fallback={<div>Loading...</div>}>
 							<HistoryLayout />
 						</Suspense>

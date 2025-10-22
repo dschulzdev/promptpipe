@@ -4,7 +4,9 @@ import {
 	S3Client,
 } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-import { Injectable } from "@nestjs/common";
+import { Injectable, NotFoundException } from "@nestjs/common";
+import { plainToInstance } from "class-transformer";
+import { ProgressMessageWithTypeDto } from "../runner/dto/progress-message-with-type.dto";
 
 @Injectable()
 export class StorageService {
@@ -43,5 +45,30 @@ export class StorageService {
 			ResponseContentDisposition: "attachment", // Forces download
 		});
 		return await getSignedUrl(this.client, command, { expiresIn });
+	}
+
+	public async getLogById({
+		id,
+		userId,
+	}: {
+		id: string;
+		userId: string;
+	}): Promise<ProgressMessageWithTypeDto[]> {
+		const command = new GetObjectCommand({
+			Bucket: "promptpipe-dev",
+			Key: `logs/${userId}/${id}.json`,
+			ResponseContentDisposition: "attachment", // Forces download
+		});
+		const result = await this.client.send(command);
+		if (!result.Body) {
+			throw new NotFoundException("Log not found");
+		}
+
+		const parsedResult = JSON.parse(
+			await result.Body.transformToString(),
+		) as Array<unknown>;
+		return parsedResult.map((item) =>
+			plainToInstance(ProgressMessageWithTypeDto, item),
+		);
 	}
 }

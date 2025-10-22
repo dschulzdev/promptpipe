@@ -78,8 +78,8 @@ export async function processMergeNodeHandles(
 	workflowData: RunWorkloadDto,
 	nodeHandleOutputMap: NodeOutputMap,
 	aiService: AiService,
-	onStart = (id?: string) => {},
-	onEnd = (id?: string) => {},
+	onStart = (_id?: string) => {},
+	onEnd = (_id?: string) => {},
 ) {
 	const handles = node.data.inputs;
 	const connectionTargets = handles.map((handle) => {

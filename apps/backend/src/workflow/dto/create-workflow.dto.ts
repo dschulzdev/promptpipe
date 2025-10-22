@@ -26,6 +26,7 @@ export class CreateWorkflowDto {
 			{ $ref: "#/components/schemas/TextOutputNodeDto" },
 			{ $ref: "#/components/schemas/BasicStartNodeDto" },
 			{ $ref: "#/components/schemas/TextGenerationNodeDto" },
+			{ $ref: "#/components/schemas/StructuredOutputNodeDto" },
 		],
 	})
 	@IsOptional()

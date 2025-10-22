@@ -249,7 +249,6 @@ const useNodeStore = create<NodeState & NodeActions>((set, get) => ({
 						type: "text_generation",
 						data: {
 							state: "initial",
-							json_mode: false,
 						},
 						position: oldNode.position,
 					};

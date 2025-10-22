@@ -28,8 +28,23 @@ export type WorkflowHistoryDto = {
     workflowId: string;
 };
 
+export type ProgressMessageDto = {
+    payload?: {
+        nodeId: string;
+        data?: {
+            [key: string]: unknown;
+        };
+    };
+    log: string;
+};
+
+export type ProgressMessageWithTypeDto = {
+    type: 'log' | 'progress_node' | 'success_node' | 'result_success' | 'result_fail' | 'fail_node';
+    payload: ProgressMessageDto;
+};
+
 export type CreateWorkflowDto = {
-    nodes?: Array<LlmNodeDto | TextInputNodeDto | TextOutputNodeDto | BasicStartNodeDto | TextGenerationNodeDto>;
+    nodes?: Array<LlmNodeDto | TextInputNodeDto | TextOutputNodeDto | BasicStartNodeDto | TextGenerationNodeDto | StructuredOutputNodeDto>;
     name: string;
     connections?: Array<PipelineConnectionDto>;
 };
@@ -47,7 +62,7 @@ export type Position = {
 
 export type LlmNodeDataDto = {
     llmProvider: 'openai' | 'google_genai' | 'openrouter';
-    llmModel: 'gemini-2.5-flash' | 'gemini-2.5-flash-lite' | 'gemini-2.0-flash' | 'gemini-2.0-flash-lite' | 'gpt-5-nano' | 'gpt-4.1-mini' | 'gpt-4.1-nano' | 'gpt-4o-mini';
+    llmModel: 'gemini-2.5-flash' | 'gemini-2.5-flash-lite' | 'gemini-2.0-flash' | 'gemini-2.0-flash-lite' | 'gpt-5-nano' | 'gpt-4.1-mini' | 'gpt-4.1-nano' | 'gpt-4o-mini' | 'openrouter/horizon-beta' | 'openrouter/sonoma-dusk-alpha' | 'openrouter/sonoma-sky-alpha' | 'openai/gpt-oss-120b:free' | 'openai/gpt-oss-20b:free' | 'z-ai/glm-4.5-air:free' | 'moonshotai/kimi-k2:free';
 };
 
 export type LlmNodeDto = {
@@ -260,6 +275,22 @@ export type WorkflowControllerFindHistoryResponses = {
 };
 
 export type WorkflowControllerFindHistoryResponse = WorkflowControllerFindHistoryResponses[keyof WorkflowControllerFindHistoryResponses];
+
+export type WorkflowControllerGetLogForHistoryData = {
+    body?: never;
+    path: {
+        id: string;
+        runId: string;
+    };
+    query?: never;
+    url: '/workflow/{id}/history/{runId}';
+};
+
+export type WorkflowControllerGetLogForHistoryResponses = {
+    200: Array<ProgressMessageWithTypeDto>;
+};
+
+export type WorkflowControllerGetLogForHistoryResponse = WorkflowControllerGetLogForHistoryResponses[keyof WorkflowControllerGetLogForHistoryResponses];
 
 export type WorkflowControllerDownloadHistoryData = {
     body?: never;

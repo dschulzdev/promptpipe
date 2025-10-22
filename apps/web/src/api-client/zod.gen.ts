@@ -29,7 +29,14 @@ export const zLlmNodeDataDto = z.object({
         'gpt-5-nano',
         'gpt-4.1-mini',
         'gpt-4.1-nano',
-        'gpt-4o-mini'
+        'gpt-4o-mini',
+        'openrouter/horizon-beta',
+        'openrouter/sonoma-dusk-alpha',
+        'openrouter/sonoma-sky-alpha',
+        'openai/gpt-oss-120b:free',
+        'openai/gpt-oss-20b:free',
+        'z-ai/glm-4.5-air:free',
+        'moonshotai/kimi-k2:free'
     ])
 });
 
@@ -197,13 +204,34 @@ export const zWorkflowHistoryDto = z.object({
     workflowId: z.string()
 });
 
+export const zProgressMessageDto = z.object({
+    payload: z.object({
+        nodeId: z.string(),
+        data: z.object({}).optional()
+    }).optional(),
+    log: z.string()
+});
+
+export const zProgressMessageWithTypeDto = z.object({
+    type: z.enum([
+        'log',
+        'progress_node',
+        'success_node',
+        'result_success',
+        'result_fail',
+        'fail_node'
+    ]),
+    payload: zProgressMessageDto
+});
+
 export const zCreateWorkflowDto = z.object({
     nodes: z.array(z.union([
         zLlmNodeDto,
         zTextInputNodeDto,
         zTextOutputNodeDto,
         zBasicStartNodeDto,
-        zTextGenerationNodeDto
+        zTextGenerationNodeDto,
+        zStructuredOutputNodeDto
     ])).optional(),
     name: z.string(),
     connections: z.array(zPipelineConnectionDto).optional()
@@ -304,6 +332,17 @@ export const zWorkflowControllerFindHistoryData = z.object({
 });
 
 export const zWorkflowControllerFindHistoryResponse = z.array(zWorkflowHistoryDto);
+
+export const zWorkflowControllerGetLogForHistoryData = z.object({
+    body: z.never().optional(),
+    path: z.object({
+        id: z.string(),
+        runId: z.string()
+    }),
+    query: z.never().optional()
+});
+
+export const zWorkflowControllerGetLogForHistoryResponse = z.array(zProgressMessageWithTypeDto);
 
 export const zWorkflowControllerDownloadHistoryData = z.object({
     body: z.never().optional(),
