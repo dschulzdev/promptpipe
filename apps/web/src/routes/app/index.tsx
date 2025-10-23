@@ -44,6 +44,11 @@ function Navbar() {
 	const navigate = useNavigate();
 	return (
 		<nav className="flex w-full flex-row bg-sidebar p-4">
+			<img
+				src="/android-chrome-512x512.png"
+				alt="Logo"
+				className="mr-4 h-8 w-8"
+			/>
 			<h1 className="mr-auto font-bold text-2xl text-primary">PromptPipe</h1>
 			<Button
 				onClick={() =>

@@ -14,7 +14,11 @@ export default function WorkflowEditorMenubar() {
 	return (
 		<div className="grid grid-cols-3 justify-items-center border-b-2 p-4">
 			<div className="flex items-center gap-2 justify-self-start">
-				<BrainCircuit />
+				<img
+					src="/android-chrome-512x512.png"
+					alt="Logo"
+					className="mr-4 h-8 w-8"
+				/>
 				<h3 className="text-xl">{workflow?.name}</h3>
 				<FileMenu />
 			</div>
