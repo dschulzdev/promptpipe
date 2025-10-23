@@ -15,6 +15,11 @@ function LandingPage() {
 	return (
 		<div className="flex min-h-screen flex-col bg-background text-foreground">
 			<header className="flex h-14 items-center justify-between px-4 lg:px-6">
+				<img
+					src="/android-chrome-512x512.png"
+					alt="Logo"
+					className="mr-4 h-8 w-8"
+				/>
 				{/** biome-ignore lint/a11y/useValidAnchor: its fine here, will be replaced in the future */}
 				<a className="flex items-center justify-center" href="#">
 					<span className="font-bold text-2xl text-primary">PromptPipe</span>
