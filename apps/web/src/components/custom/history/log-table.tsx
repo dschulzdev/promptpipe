@@ -31,7 +31,7 @@ export default function LogTable({
 				</TableHeader>
 				<TableBody>
 					{data.map((log, index) => (
-						// biome-ignore lint/suspicious/noArrayIndexKey: test
+						// biome-ignore lint/suspicious/noArrayIndexKey: Using index as key is acceptable here because log entries are static and not reordered.
 						<TableRow key={index}>
 							<TableCell>{iconMap[log.type] || iconMap.default}</TableCell>
 							<TableCell>

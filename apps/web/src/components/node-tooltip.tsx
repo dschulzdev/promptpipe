@@ -102,8 +102,7 @@ export const NodeTooltipContent = forwardRef<HTMLDivElement, NodeToolbarProps>(
 						"rounded-sm bg-primary p-2 text-primary-foreground",
 						className,
 					)}
-					// biome-ignore lint/a11y/noPositiveTabindex: needed
-					tabIndex="0"
+					tabIndex={0}
 					position={position}
 					{...props}
 				>

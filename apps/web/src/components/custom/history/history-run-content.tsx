@@ -27,6 +27,9 @@ export default function HistoryRunContent() {
 		return <div>Loading...</div>;
 	}
 
-	// biome-ignore lint/style/noNonNullAssertion: idk how data can be undefined here
-	return <LogTable data={data!} />;
+	if (!data) {
+		// data can be undefined if the query fails or returns no data
+		return <div>No log data available.</div>;
+	}
+	return <LogTable data={data} />;
 }

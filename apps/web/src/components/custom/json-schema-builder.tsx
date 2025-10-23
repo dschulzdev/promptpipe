@@ -1,5 +1,5 @@
 import { Brackets, PlusIcon, TrashIcon } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -190,47 +190,55 @@ const JsonSchemaBuilder = ({
 		);
 	};
 
-	const generateSchema = (currentProperties: Property[]): object => {
-		const schema: {
-			type: "object";
-			properties: { [key: string]: any };
-			required: string[];
-		} = { type: "object", properties: {}, required: [] };
+	const generateSchema = useCallback(
+		(currentProperties: Property[]): object => {
+			const schema: {
+				type: "object";
+				properties: { [key: string]: any };
+				required: string[];
+			} = { type: "object", properties: {}, required: [] };
 
-		const buildProperties = (props: Property[]) => {
-			const result: { properties: { [key: string]: any }; required: string[] } =
-				{ properties: {}, required: [] };
-			for (const prop of props) {
-				if (prop.name) {
-					result.required.push(prop.name);
-					let propSchema: any = {};
-					if (prop.type === "object") {
-						const nested = buildProperties(prop.properties || []);
-						propSchema = {
-							type: "object",
-							properties: nested.properties,
-							required: nested.required,
-						};
-					} else {
-						propSchema = { type: prop.type };
-					}
+			const buildProperties = (props: Property[]) => {
+				const result: {
+					properties: { [key: string]: any };
+					required: string[];
+				} = { properties: {}, required: [] };
+				for (const prop of props) {
+					if (prop.name) {
+						result.required.push(prop.name);
+						let propSchema: any = {};
+						if (prop.type === "object") {
+							const nested = buildProperties(prop.properties || []);
+							propSchema = {
+								type: "object",
+								properties: nested.properties,
+								required: nested.required,
+							};
+						} else {
+							propSchema = { type: prop.type };
+						}
 
-					if (prop.isArray) {
-						result.properties[prop.name] = { type: "array", items: propSchema };
-					} else {
-						result.properties[prop.name] = propSchema;
+						if (prop.isArray) {
+							result.properties[prop.name] = {
+								type: "array",
+								items: propSchema,
+							};
+						} else {
+							result.properties[prop.name] = propSchema;
+						}
 					}
 				}
-			}
-			return result;
-		};
+				return result;
+			};
 
-		const topLevel = buildProperties(currentProperties);
-		schema.properties = topLevel.properties;
-		schema.required = topLevel.required;
+			const topLevel = buildProperties(currentProperties);
+			schema.properties = topLevel.properties;
+			schema.required = topLevel.required;
 
-		return schema;
-	};
+			return schema;
+		},
+		[],
+	);
 
 	useEffect(() => {
 		onSchemaChange(generateSchema(properties));

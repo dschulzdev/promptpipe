@@ -5,12 +5,16 @@ import {
 } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { Injectable, NotFoundException } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
 import { plainToInstance } from "class-transformer";
 import { ProgressMessageWithTypeDto } from "../runner/dto/progress-message-with-type.dto";
 
 @Injectable()
 export class StorageService {
-	constructor(private readonly client: S3Client) {}
+	constructor(
+		private readonly client: S3Client,
+		private readonly configService: ConfigService,
+	) {}
 
 	public async storeLog({
 		id,
@@ -23,7 +27,7 @@ export class StorageService {
 	}): Promise<void> {
 		await this.client.send(
 			new PutObjectCommand({
-				Bucket: "promptpipe-dev",
+				Bucket: this.configService.get("AWS_S3_BUCKET_NAME"),
 				Key: `logs/${userId}/${id}.json`,
 				Body: JSON.stringify(content),
 			}),
@@ -40,7 +44,7 @@ export class StorageService {
 		expiresIn?: number;
 	}): Promise<string> {
 		const command = new GetObjectCommand({
-			Bucket: "promptpipe-dev",
+			Bucket: this.configService.get("AWS_S3_BUCKET_NAME"),
 			Key: `logs/${userId}/${id}.json`,
 			ResponseContentDisposition: "attachment", // Forces download
 		});
@@ -55,7 +59,7 @@ export class StorageService {
 		userId: string;
 	}): Promise<ProgressMessageWithTypeDto[]> {
 		const command = new GetObjectCommand({
-			Bucket: "promptpipe-dev",
+			Bucket: this.configService.get("AWS_S3_BUCKET_NAME"),
 			Key: `logs/${userId}/${id}.json`,
 			ResponseContentDisposition: "attachment", // Forces download
 		});
