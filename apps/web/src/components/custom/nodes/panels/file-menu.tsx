@@ -24,7 +24,7 @@ function FileMenu() {
 	const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
 	const { data: workflow } = useQuery(
-		// biome-ignore lint/style/noNonNullAssertion: <explanation>
+		// biome-ignore lint/style/noNonNullAssertion: id has to exist here
 		workflowControllerFindOneOptions({ path: { id: id! } }),
 	);
 
@@ -78,7 +78,7 @@ function FileMenu() {
 						</DropdownMenuItem>
 					</DropdownMenuGroup>
 					<DropdownMenuSeparator />
-					<Link to="/">
+					<Link to="/app">
 						<DropdownMenuItem>
 							<ArrowLeft />
 							Back to Workflow list

@@ -6,8 +6,13 @@ export const zPipelineConnectionDto = z.object({
     id: z.string(),
     sourceNodeId: z.string(),
     targetNodeId: z.string(),
-    sourceNodeHandleId: z.string(),
-    targetNodeHandleId: z.string()
+    sourceNodeHandleId: z.string().optional(),
+    targetNodeHandleId: z.string().optional()
+});
+
+export const zPosition = z.object({
+    x: z.number(),
+    y: z.number()
 });
 
 export const zLlmNodeDataDto = z.object({
@@ -24,13 +29,15 @@ export const zLlmNodeDataDto = z.object({
         'gpt-5-nano',
         'gpt-4.1-mini',
         'gpt-4.1-nano',
-        'gpt-4o-mini'
+        'gpt-4o-mini',
+        'openrouter/horizon-beta',
+        'openrouter/sonoma-dusk-alpha',
+        'openrouter/sonoma-sky-alpha',
+        'openai/gpt-oss-120b:free',
+        'openai/gpt-oss-20b:free',
+        'z-ai/glm-4.5-air:free',
+        'moonshotai/kimi-k2:free'
     ])
-});
-
-export const zPosition = z.object({
-    x: z.number(),
-    y: z.number()
 });
 
 export const zLlmNodeDto = z.object({
@@ -44,8 +51,8 @@ export const zLlmNodeDto = z.object({
         'merge',
         'structured_output'
     ]),
-    data: zLlmNodeDataDto,
-    position: zPosition
+    position: zPosition,
+    data: zLlmNodeDataDto
 });
 
 export const zTextInputNodeDataDto = z.object({
@@ -64,8 +71,8 @@ export const zTextInputNodeDto = z.object({
         'merge',
         'structured_output'
     ]),
-    data: zTextInputNodeDataDto,
-    position: zPosition
+    position: zPosition,
+    data: zTextInputNodeDataDto
 });
 
 export const zTextOutputNodeDataDto = z.object({
@@ -83,8 +90,8 @@ export const zTextOutputNodeDto = z.object({
         'merge',
         'structured_output'
     ]),
-    data: zTextOutputNodeDataDto,
-    position: zPosition
+    position: zPosition,
+    data: zTextOutputNodeDataDto
 });
 
 export const zBasicStartNodeDataDto = z.object({});
@@ -100,8 +107,8 @@ export const zBasicStartNodeDto = z.object({
         'merge',
         'structured_output'
     ]),
-    data: zBasicStartNodeDataDto,
-    position: zPosition
+    position: zPosition,
+    data: zBasicStartNodeDataDto
 });
 
 export const zTextGenerationNodeDataDto = z.object({});
@@ -117,14 +124,16 @@ export const zTextGenerationNodeDto = z.object({
         'merge',
         'structured_output'
     ]),
-    data: zTextGenerationNodeDataDto,
-    position: zPosition
+    position: zPosition,
+    data: zTextGenerationNodeDataDto
+});
+
+export const zMergeInput = z.object({
+    id: z.string()
 });
 
 export const zMergeNodeDataDto = z.object({
-    inputs: z.array(z.object({
-        id: z.string()
-    }))
+    inputs: z.array(zMergeInput)
 });
 
 export const zMergeNodeDto = z.object({
@@ -138,8 +147,8 @@ export const zMergeNodeDto = z.object({
         'merge',
         'structured_output'
     ]),
-    data: zMergeNodeDataDto,
-    position: zPosition
+    position: zPosition,
+    data: zMergeNodeDataDto
 });
 
 export const zStructuredOutputNodeDataDto = z.object({
@@ -157,8 +166,8 @@ export const zStructuredOutputNodeDto = z.object({
         'merge',
         'structured_output'
     ]),
-    data: zStructuredOutputNodeDataDto,
-    position: zPosition
+    position: zPosition,
+    data: zStructuredOutputNodeDataDto
 });
 
 export const zWorkflowDto = z.object({
@@ -178,13 +187,51 @@ export const zWorkflowDto = z.object({
     updatedAt: z.string().datetime()
 });
 
+export const zWorkflowHistoryDto = z.object({
+    id: z.string(),
+    createdAt: z.string().datetime(),
+    updatedAt: z.string().datetime(),
+    status: z.string(),
+    errorMessage: z.union([
+        z.string(),
+        z.null()
+    ]),
+    startedAt: z.string().datetime(),
+    completedAt: z.union([
+        z.string().datetime(),
+        z.null()
+    ]),
+    workflowId: z.string()
+});
+
+export const zProgressMessageDto = z.object({
+    payload: z.object({
+        nodeId: z.string(),
+        data: z.object({}).optional()
+    }).optional(),
+    log: z.string()
+});
+
+export const zProgressMessageWithTypeDto = z.object({
+    type: z.enum([
+        'log',
+        'progress_node',
+        'success_node',
+        'result_success',
+        'result_fail',
+        'fail_node'
+    ]),
+    payload: zProgressMessageDto
+});
+
 export const zCreateWorkflowDto = z.object({
     nodes: z.array(z.union([
         zLlmNodeDto,
         zTextInputNodeDto,
         zTextOutputNodeDto,
         zBasicStartNodeDto,
-        zTextGenerationNodeDto
+        zTextGenerationNodeDto,
+        zStructuredOutputNodeDto
     ])).optional(),
     name: z.string(),
     connections: z.array(zPipelineConnectionDto).optional()
@@ -275,3 +322,34 @@ export const zWorkflowControllerUpdateData = z.object({
 });
 
 export const zWorkflowControllerUpdateResponse = zWorkflowDto;
+
+export const zWorkflowControllerFindHistoryData = z.object({
+    body: z.never().optional(),
+    path: z.object({
+        id: z.string()
+    }),
+    query: z.never().optional()
+});
+
+export const zWorkflowControllerFindHistoryResponse = z.array(zWorkflowHistoryDto);
+
+export const zWorkflowControllerGetLogForHistoryData = z.object({
+    body: z.never().optional(),
+    path: z.object({
+        id: z.string(),
+        runId: z.string()
+    }),
+    query: z.never().optional()
+});
+
+export const zWorkflowControllerGetLogForHistoryResponse = z.array(zProgressMessageWithTypeDto);
+
+export const zWorkflowControllerDownloadHistoryData = z.object({
+    body: z.never().optional(),
+    path: z.object({
+        runId: z.string()
+    }),
+    query: z.never().optional()
+});
+
+export const zWorkflowControllerDownloadHistoryResponse = z.string();

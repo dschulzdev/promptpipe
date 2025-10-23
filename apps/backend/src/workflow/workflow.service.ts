@@ -10,6 +10,7 @@ import { ResultAsync } from "neverthrow";
 import { Observable } from "rxjs";
 import { PrismaService } from "../prisma/prisma.service";
 import { RunnerService } from "../runner/runner.service";
+import { StorageService } from "../storage/storage.service";
 import { getApplicationUser } from "../utils/get-application-user";
 import { CreateWorkflowDto } from "./dto/create-workflow.dto";
 import { UpdateWorkflowDto } from "./dto/update-workflow.dto";
@@ -20,6 +21,7 @@ export class WorkflowService {
 	constructor(
 		private readonly runnerService: RunnerService,
 		private readonly prismaService: PrismaService,
+		private readonly storageService: StorageService,
 	) {}
 
 	public async runWorkflow(
@@ -45,6 +47,7 @@ export class WorkflowService {
 		return this.runnerService.runWorkflow({
 			nodes: workflowData.nodes,
 			connections: workflowData.connections,
+			workflowId: workflowData.id,
 			userId: applicationUser.id,
 		});
 	}
@@ -67,14 +70,49 @@ export class WorkflowService {
 	}
 
 	public async findAll(user: UserSession["user"]) {
-		return await this.prismaService.workflow.findMany({
+		return this.prismaService.workflow.findMany({
 			where: { ApplicationUser: { user: { id: user.id } } },
 		});
 	}
 
 	public async findOne(id: string, user: UserSession["user"]) {
-		return await this.prismaService.workflow.findUnique({
+		return this.prismaService.workflow.findUnique({
 			where: { id, ApplicationUser: { user: { id: user.id } } },
+		});
+	}
+
+	public async findHistory(id: string, user: UserSession["user"]) {
+		const historyEntries = await this.prismaService.workflow.findUnique({
+			where: { id, ApplicationUser: { user: { id: user.id } } },
+			select: {
+				WorkflowRun: {
+					orderBy: { createdAt: "desc" },
+				},
+			},
+		});
+		return historyEntries?.WorkflowRun;
+	}
+
+	public async downloadLogForSingleHistory(
+		runId: string,
+		user: UserSession["user"],
+	) {
+		return this.runnerService.getLogForWorkflowRun(runId, user.id);
+	}
+
+	public async getLogForHistory(runId: string, user: UserSession["user"]) {
+		const applicationUser = await getApplicationUser(
+			user.id,
+			this.prismaService,
+		);
+		if (!applicationUser) {
+			throw new UnauthorizedException(
+				"You are not allowed to perform this action",
+			);
+		}
+		return this.storageService.getLogById({
+			id: runId,
+			userId: applicationUser.id,
 		});
 	}
 

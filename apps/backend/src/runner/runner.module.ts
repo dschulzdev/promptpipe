@@ -2,6 +2,8 @@ import { BullModule } from "@nestjs/bullmq";
 import { Module } from "@nestjs/common";
 import { AiModule } from "../ai/ai.module";
 import { AnalyticsModule } from "../analytics/analytics.module";
+import { PrismaModule } from "../prisma/prisma.module";
+import { StorageModule } from "../storage/storage.module";
 import { RunnerProcessor } from "./runner.processor";
 import { RunnerService } from "./runner.service";
 
@@ -12,6 +14,8 @@ import { RunnerService } from "./runner.service";
 			name: "workflow_runs",
 		}),
 		AnalyticsModule,
+		PrismaModule,
+		StorageModule,
 	],
 	controllers: [],
 	providers: [RunnerService, RunnerProcessor],

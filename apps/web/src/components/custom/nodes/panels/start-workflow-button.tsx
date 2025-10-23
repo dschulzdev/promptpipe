@@ -73,16 +73,16 @@ function StartWorkflowButton() {
 		<Tooltip>
 			<TooltipTrigger asChild>
 				<Button
-					size={"icon"}
+					size={"default"}
 					disabled={isSaving || workflowInProgress}
 					onClick={handleStartWorkflow}
-					variant={"secondary"}
 				>
 					{workflowInProgress ? (
 						<Loader2 className="h-full w-full animate-spin" />
 					) : (
 						<Play />
 					)}
+					{"Start Workflow"}
 				</Button>
 			</TooltipTrigger>
 			<TooltipContent>

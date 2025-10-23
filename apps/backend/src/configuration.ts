@@ -19,6 +19,11 @@ const configSchema = z.object({
 			apiKey: z.string().min(1).optional(),
 		}),
 	}),
+	storage: z.object({
+		access_key_id: z.string().min(1),
+		secret_access_key: z.string().min(1),
+		s3_endpoint: z.string().min(1).optional(),
+	}),
 	auth: z.object({
 		betterAuthSecret: z.string().min(1),
 		betterAuthUrl: z.string().min(1),
@@ -61,6 +66,11 @@ export const validateConfig = () => {
 					clientSecret: process.env.GITHUB_CLIENT_SECRET,
 				},
 			},
+		},
+		storage: {
+			access_key_id: process.env.AWS_ACCESS_KEY_ID,
+			secret_access_key: process.env.AWS_SECRET_ACCESS_KEY,
+			s3_endpoint: process.env.AWS_S3_ENDPOINT,
 		},
 	};
 

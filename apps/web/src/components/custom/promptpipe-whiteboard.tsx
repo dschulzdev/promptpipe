@@ -2,10 +2,8 @@ import {
 	Background,
 	BackgroundVariant,
 	type Connection,
-	Controls,
 	type Edge,
 	getOutgoers,
-	MiniMap,
 	type Node,
 	Panel,
 	ReactFlow,
@@ -16,7 +14,6 @@ import { nodeTypes } from "@/constants/node_types";
 import { useJobUpdates } from "@/hooks/use-job-updates";
 import type { NodeActions, NodeState } from "@/stores/node-store";
 import useNodeStore from "@/stores/node-store";
-import FileMenu from "./nodes/panels/file-menu";
 import SidebarToggle from "./nodes/panels/sidebar-toggle";
 import {
 	WorkflowButtonGroup,
@@ -81,17 +78,14 @@ export default function PromptpipeWhiteboard() {
 			fitView
 			proOptions={{ hideAttribution: true }}
 		>
-			<Controls />
 			<Panel position={"top-left"}>
 				<WorkflowButtonGroupWrapper>
-					<FileMenu />
 					<SidebarToggle />
 				</WorkflowButtonGroupWrapper>
 			</Panel>
 			<Panel position={"top-right"}>
 				<WorkflowButtonGroup />
 			</Panel>
-			<MiniMap />
 			<Background variant={BackgroundVariant.Dots} gap={12} size={1} />
 		</ReactFlow>
 	);

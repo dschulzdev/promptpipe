@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { auth } from "@/lib/auth";
 
-export const Route = createFileRoute("/_authenticated/")({
+export const Route = createFileRoute("/app/")({
 	component: HomeComponent,
 });
 function HomeComponent() {
@@ -44,7 +44,7 @@ function Navbar() {
 	const navigate = useNavigate();
 	return (
 		<nav className="flex w-full flex-row bg-sidebar p-4">
-			<h1 className="flex-1">PromptPipe</h1>
+			<h1 className="mr-auto font-bold text-2xl text-primary">PromptPipe</h1>
 			<Button
 				onClick={() =>
 					signOut({}, { onSuccess: () => navigate({ to: "/login" }) })
@@ -107,7 +107,11 @@ function WorkflowCard(workflow: WorkflowDto) {
 
 	return (
 		<>
-			<Link className="w-80" to={"/workflows/$id"} params={{ id: workflow.id }}>
+			<Link
+				className="w-80"
+				to={"/app/workflows/$id"}
+				params={{ id: workflow.id }}
+			>
 				<Card>
 					<CardHeader>
 						<CardTitle>{workflow.name}</CardTitle>

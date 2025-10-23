@@ -33,27 +33,6 @@ const JsonSchemaBuilderDialog = ({
 	const [activeTab, setActiveTab] = useState("visual");
 	const [error, setError] = useState<string | null>(null);
 
-	useEffect(() => {
-		if (initialSchema) {
-			try {
-				const parsedSchema = JSON.parse(initialSchema);
-				const properties = parseSchemaToProperties(parsedSchema);
-				setInitialProperties(properties);
-				setVisualSchema(parsedSchema);
-				setCodeSchema(initialSchema);
-			} catch (error) {
-				console.error("Error parsing initial schema:", error);
-				setInitialProperties([]);
-				setVisualSchema({});
-				setCodeSchema("");
-			}
-		} else {
-			setInitialProperties([]);
-			setVisualSchema({});
-			setCodeSchema("");
-		}
-	}, [initialSchema]);
-
 	const parseSchemaToProperties = (schema: any): Property[] => {
 		if (!schema || !schema.properties) return [];
 
@@ -89,6 +68,27 @@ const JsonSchemaBuilderDialog = ({
 		);
 	};
 
+	useEffect(() => {
+		if (initialSchema) {
+			try {
+				const parsedSchema = JSON.parse(initialSchema);
+				const properties = parseSchemaToProperties(parsedSchema);
+				setInitialProperties(properties);
+				setVisualSchema(parsedSchema);
+				setCodeSchema(initialSchema);
+			} catch (error) {
+				console.error("Error parsing initial schema:", error);
+				setInitialProperties([]);
+				setVisualSchema({});
+				setCodeSchema("");
+			}
+		} else {
+			setInitialProperties([]);
+			setVisualSchema({});
+			setCodeSchema("");
+		}
+	}, [initialSchema, parseSchemaToProperties]);
+
 	const handleVisualSchemaChange = (schema: object) => {
 		setVisualSchema(schema);
 		setCodeSchema(JSON.stringify(schema, null, 2));
@@ -103,7 +103,7 @@ const JsonSchemaBuilderDialog = ({
 			const parsedSchema = JSON.parse(newCode);
 			setVisualSchema(parsedSchema);
 			setInitialProperties(parseSchemaToProperties(parsedSchema));
-		} catch (error) {
+		} catch (_error) {
 			// Invalid JSON, do not update visual schema
 		}
 	};

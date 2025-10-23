@@ -4,8 +4,8 @@ export type PipelineConnectionDto = {
     id: string;
     sourceNodeId: string;
     targetNodeId: string;
-    sourceNodeHandleId: string;
-    targetNodeHandleId: string;
+    sourceNodeHandleId?: string;
+    targetNodeHandleId?: string;
 };
 
 export type WorkflowDto = {
@@ -17,8 +17,34 @@ export type WorkflowDto = {
     updatedAt: string;
 };
 
+export type WorkflowHistoryDto = {
+    id: string;
+    createdAt: string;
+    updatedAt: string;
+    status: string;
+    errorMessage: string | null;
+    startedAt: string;
+    completedAt: string | null;
+    workflowId: string;
+};
+
+export type ProgressMessageDto = {
+    payload?: {
+        nodeId: string;
+        data?: {
+            [key: string]: unknown;
+        };
+    };
+    log: string;
+};
+
+export type ProgressMessageWithTypeDto = {
+    type: 'log' | 'progress_node' | 'success_node' | 'result_success' | 'result_fail' | 'fail_node';
+    payload: ProgressMessageDto;
+};
+
 export type CreateWorkflowDto = {
-    nodes?: Array<LlmNodeDto | TextInputNodeDto | TextOutputNodeDto | BasicStartNodeDto | TextGenerationNodeDto>;
+    nodes?: Array<LlmNodeDto | TextInputNodeDto | TextOutputNodeDto | BasicStartNodeDto | TextGenerationNodeDto | StructuredOutputNodeDto>;
     name: string;
     connections?: Array<PipelineConnectionDto>;
 };
@@ -29,21 +55,21 @@ export type UpdateWorkflowDto = {
     name?: string;
 };
 
-export type LlmNodeDataDto = {
-    llmProvider: 'openai' | 'google_genai' | 'openrouter';
-    llmModel: 'gemini-2.5-flash' | 'gemini-2.5-flash-lite' | 'gemini-2.0-flash' | 'gemini-2.0-flash-lite' | 'gpt-5-nano' | 'gpt-4.1-mini' | 'gpt-4.1-nano' | 'gpt-4o-mini';
-};
-
 export type Position = {
     x: number;
     y: number;
 };
 
+export type LlmNodeDataDto = {
+    llmProvider: 'openai' | 'google_genai' | 'openrouter';
+    llmModel: 'gemini-2.5-flash' | 'gemini-2.5-flash-lite' | 'gemini-2.0-flash' | 'gemini-2.0-flash-lite' | 'gpt-5-nano' | 'gpt-4.1-mini' | 'gpt-4.1-nano' | 'gpt-4o-mini' | 'openrouter/horizon-beta' | 'openrouter/sonoma-dusk-alpha' | 'openrouter/sonoma-sky-alpha' | 'openai/gpt-oss-120b:free' | 'openai/gpt-oss-20b:free' | 'z-ai/glm-4.5-air:free' | 'moonshotai/kimi-k2:free';
+};
+
 export type LlmNodeDto = {
     id: string;
     type: 'text_input' | 'text_output' | 'text_generation' | 'basic_start' | 'llm' | 'merge' | 'structured_output';
-    data: LlmNodeDataDto;
     position: Position;
+    data: LlmNodeDataDto;
 };
 
 export type BasicStartNodeDataDto = {
@@ -53,8 +79,8 @@ export type BasicStartNodeDataDto = {
 export type BasicStartNodeDto = {
     id: string;
     type: 'text_input' | 'text_output' | 'text_generation' | 'basic_start' | 'llm' | 'merge' | 'structured_output';
-    data: BasicStartNodeDataDto;
     position: Position;
+    data: BasicStartNodeDataDto;
 };
 
 export type TextInputNodeDataDto = {
@@ -67,8 +93,8 @@ export type TextInputNodeDataDto = {
 export type TextInputNodeDto = {
     id: string;
     type: 'text_input' | 'text_output' | 'text_generation' | 'basic_start' | 'llm' | 'merge' | 'structured_output';
-    data: TextInputNodeDataDto;
     position: Position;
+    data: TextInputNodeDataDto;
 };
 
 export type TextOutputNodeDataDto = {
@@ -80,8 +106,8 @@ export type TextOutputNodeDataDto = {
 export type TextOutputNodeDto = {
     id: string;
     type: 'text_input' | 'text_output' | 'text_generation' | 'basic_start' | 'llm' | 'merge' | 'structured_output';
-    data: TextOutputNodeDataDto;
     position: Position;
+    data: TextOutputNodeDataDto;
 };
 
 export type TextGenerationNodeDataDto = {
@@ -91,8 +117,8 @@ export type TextGenerationNodeDataDto = {
 export type TextGenerationNodeDto = {
     id: string;
     type: 'text_input' | 'text_output' | 'text_generation' | 'basic_start' | 'llm' | 'merge' | 'structured_output';
-    data: TextGenerationNodeDataDto;
     position: Position;
+    data: TextGenerationNodeDataDto;
 };
 
 export type StructuredOutputNodeDataDto = {
@@ -102,21 +128,23 @@ export type StructuredOutputNodeDataDto = {
 export type StructuredOutputNodeDto = {
     id: string;
     type: 'text_input' | 'text_output' | 'text_generation' | 'basic_start' | 'llm' | 'merge' | 'structured_output';
-    data: StructuredOutputNodeDataDto;
     position: Position;
+    data: StructuredOutputNodeDataDto;
+};
+
+export type MergeInput = {
+    id: string;
 };
 
 export type MergeNodeDataDto = {
-    inputs: Array<{
-        id: string;
-    }>;
+    inputs: Array<MergeInput>;
 };
 
 export type MergeNodeDto = {
     id: string;
     type: 'text_input' | 'text_output' | 'text_generation' | 'basic_start' | 'llm' | 'merge' | 'structured_output';
-    data: MergeNodeDataDto;
     position: Position;
+    data: MergeNodeDataDto;
 };
 
 export type AppControllerGetHelloData = {
@@ -232,6 +260,52 @@ export type WorkflowControllerUpdateResponses = {
 };
 
 export type WorkflowControllerUpdateResponse = WorkflowControllerUpdateResponses[keyof WorkflowControllerUpdateResponses];
+
+export type WorkflowControllerFindHistoryData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/workflow/{id}/history';
+};
+
+export type WorkflowControllerFindHistoryResponses = {
+    200: Array<WorkflowHistoryDto>;
+};
+
+export type WorkflowControllerFindHistoryResponse = WorkflowControllerFindHistoryResponses[keyof WorkflowControllerFindHistoryResponses];
+
+export type WorkflowControllerGetLogForHistoryData = {
+    body?: never;
+    path: {
+        id: string;
+        runId: string;
+    };
+    query?: never;
+    url: '/workflow/{id}/history/{runId}';
+};
+
+export type WorkflowControllerGetLogForHistoryResponses = {
+    200: Array<ProgressMessageWithTypeDto>;
+};
+
+export type WorkflowControllerGetLogForHistoryResponse = WorkflowControllerGetLogForHistoryResponses[keyof WorkflowControllerGetLogForHistoryResponses];
+
+export type WorkflowControllerDownloadHistoryData = {
+    body?: never;
+    path: {
+        runId: string;
+    };
+    query?: never;
+    url: '/workflow/{runId}/download';
+};
+
+export type WorkflowControllerDownloadHistoryResponses = {
+    200: string;
+};
+
+export type WorkflowControllerDownloadHistoryResponse = WorkflowControllerDownloadHistoryResponses[keyof WorkflowControllerDownloadHistoryResponses];
 
 export type ClientOptions = {
     baseUrl: string;

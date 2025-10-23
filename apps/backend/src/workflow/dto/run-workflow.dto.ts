@@ -30,4 +30,7 @@ export class RunWorkloadDto {
 
 	@IsString()
 	userId: string;
+
+	@IsString()
+	workflowId: string;
 }
