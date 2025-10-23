@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
 	Dialog,
@@ -33,7 +33,7 @@ const JsonSchemaBuilderDialog = ({
 	const [activeTab, setActiveTab] = useState("visual");
 	const [error, setError] = useState<string | null>(null);
 
-	const parseSchemaToProperties = (schema: any): Property[] => {
+	const parseSchemaToProperties = useCallback((schema: any): Property[] => {
 		if (!schema || !schema.properties) return [];
 
 		return Object.entries(schema.properties).map(
@@ -66,7 +66,7 @@ const JsonSchemaBuilderDialog = ({
 				};
 			},
 		);
-	};
+	}, []);
 
 	useEffect(() => {
 		if (initialSchema) {
