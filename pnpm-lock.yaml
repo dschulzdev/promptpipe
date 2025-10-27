@@ -68,7 +68,7 @@ importers:
         version: 1.2.0(ai@5.0.30(zod@4.0.5))(zod@4.0.5)
       '@posthog/ai':
         specifier: ^6.3.2
-        version: 6.3.2(@opentelemetry/api@1.9.0)(handlebars@4.7.8)(posthog-node@5.8.1)(ws@8.18.3)
+        version: 6.3.2(@opentelemetry/api@1.9.0)(handlebars@4.7.8)(posthog-node@5.10.4)(ws@8.18.3)
       '@thallesp/nestjs-better-auth':
         specifier: ^2.0.0
         version: 2.0.0(@nestjs/common@11.1.3(class-transformer@0.5.1)(class-validator@0.14.2)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.3)(@nestjs/graphql@13.2.0(@nestjs/common@11.1.3(class-transformer@0.5.1)(class-validator@0.14.2)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.3)(class-transformer@0.5.1)(class-validator@0.14.2)(graphql@16.11.0)(reflect-metadata@0.2.2))(better-auth@1.3.8(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(express@5.1.0)(graphql@16.11.0)(typescript@5.8.3)
@@ -100,8 +100,8 @@ importers:
         specifier: ^8.2.0
         version: 8.2.0
       posthog-node:
-        specifier: ^5.8.1
-        version: 5.8.1
+        specifier: ^5.10.4
+        version: 5.10.4
       reflect-metadata:
         specifier: ^0.2.2
         version: 0.2.2
@@ -1720,8 +1720,8 @@ packages:
     peerDependencies:
       posthog-node: ^5.0.0
 
-  '@posthog/core@1.0.2':
-    resolution: {integrity: sha512-hWk3rUtJl2crQK0WNmwg13n82hnTwB99BT99/XI5gZSvIlYZ1TPmMZE8H2dhJJ98J/rm9vYJ/UXNzw3RV5HTpQ==}
+  '@posthog/core@1.4.0':
+    resolution: {integrity: sha512-jmW8/I//YOHAfjzokqas+Qtc2T57Ux8d2uIJu7FLcMGxywckHsl6od59CD18jtUzKToQdjQhV6Y3429qj+KeNw==}
 
   '@preact/signals-core@1.11.0':
     resolution: {integrity: sha512-jglbibeWHuFRzEWVFY/TT7wB1PppJxmcSfUHcK+2J9vBRtiooMfw6tAPttojNYrrpdGViqAYCbPpmWYlMm+eMQ==}
@@ -5874,8 +5874,8 @@ packages:
     resolution: {integrity: sha512-3Ybi1tAuwAP9s0r1UQ2J4n5Y0G05bJkpUIO0/bI9MhwmD70S5aTWbXGBwxHrelT+XM1k6dM0pk+SwNkpTRN7Pg==}
     engines: {node: ^10 || ^12 || >=14}
 
-  posthog-node@5.8.1:
-    resolution: {integrity: sha512-YJYlYnlpItVjHqM9IhvZx8TzK8gnx2nU+0uhiog4RN47NnV0Z0K1AdC4ul+O8VuvS/jHqKCQvL8iAONRA37+0A==}
+  posthog-node@5.10.4:
+    resolution: {integrity: sha512-sy020/Q4mt18eCkVo/cGEJD+wgdxeg5DTgNUaA85awBCbuEP43BOdCTOOw/K2Tvgw2oZfag3PFyhkVuQ6nJfBg==}
     engines: {node: '>=20'}
 
   preact@10.26.9:
@@ -8854,7 +8854,7 @@ snapshots:
       react: 19.1.0
       react-dom: 19.1.0(react@19.1.0)
 
-  '@posthog/ai@6.3.2(@opentelemetry/api@1.9.0)(handlebars@4.7.8)(posthog-node@5.8.1)(ws@8.18.3)':
+  '@posthog/ai@6.3.2(@opentelemetry/api@1.9.0)(handlebars@4.7.8)(posthog-node@5.10.4)(ws@8.18.3)':
     dependencies:
       '@ai-sdk/provider': 2.0.0
       '@anthropic-ai/sdk': 0.36.3
@@ -8863,7 +8863,7 @@ snapshots:
       ai: 5.0.30(zod@3.25.76)
       langchain: 0.3.32(@langchain/core@0.3.73(@opentelemetry/api@1.9.0)(openai@5.19.1(ws@8.18.3)(zod@3.25.76)))(@opentelemetry/api@1.9.0)(handlebars@4.7.8)(openai@5.19.1(ws@8.18.3)(zod@3.25.76))(ws@8.18.3)
       openai: 5.19.1(ws@8.18.3)(zod@4.0.5)
-      posthog-node: 5.8.1
+      posthog-node: 5.10.4
       uuid: 11.1.0
       zod: 3.25.76
     transitivePeerDependencies:
@@ -8894,7 +8894,7 @@ snapshots:
       - utf-8-validate
       - ws
 
-  '@posthog/core@1.0.2': {}
+  '@posthog/core@1.4.0': {}
 
   '@preact/signals-core@1.11.0': {}
 
@@ -13405,9 +13405,9 @@ snapshots:
       picocolors: 1.1.1
       source-map-js: 1.2.1
 
-  posthog-node@5.8.1:
+  posthog-node@5.10.4:
     dependencies:
-      '@posthog/core': 1.0.2
+      '@posthog/core': 1.4.0
 
   preact@10.26.9: {}
 
