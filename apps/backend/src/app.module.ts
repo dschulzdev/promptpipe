@@ -9,6 +9,7 @@ import { AnalyticsModule } from "./analytics/analytics.module";
 import { AppController } from "./app.controller";
 import { auth } from "./auth";
 import { validateConfig } from "./configuration";
+import { DemoModule } from "./demo/demo.module";
 import { PrismaModule } from "./prisma/prisma.module";
 import { PrismaService } from "./prisma/prisma.service";
 import { RunnerModule } from "./runner/runner.module";
@@ -54,6 +55,7 @@ import { WorkflowModule } from "./workflow/workflow.module";
 		WorkflowModule,
 		AnalyticsModule,
 		StorageModule,
+		DemoModule,
 	],
 	providers: [
 		{

@@ -19,14 +19,15 @@ import { useSimpleHotkey } from "@/hooks/hotkeys";
 import useSaveFileMutation from "@/hooks/mutations/use-save-file-mutation";
 import EditWorkflowDialog from "../../edit-workflow-dialog";
 
-function FileMenu() {
+function FileMenu({ demoMode }: { demoMode: boolean }) {
 	const { id } = useParams({ strict: false });
 	const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
-	const { data: workflow } = useQuery(
-		// biome-ignore lint/style/noNonNullAssertion: id has to exist here
-		workflowControllerFindOneOptions({ path: { id: id! } }),
-	);
+	const { data: workflow } = useQuery({
+		enabled: !demoMode,
+		// biome-ignore lint/style/noNonNullAssertion: exists outside of demo mode
+		...workflowControllerFindOneOptions({ path: { id: id! } }),
+	});
 
 	// biome-ignore lint/style/noNonNullAssertion: id has to exist, when being on this screen
 	const { mutate, isPending } = useSaveFileMutation({ id: id! });
@@ -34,7 +35,9 @@ function FileMenu() {
 	useSimpleHotkey(
 		"save",
 		async () => {
-			await mutate();
+			if (!demoMode) {
+				await mutate();
+			}
 		},
 		{ preventDefault: true },
 		[id, mutate],
@@ -54,7 +57,7 @@ function FileMenu() {
 					</DropdownMenuLabel>
 					<DropdownMenuGroup>
 						<DropdownMenuItem
-							disabled={isPending}
+							disabled={isPending || demoMode}
 							className="flex items-center justify-start"
 							onClick={async () => {
 								if (!id) {
@@ -69,6 +72,7 @@ function FileMenu() {
 							<Kbd>⇧+S</Kbd>
 						</DropdownMenuItem>
 						<DropdownMenuItem
+							disabled={demoMode}
 							onClick={() => {
 								setIsEditDialogOpen(true);
 							}}
@@ -78,7 +82,7 @@ function FileMenu() {
 						</DropdownMenuItem>
 					</DropdownMenuGroup>
 					<DropdownMenuSeparator />
-					<Link to="/app">
+					<Link to={demoMode ? "/" : "/app"}>
 						<DropdownMenuItem>
 							<ArrowLeft />
 							Back to Workflow list

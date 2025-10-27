@@ -353,3 +353,17 @@ export const zWorkflowControllerDownloadHistoryData = z.object({
 });
 
 export const zWorkflowControllerDownloadHistoryResponse = z.string();
+
+export const zDemoControllerGetDemoData = z.object({
+    body: z.never().optional(),
+    path: z.never().optional(),
+    query: z.never().optional()
+});
+
+export const zDemoControllerGetDemoResponse = zWorkflowDto;
+
+export const zDemoControllerRunDemoWorkflowData = z.object({
+    body: z.never().optional(),
+    path: z.never().optional(),
+    query: z.never().optional()
+});

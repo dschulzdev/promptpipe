@@ -307,6 +307,30 @@ export type WorkflowControllerDownloadHistoryResponses = {
 
 export type WorkflowControllerDownloadHistoryResponse = WorkflowControllerDownloadHistoryResponses[keyof WorkflowControllerDownloadHistoryResponses];
 
+export type DemoControllerGetDemoData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/demo';
+};
+
+export type DemoControllerGetDemoResponses = {
+    200: WorkflowDto;
+};
+
+export type DemoControllerGetDemoResponse = DemoControllerGetDemoResponses[keyof DemoControllerGetDemoResponses];
+
+export type DemoControllerRunDemoWorkflowData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/demo/run';
+};
+
+export type DemoControllerRunDemoWorkflowResponses = {
+    201: unknown;
+};
+
 export type ClientOptions = {
     baseUrl: string;
 };

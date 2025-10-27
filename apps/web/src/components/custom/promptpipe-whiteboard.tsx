@@ -1,3 +1,5 @@
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { useParams } from "@tanstack/react-router";
 import {
 	Background,
 	BackgroundVariant,
@@ -8,12 +10,20 @@ import {
 	Panel,
 	ReactFlow,
 } from "@xyflow/react";
-import { useCallback } from "react";
+import { ArchiveRestore } from "lucide-react";
+import { Suspense, useCallback } from "react";
 import { useShallow } from "zustand/react/shallow";
+import {
+	demoControllerGetDemoOptions,
+	workflowControllerFindOneOptions,
+} from "@/api-client/@tanstack/react-query.gen";
 import { nodeTypes } from "@/constants/node_types";
 import { useJobUpdates } from "@/hooks/use-job-updates";
+import useEditorState from "@/stores/editor-store";
 import type { NodeActions, NodeState } from "@/stores/node-store";
 import useNodeStore from "@/stores/node-store";
+import type { PipelineNodeDto } from "~/workflow/dto/pipeline-node.dto";
+import { Button } from "../ui/button";
 import SidebarToggle from "./nodes/panels/sidebar-toggle";
 import {
 	WorkflowButtonGroup,
@@ -81,6 +91,9 @@ export default function PromptpipeWhiteboard() {
 			<Panel position={"top-left"}>
 				<WorkflowButtonGroupWrapper>
 					<SidebarToggle />
+					<Suspense>
+						<ResetButton />
+					</Suspense>
 				</WorkflowButtonGroupWrapper>
 			</Panel>
 			<Panel position={"top-right"}>
@@ -88,5 +101,34 @@ export default function PromptpipeWhiteboard() {
 			</Panel>
 			<Background variant={BackgroundVariant.Dots} gap={12} size={1} />
 		</ReactFlow>
+	);
+}
+
+function ResetButton() {
+	const { id } = useParams({ strict: false });
+	const mode = useEditorState((state) => state.mode);
+	const queryOptions = {
+		...(mode !== "demo" &&
+			workflowControllerFindOneOptions({
+				path: {
+					// biome-ignore lint/style/noNonNullAssertion: id has to exist when not in demo mode
+					id: id!,
+				},
+			})),
+		...(mode === "demo" && demoControllerGetDemoOptions({})),
+	};
+	//@ts-expect-error
+	const { data } = useSuspenseQuery(queryOptions);
+	const initData = useNodeStore((state) => state.initData);
+	return (
+		<Button
+			size={"icon"}
+			variant={"secondary"}
+			onClick={() =>
+				initData(data.nodes as unknown as PipelineNodeDto[], data.connections)
+			}
+		>
+			<ArchiveRestore />
+		</Button>
 	);
 }

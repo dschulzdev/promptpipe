@@ -50,9 +50,8 @@ function LandingPage() {
 								</div>
 								<div className="animation-delay-400 flex animate-fade-in-up flex-col justify-center gap-2 lg:justify-start min-[400px]:flex-row">
 									<a
-										className="inline-flex h-10 items-center justify-center rounded-md px-8 font-medium text-primary-foreground text-sm shadow transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
+										className="inline-flex h-10 items-center justify-center rounded-md bg-primary px-8 font-medium text-primary-foreground text-sm shadow transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
 										href="/app"
-										style={{ backgroundColor: "var(--primary)" }}
 									>
 										Request Demo
 									</a>
