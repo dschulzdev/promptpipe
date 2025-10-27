@@ -6,6 +6,10 @@ export const hotkeyMap = {
 		hotkey: "shift+s",
 		visualRepresentation: "⇧+S",
 	},
+	resetToLastSavedState: {
+		hotkey: "shift+r",
+		visualRepresentation: "⇧+R",
+	},
 	toggle_sidebar: {
 		hotkey: "shift+m",
 		visualRepresentation: "⇧+M",

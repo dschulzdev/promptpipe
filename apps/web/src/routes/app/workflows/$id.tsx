@@ -3,10 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { ReactFlowProvider } from "@xyflow/react";
 import { Loader2 } from "lucide-react";
 import { Suspense, useEffect } from "react";
-import {
-	demoControllerGetDemoOptions,
-	workflowControllerFindOneOptions,
-} from "@/api-client/@tanstack/react-query.gen";
+import { workflowControllerFindOneOptions } from "@/api-client/@tanstack/react-query.gen";
 import BlockSidebar from "@/components/custom/block-sidebar";
 import PromptpipeWhiteboard from "@/components/custom/promptpipe-whiteboard";
 import WorkflowEditorMenubar from "@/components/custom/workflow-editor-menubar";
@@ -14,6 +11,7 @@ import HistoryLayout from "@/components/layouts/history-layout";
 import { Button } from "@/components/ui/button";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
+import { getDemoOrWorkflowOptions } from "@/hooks/queries/get-workflow-or-demo";
 import useEditorState from "@/stores/editor-store";
 import useNodeStore from "@/stores/node-store";
 import type { PipelineNodeDto } from "~/workflow/dto/pipeline-node.dto";
@@ -68,16 +66,7 @@ function RouteComponent() {
 
 export function Backdrop({ id }: { id?: string }) {
 	const mode = useEditorState((state) => state.mode);
-	const queryOptions = {
-		...(mode !== "demo" &&
-			workflowControllerFindOneOptions({
-				path: {
-					// biome-ignore lint/style/noNonNullAssertion: id has to exist when not in demo mode
-					id: id!,
-				},
-			})),
-		...(mode === "demo" && demoControllerGetDemoOptions({})),
-	};
+	const queryOptions = getDemoOrWorkflowOptions(mode, id);
 	//@ts-expect-error
 	const { data, isPending, isSuccess, error, refetch } = useQuery(queryOptions);
 	const initData = useNodeStore((state) => state.initData);

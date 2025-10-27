@@ -13,17 +13,17 @@ import {
 import { ArchiveRestore } from "lucide-react";
 import { Suspense, useCallback } from "react";
 import { useShallow } from "zustand/react/shallow";
-import {
-	demoControllerGetDemoOptions,
-	workflowControllerFindOneOptions,
-} from "@/api-client/@tanstack/react-query.gen";
 import { nodeTypes } from "@/constants/node_types";
+import { hotkeyMap, useSimpleHotkey } from "@/hooks/hotkeys";
+import { getDemoOrWorkflowOptions } from "@/hooks/queries/get-workflow-or-demo";
 import { useJobUpdates } from "@/hooks/use-job-updates";
 import useEditorState from "@/stores/editor-store";
 import type { NodeActions, NodeState } from "@/stores/node-store";
 import useNodeStore from "@/stores/node-store";
 import type { PipelineNodeDto } from "~/workflow/dto/pipeline-node.dto";
 import { Button } from "../ui/button";
+import { Kbd } from "../ui/kbd";
+import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 import SidebarToggle from "./nodes/panels/sidebar-toggle";
 import {
 	WorkflowButtonGroup,
@@ -107,28 +107,40 @@ export default function PromptpipeWhiteboard() {
 function ResetButton() {
 	const { id } = useParams({ strict: false });
 	const mode = useEditorState((state) => state.mode);
-	const queryOptions = {
-		...(mode !== "demo" &&
-			workflowControllerFindOneOptions({
-				path: {
-					// biome-ignore lint/style/noNonNullAssertion: id has to exist when not in demo mode
-					id: id!,
-				},
-			})),
-		...(mode === "demo" && demoControllerGetDemoOptions({})),
-	};
+	const queryOptions = getDemoOrWorkflowOptions(mode, id);
 	//@ts-expect-error
 	const { data } = useSuspenseQuery(queryOptions);
 	const initData = useNodeStore((state) => state.initData);
+
+	const resetToLastSavedState = () =>
+		initData(data.nodes as unknown as PipelineNodeDto[], data.connections);
+
+	useSimpleHotkey(
+		"resetToLastSavedState",
+		() => {
+			resetToLastSavedState();
+		},
+		{},
+		[resetToLastSavedState],
+	);
+
 	return (
-		<Button
-			size={"icon"}
-			variant={"secondary"}
-			onClick={() =>
-				initData(data.nodes as unknown as PipelineNodeDto[], data.connections)
-			}
-		>
-			<ArchiveRestore />
-		</Button>
+		<Tooltip>
+			<TooltipTrigger asChild>
+				<Button
+					size={"icon"}
+					variant={"secondary"}
+					onClick={resetToLastSavedState}
+				>
+					<ArchiveRestore />
+				</Button>
+			</TooltipTrigger>
+			<TooltipContent>
+				<p>
+					Reset to Last Saved State{" "}
+					<Kbd>{hotkeyMap.resetToLastSavedState.visualRepresentation}</Kbd>
+				</p>
+			</TooltipContent>
+		</Tooltip>
 	);
 }

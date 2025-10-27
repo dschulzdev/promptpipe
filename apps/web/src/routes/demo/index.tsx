@@ -2,7 +2,6 @@ import { createFileRoute } from "@tanstack/react-router";
 import { ReactFlowProvider } from "@xyflow/react";
 import { Suspense } from "react";
 import Joyride, { type Step } from "react-joyride";
-import { useShallow } from "zustand/react/shallow";
 import { demoControllerGetDemoOptions } from "@/api-client/@tanstack/react-query.gen";
 import BlockSidebar from "@/components/custom/block-sidebar";
 import PromptpipeWhiteboard from "@/components/custom/promptpipe-whiteboard";
