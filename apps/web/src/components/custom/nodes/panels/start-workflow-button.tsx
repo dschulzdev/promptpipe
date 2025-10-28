@@ -1,4 +1,4 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useParams } from "@tanstack/react-router";
 import { Loader2, Play } from "lucide-react";
 import { memo, useCallback } from "react";
@@ -16,7 +16,9 @@ import {
 } from "@/components/ui/tooltip";
 import { hotkeyMap, useSimpleHotkey } from "@/hooks/hotkeys";
 import useSaveFileMutation from "@/hooks/mutations/use-save-file-mutation";
+import { getDemoOrWorkflowOptions } from "@/hooks/queries/demo-dependent-queries";
 import useEditorState from "@/stores/editor-store";
+import useNodeStore from "@/stores/node-store";
 import useRunnerStore from "@/stores/runner-store";
 import { Button } from "../../../ui/button";
 
@@ -27,6 +29,7 @@ function StartWorkflowButton() {
 		id: id!,
 	});
 	const mode = useEditorState((state) => state.mode);
+	const dirty = useEditorState((state) => state.dirty);
 
 	const { mutate, isPending } = useMutation(workflowControllerRunMutation());
 	const { mutate: demoMutate, isPending: demoIsPending } = useMutation(
@@ -86,12 +89,12 @@ function StartWorkflowButton() {
 	useSimpleHotkey(
 		"run_workflow",
 		() => {
-			if (!isSaving && !isRunning && !isPending) {
+			if (!isSaving && !isRunning && !isPending && !dirty) {
 				handleStartWorkflow();
 			}
 		},
 		{},
-		[isRunning, isPending, isSaving, handleStartWorkflow],
+		[isRunning, isPending, isSaving, handleStartWorkflow, dirty],
 	);
 
 	return (
@@ -99,7 +102,7 @@ function StartWorkflowButton() {
 			<TooltipTrigger asChild>
 				<Button
 					size={"default"}
-					disabled={isSaving || workflowInProgress}
+					disabled={isSaving || workflowInProgress || dirty}
 					onClick={handleStartWorkflow}
 				>
 					{workflowInProgress ? (

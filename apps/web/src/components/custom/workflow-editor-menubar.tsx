@@ -22,16 +22,13 @@ export default function WorkflowEditorMenubar({
 	const { data: workflow } = useQuery(options);
 	return (
 		<div className="grid grid-cols-3 justify-items-center border-b-2 p-4">
-			<div className="flex items-center gap-2 justify-self-start">
-				<img
-					src="/android-chrome-512x512.png"
-					alt="Logo"
-					className="mr-4 h-8 w-8"
-				/>
+			<div className="flex items-center gap-4 justify-self-start">
+				<img src="/android-chrome-512x512.png" alt="Logo" className="h-8 w-8" />
 				<h3 className="text-xl">{workflow?.name}</h3>
 				<FileMenu demoMode />
 			</div>
-			<TabsList>
+			{/** biome-ignore lint/correctness/useUniqueElementIds: id needed for react joyride targeting */}
+			<TabsList id="tabbar">
 				<TabsTrigger value="editor">
 					<GitGraph />
 					Workflow Editor

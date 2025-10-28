@@ -20,6 +20,7 @@ import { useJobUpdates } from "@/hooks/use-job-updates";
 import useEditorState from "@/stores/editor-store";
 import type { NodeActions, NodeState } from "@/stores/node-store";
 import useNodeStore from "@/stores/node-store";
+import useRunnerStore from "@/stores/runner-store";
 import type { PipelineNodeDto } from "~/workflow/dto/pipeline-node.dto";
 import { Button } from "../ui/button";
 import { Kbd } from "../ui/kbd";
@@ -41,6 +42,7 @@ export default function PromptpipeWhiteboard() {
 	});
 	const { nodes, edges, onNodesChange, onEdgesChange, onConnect } =
 		useNodeStore(useShallow(selector));
+	const isRunning = useRunnerStore(useShallow((state) => state.isRunning));
 
 	const isValidConnection = useCallback(
 		(connection: Edge | Connection) => {
@@ -78,6 +80,10 @@ export default function PromptpipeWhiteboard() {
 	);
 	return (
 		<ReactFlow
+			nodesConnectable={!isRunning}
+			nodesDraggable={!isRunning}
+			nodesFocusable={!isRunning}
+			edgesFocusable={!isRunning}
 			nodes={nodes}
 			edges={edges}
 			nodeTypes={nodeTypes}

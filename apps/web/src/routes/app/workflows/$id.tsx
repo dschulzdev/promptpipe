@@ -70,12 +70,14 @@ export function Backdrop({ id }: { id?: string }) {
 	//@ts-expect-error
 	const { data, isPending, isSuccess, error, refetch } = useQuery(queryOptions);
 	const initData = useNodeStore((state) => state.initData);
+	const setDirty = useEditorState((state) => state.setDirty);
 
 	useEffect(() => {
 		if (isSuccess && data) {
 			initData(data.nodes as unknown as PipelineNodeDto[], data.connections);
+			setDirty(false);
 		}
-	}, [isSuccess, initData, data]);
+	}, [isSuccess, initData, data, setDirty]);
 
 	if (!isPending && isSuccess) {
 		return null;

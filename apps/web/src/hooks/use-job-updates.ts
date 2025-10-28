@@ -1,6 +1,7 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo } from "react";
 import { useShallow } from "zustand/react/shallow";
+import useEditorState from "@/stores/editor-store";
 import useNodeStore from "@/stores/node-store";
 import useRunnerStore from "@/stores/runner-store";
 import type {
@@ -99,6 +100,7 @@ export const useJobUpdates = () => {
 					updateNode(queryData.payload.payload?.nodeId, {
 						state: "loading",
 					});
+					useEditorState.setState({ dirty: false });
 				}
 			}
 			if (queryData.type === "success_node") {
@@ -107,6 +109,7 @@ export const useJobUpdates = () => {
 						state: "success",
 						...(queryData.payload.payload.data ?? undefined),
 					});
+					useEditorState.setState({ dirty: false });
 				}
 			}
 			if (
@@ -130,6 +133,7 @@ export const useJobUpdates = () => {
 						},
 					})),
 				});
+				useEditorState.setState({ dirty: false });
 				eventSource.close();
 				setConnectedToUpdateStream(false);
 				stopWorkflow();
