@@ -86,15 +86,8 @@ function LandingPage() {
 								</p>
 							</div>
 						</div>
-						<div className="mx-auto grid max-w-5xl items-center gap-6 py-12 lg:grid-cols-2 lg:gap-12">
-							<img
-								src="https://images.unsplash.com/photo-1696258685005-e1541647b813?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w1NzU3MzZ8MHwxfHNlYXJjaHwxfHxBSV93b3JrZmxvd3xlbnwwfHx8fDE3MTk5MjY1NDd8MA&ixlib=rb-4.0.3&q=80&w=400"
-								width="500"
-								height="400"
-								alt="Visual Workflow Builder"
-								className="mx-auto aspect-video animate-fade-in-up overflow-hidden rounded-xl object-cover object-center sm:w-full lg:order-last"
-							/>
-							<div className="flex flex-col justify-center space-y-4 text-center lg:text-left">
+						<div className="mx-auto max-w-5xl items-center gap-6 py-12 lg:gap-12">
+							<div className="flex flex-row justify-center space-y-4 text-center lg:text-left">
 								<ul className="grid gap-6">
 									<li>
 										<div className="grid gap-1">
@@ -164,11 +157,7 @@ function LandingPage() {
 					</div>
 				</section>
 			</main>
-			<footer className="flex w-full shrink-0 flex-col items-center gap-2 border-t px-4 py-6 sm:flex-row md:px-6">
-				<p className="text-muted-foreground text-xs">
-					© 2025 PromptPipe. All rights reserved.
-				</p>
-			</footer>
+			<footer className="flex min-h-24 w-full shrink-0 flex-col items-center gap-2 border-t px-4 py-6 sm:flex-row md:px-6" />
 		</div>
 	);
 }

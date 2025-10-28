@@ -1,6 +1,7 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { useParams } from "@tanstack/react-router";
-import { workflowControllerFindHistoryOptions } from "@/api-client/@tanstack/react-query.gen";
+import useEditorState from "@/stores/editor-store";
+import { findDemoOrWorkflowHistoryOptions } from "../../hooks/queries/demo-dependent-queries";
 import { EmptyPreviousRuns } from "../custom/empty/empty-previous-runs";
 import HistoryRunContent from "../custom/history/history-run-content";
 import HistoryRunItem from "../custom/history/history-run-item";
@@ -12,10 +13,10 @@ import {
 
 export default function HistoryLayout() {
 	const { id } = useParams({ strict: false });
-	const { data: workflowHistory } = useSuspenseQuery({
-		// biome-ignore lint/style/noNonNullAssertion: id should exist here
-		...workflowControllerFindHistoryOptions({ path: { id: id! } }),
-	});
+	const mode = useEditorState((state) => state.mode);
+	// biome-ignore lint/style/noNonNullAssertion: id should exist here
+	const queryOptions = findDemoOrWorkflowHistoryOptions(mode, id!);
+	const { data: workflowHistory } = useSuspenseQuery(queryOptions);
 	if (workflowHistory && workflowHistory.length === 0) {
 		return <EmptyPreviousRuns />;
 	}

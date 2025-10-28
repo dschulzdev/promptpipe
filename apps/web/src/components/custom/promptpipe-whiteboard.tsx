@@ -15,7 +15,7 @@ import { Suspense, useCallback } from "react";
 import { useShallow } from "zustand/react/shallow";
 import { nodeTypes } from "@/constants/node_types";
 import { hotkeyMap, useSimpleHotkey } from "@/hooks/hotkeys";
-import { getDemoOrWorkflowOptions } from "@/hooks/queries/get-workflow-or-demo";
+import { getDemoOrWorkflowOptions } from "@/hooks/queries/demo-dependent-queries";
 import { useJobUpdates } from "@/hooks/use-job-updates";
 import useEditorState from "@/stores/editor-store";
 import type { NodeActions, NodeState } from "@/stores/node-store";

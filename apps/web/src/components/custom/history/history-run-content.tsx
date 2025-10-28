@@ -1,7 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "@tanstack/react-router";
+import { getLogForDemoOrWorkflowHistoryOptions } from "@/hooks/queries/demo-dependent-queries";
+import { useEditorMode } from "@/hooks/use-editor-mode";
 import useEditorState from "@/stores/editor-store";
-import { workflowControllerGetLogForHistoryOptions } from "../../../api-client/@tanstack/react-query.gen";
 import NoRunSelected from "../empty/no-run-selected";
 import LogTable from "./log-table";
 
@@ -10,12 +11,16 @@ export default function HistoryRunContent() {
 	const selectedPreviousRunId = useEditorState(
 		(state) => state.selectedPreviousRunId,
 	);
+	const mode = useEditorMode();
 
 	const { data, isLoading } = useQuery({
-		...workflowControllerGetLogForHistoryOptions({
-			// biome-ignore lint/style/noNonNullAssertion: id has to exist
-			path: { runId: selectedPreviousRunId!, id: id! },
-		}),
+		...getLogForDemoOrWorkflowHistoryOptions(
+			mode,
+			// biome-ignore lint/style/noNonNullAssertion: id has to exist here
+			id!,
+			// biome-ignore lint/style/noNonNullAssertion: selectedPreviousRunId has to exist here
+			selectedPreviousRunId!,
+		),
 		enabled: !!selectedPreviousRunId,
 	});
 

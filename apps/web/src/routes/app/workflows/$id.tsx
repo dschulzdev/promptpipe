@@ -11,7 +11,7 @@ import HistoryLayout from "@/components/layouts/history-layout";
 import { Button } from "@/components/ui/button";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
-import { getDemoOrWorkflowOptions } from "@/hooks/queries/get-workflow-or-demo";
+import { getDemoOrWorkflowOptions } from "@/hooks/queries/demo-dependent-queries";
 import useEditorState from "@/stores/editor-store";
 import useNodeStore from "@/stores/node-store";
 import type { PipelineNodeDto } from "~/workflow/dto/pipeline-node.dto";

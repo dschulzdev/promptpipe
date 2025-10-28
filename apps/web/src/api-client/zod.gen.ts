@@ -367,3 +367,46 @@ export const zDemoControllerRunDemoWorkflowData = z.object({
     path: z.never().optional(),
     query: z.never().optional()
 });
+
+export const zDemoControllerRunDemoWorkflowResponse = z.string();
+
+export const zDemoControllerStreamDemoUpdatesData = z.object({
+    body: z.never().optional(),
+    path: z.object({
+        runId: z.string()
+    }),
+    query: z.never().optional()
+});
+
+export const zDemoControllerStreamDemoUpdatesResponse = z.object({});
+
+export const zDemoControllerDownloadLogForRunData = z.object({
+    body: z.never().optional(),
+    path: z.object({
+        runId: z.string()
+    }),
+    query: z.never().optional()
+});
+
+export const zDemoControllerDownloadLogForRunResponse = z.string();
+
+export const zDemoControllerFindHistoryData = z.object({
+    body: z.never().optional(),
+    path: z.object({
+        id: z.string()
+    }),
+    query: z.never().optional()
+});
+
+export const zDemoControllerFindHistoryResponse = z.array(zWorkflowHistoryDto);
+
+export const zDemoControllerGetLogForHistoryData = z.object({
+    body: z.never().optional(),
+    path: z.object({
+        id: z.string(),
+        runId: z.string()
+    }),
+    query: z.never().optional()
+});
+
+export const zDemoControllerGetLogForHistoryResponse = z.array(zProgressMessageWithTypeDto);
