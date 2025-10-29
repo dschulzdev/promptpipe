@@ -16,6 +16,8 @@ const authConfig = (prisma: PrismaClient) =>
 		},
 		socialProviders: {
 			github: {
+				// No new signups for production right now
+				disableSignUp: true,
 				enabled: true,
 				clientId: process.env.GITHUB_CLIENT_ID as string,
 				clientSecret: process.env.GITHUB_CLIENT_SECRET as string,

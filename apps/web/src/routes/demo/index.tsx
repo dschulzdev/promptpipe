@@ -25,26 +25,22 @@ function RouteComponent() {
 	const steps: Step[] = [
 		{
 			target: "body",
-			showProgress: true,
 			content: "Welcome to the Promptpipe demo! Let's take a quick tour.",
 			placement: "center",
 		},
 		{
 			target: "#sidebar",
-			showProgress: true,
 			content: "This is the sidebar where you can find all your blocks.",
 			placement: "right",
 		},
 		{
 			target: "#tabbar",
-			showProgress: true,
 			content:
 				"In the Tab bar you can toggle between different views for creating and managing your workflow and previous runs.",
 			placement: "bottom",
 		},
 		{
 			target: "body",
-			showProgress: true,
 			content: (
 				<div>
 					<p>This is only a demo environment. Some features are restricted: </p>
@@ -56,7 +52,7 @@ function RouteComponent() {
 						</li>
 						<li>
 							- Only the preconfigured workflow is available to run. More
-							examples will be added soon.
+							examples coming soon.
 						</li>
 						<li>- You can only use the pre-configured LLM.</li>
 						<li>- You cannot create an account or log in.</li>
@@ -69,7 +65,7 @@ function RouteComponent() {
 	];
 	return (
 		<>
-			<Joyride steps={steps} run continuous hideCloseButton />
+			<Joyride steps={steps} run continuous hideCloseButton showProgress />
 			<Tabs value={selectedTab} onValueChange={setSelectedTab}>
 				<div className="flex h-screen w-full flex-col">
 					<WorkflowEditorMenubar demoMode />

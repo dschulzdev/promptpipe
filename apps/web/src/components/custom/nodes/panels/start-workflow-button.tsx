@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { useParams } from "@tanstack/react-router";
 import { Loader2, Play } from "lucide-react";
 import { memo, useCallback } from "react";
@@ -16,9 +16,7 @@ import {
 } from "@/components/ui/tooltip";
 import { hotkeyMap, useSimpleHotkey } from "@/hooks/hotkeys";
 import useSaveFileMutation from "@/hooks/mutations/use-save-file-mutation";
-import { getDemoOrWorkflowOptions } from "@/hooks/queries/demo-dependent-queries";
 import useEditorState from "@/stores/editor-store";
-import useNodeStore from "@/stores/node-store";
 import useRunnerStore from "@/stores/runner-store";
 import { Button } from "../../../ui/button";
 
@@ -70,6 +68,7 @@ function StartWorkflowButton() {
 		mutate(
 			{
 				path: {
+					// biome-ignore lint/style/noNonNullAssertion: id has to exist, when this function is being called
 					workflowId: id!, // Replace with actual workflow ID if needed
 				},
 			},
