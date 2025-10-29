@@ -25,7 +25,7 @@ export default function WorkflowEditorMenubar({
 			<div className="flex items-center gap-4 justify-self-start">
 				<img src="/android-chrome-512x512.png" alt="Logo" className="h-8 w-8" />
 				<h3 className="text-xl">{workflow?.name}</h3>
-				<FileMenu demoMode />
+				<FileMenu demoMode={demoMode} />
 			</div>
 			{/** biome-ignore lint/correctness/useUniqueElementIds: id needed for react joyride targeting */}
 			<TabsList id="tabbar">
