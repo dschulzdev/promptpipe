@@ -16,15 +16,15 @@ export const getDemoOrWorkflowOptions = (
 	mode: EditorState["mode"],
 	id?: string,
 ) => {
-	return {
-		...workflowControllerFindOneOptions({
-			path: {
-				// biome-ignore lint/style/noNonNullAssertion: id has to exist when not in demo mode
-				id: id!,
-			},
-		}),
-		...(mode === "demo" && demoControllerGetDemoOptions({})),
-	};
+	if (mode === "demo") {
+		return demoControllerGetDemoOptions({});
+	}
+	return workflowControllerFindOneOptions({
+		path: {
+			// biome-ignore lint/style/noNonNullAssertion: id has to exist when not in demo mode
+			id: id!,
+		},
+	});
 };
 
 export const streamDemoOrWorkflowUpdateOptions = (
