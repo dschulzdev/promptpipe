@@ -65,12 +65,12 @@ export const findDemoOrWorkflowHistoryOptions = (
 	mode: EditorState["mode"],
 	id: string,
 ) => {
-	return {
-		...workflowControllerFindHistoryOptions({ path: { id: id } }),
-		...(mode === "demo" &&
-			//The id will never be used, but to satisfy type inference for tanstack query we act like it exists for the generation
-			demoControllerFindHistoryOptions({ path: { id: id } })),
-	};
+	if (mode === "demo") {
+		// The id will never be used, but to satisfy type inference for tanstack query we act like it exists for the generation
+		return demoControllerFindHistoryOptions({ path: { id: id } });
+	} else {
+		return workflowControllerFindHistoryOptions({ path: { id: id } });
+	}
 };
 
 export const getLogForDemoOrWorkflowHistoryOptions = (
