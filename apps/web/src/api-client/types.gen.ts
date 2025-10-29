@@ -307,6 +307,95 @@ export type WorkflowControllerDownloadHistoryResponses = {
 
 export type WorkflowControllerDownloadHistoryResponse = WorkflowControllerDownloadHistoryResponses[keyof WorkflowControllerDownloadHistoryResponses];
 
+export type DemoControllerGetDemoData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/demo';
+};
+
+export type DemoControllerGetDemoResponses = {
+    200: WorkflowDto;
+};
+
+export type DemoControllerGetDemoResponse = DemoControllerGetDemoResponses[keyof DemoControllerGetDemoResponses];
+
+export type DemoControllerRunDemoWorkflowData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/demo/run';
+};
+
+export type DemoControllerRunDemoWorkflowResponses = {
+    201: string;
+};
+
+export type DemoControllerRunDemoWorkflowResponse = DemoControllerRunDemoWorkflowResponses[keyof DemoControllerRunDemoWorkflowResponses];
+
+export type DemoControllerStreamDemoUpdatesData = {
+    body?: never;
+    path: {
+        runId: string;
+    };
+    query?: never;
+    url: '/demo/stream/{runId}';
+};
+
+export type DemoControllerStreamDemoUpdatesResponses = {
+    200: {
+        [key: string]: unknown;
+    };
+};
+
+export type DemoControllerStreamDemoUpdatesResponse = DemoControllerStreamDemoUpdatesResponses[keyof DemoControllerStreamDemoUpdatesResponses];
+
+export type DemoControllerDownloadLogForRunData = {
+    body?: never;
+    path: {
+        runId: string;
+    };
+    query?: never;
+    url: '/demo/{runId}/download';
+};
+
+export type DemoControllerDownloadLogForRunResponses = {
+    200: string;
+};
+
+export type DemoControllerDownloadLogForRunResponse = DemoControllerDownloadLogForRunResponses[keyof DemoControllerDownloadLogForRunResponses];
+
+export type DemoControllerFindHistoryData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/demo/history';
+};
+
+export type DemoControllerFindHistoryResponses = {
+    200: Array<WorkflowHistoryDto>;
+};
+
+export type DemoControllerFindHistoryResponse = DemoControllerFindHistoryResponses[keyof DemoControllerFindHistoryResponses];
+
+export type DemoControllerGetLogForHistoryData = {
+    body?: never;
+    path: {
+        id: string;
+        runId: string;
+    };
+    query?: never;
+    url: '/demo/history/{runId}';
+};
+
+export type DemoControllerGetLogForHistoryResponses = {
+    200: Array<ProgressMessageWithTypeDto>;
+};
+
+export type DemoControllerGetLogForHistoryResponse = DemoControllerGetLogForHistoryResponses[keyof DemoControllerGetLogForHistoryResponses];
+
 export type ClientOptions = {
     baseUrl: string;
 };

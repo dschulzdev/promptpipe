@@ -23,6 +23,7 @@ import {
 	type LLMProvider,
 } from "../../../backend/src/ai/llm-providers";
 import type { PipelineNodeDto } from "../../../backend/src/workflow/dto/pipeline-node.dto";
+import useEditorState from "./editor-store";
 
 export type AppNode = Node<NodeInputData>;
 
@@ -96,11 +97,13 @@ const useNodeStore = create<NodeState & NodeActions>((set, get) => ({
 		});
 	},
 	onConnect: (connection) => {
+		useEditorState.setState({ dirty: true });
 		set({
 			edges: addEdge(connection, get().edges),
 		});
 	},
 	updateNode: (id: string, data: NodeInputData) => {
+		useEditorState.setState({ dirty: true });
 		set({
 			nodes: get().nodes.map((node) => {
 				if (node.id === id) {
@@ -127,6 +130,7 @@ const useNodeStore = create<NodeState & NodeActions>((set, get) => ({
 			},
 			position: generateRandomStartPosition(),
 		};
+		useEditorState.setState({ dirty: true });
 		set({
 			nodes: [...get().nodes, newNode],
 		});
@@ -140,6 +144,7 @@ const useNodeStore = create<NodeState & NodeActions>((set, get) => ({
 			},
 			position: generateRandomStartPosition(),
 		};
+		useEditorState.setState({ dirty: true });
 		set({
 			nodes: [...get().nodes, newNode],
 		});
@@ -154,6 +159,7 @@ const useNodeStore = create<NodeState & NodeActions>((set, get) => ({
 			},
 			position: generateRandomStartPosition(),
 		};
+		useEditorState.setState({ dirty: true });
 		set({
 			nodes: [...get().nodes, newNode],
 		});
@@ -168,6 +174,7 @@ const useNodeStore = create<NodeState & NodeActions>((set, get) => ({
 			},
 			position: generateRandomStartPosition(),
 		};
+		useEditorState.setState({ dirty: true });
 		set({
 			nodes: [...get().nodes, newNode],
 		});
@@ -182,6 +189,7 @@ const useNodeStore = create<NodeState & NodeActions>((set, get) => ({
 			},
 			position: generateRandomStartPosition(),
 		};
+		useEditorState.setState({ dirty: true });
 		set({
 			nodes: [...get().nodes, newNode],
 		});
@@ -197,6 +205,7 @@ const useNodeStore = create<NodeState & NodeActions>((set, get) => ({
 			},
 			position: generateRandomStartPosition(),
 		};
+		useEditorState.setState({ dirty: true });
 		set({
 			nodes: [...get().nodes, newNode],
 		});
@@ -211,17 +220,21 @@ const useNodeStore = create<NodeState & NodeActions>((set, get) => ({
 			},
 			position: generateRandomStartPosition(),
 		};
+		useEditorState.setState({ dirty: true });
 		set({
 			nodes: [...get().nodes, newNode],
 		});
 	},
 	setNodes: (nodes) => {
+		useEditorState.setState({ dirty: true });
 		set({ nodes });
 	},
 	setEdges: (edges) => {
+		useEditorState.setState({ dirty: true });
 		set({ edges });
 	},
 	replaceNode: (oldNodeId, newNodeType) => {
+		useEditorState.setState({ dirty: true });
 		set((state) => {
 			const oldNode = state.nodes.find((node) => node.id === oldNodeId);
 			if (!oldNode) {

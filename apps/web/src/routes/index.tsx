@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { ChevronDownIcon } from "lucide-react";
 import {
 	Collapsible,
@@ -25,12 +25,12 @@ function LandingPage() {
 					<span className="font-bold text-2xl text-primary">PromptPipe</span>
 				</a>
 				<nav className="ml-auto flex gap-4 sm:gap-6">
-					<a
+					<Link
 						className="inline-flex h-9 items-center justify-center rounded-md bg-primary px-4 py-2 font-medium text-primary-foreground text-sm shadow transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
-						href="/app"
+						to="/demo"
 					>
-						Request Demo
-					</a>
+						Try the Demo
+					</Link>
 				</nav>
 			</header>
 			<main className="flex-1">
@@ -49,13 +49,12 @@ function LandingPage() {
 									</p>
 								</div>
 								<div className="animation-delay-400 flex animate-fade-in-up flex-col justify-center gap-2 lg:justify-start min-[400px]:flex-row">
-									<a
-										className="inline-flex h-10 items-center justify-center rounded-md px-8 font-medium text-primary-foreground text-sm shadow transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
-										href="/app"
-										style={{ backgroundColor: "var(--primary)" }}
+									<Link
+										className="inline-flex h-10 items-center justify-center rounded-md bg-primary px-8 font-medium text-primary-foreground text-sm shadow transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
+										to="/demo"
 									>
-										Request Demo
-									</a>
+										Try the Demo
+									</Link>
 									<a
 										className="inline-flex h-10 items-center justify-center rounded-md border border-input bg-background px-8 font-medium text-sm shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
 										href={newLocal}
@@ -66,11 +65,9 @@ function LandingPage() {
 							</div>
 							<div className="flex justify-center lg:justify-end">
 								<img
-									src="https://images.unsplash.com/photo-1696258685005-e1541647b813?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w1NzU3MzZ8MHwxfHNlYXJjaHwxfHxBSV93b3JrZmxvd3xlbnwwfHx8fDE3MTk5MjY1NDd8MA&ixlib=rb-4.0.3&q=80&w=400"
-									width="500"
-									height="400"
+									src="landing_screenshot.png"
 									alt="AI Workflow Editor"
-									className="animation-delay-600 mx-auto aspect-video animate-fade-in-up overflow-hidden rounded-xl object-cover sm:w-full lg:order-last lg:aspect-square"
+									className="animation-delay-600 mx-auto aspect-video animate-fade-in-up overflow-hidden rounded-xl object-contain sm:w-full lg:order-last"
 								/>
 							</div>
 						</div>
@@ -89,15 +86,8 @@ function LandingPage() {
 								</p>
 							</div>
 						</div>
-						<div className="mx-auto grid max-w-5xl items-center gap-6 py-12 lg:grid-cols-2 lg:gap-12">
-							<img
-								src="https://images.unsplash.com/photo-1696258685005-e1541647b813?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w1NzU3MzZ8MHwxfHNlYXJjaHwxfHxBSV93b3JrZmxvd3xlbnwwfHx8fDE3MTk5MjY1NDd8MA&ixlib=rb-4.0.3&q=80&w=400"
-								width="500"
-								height="400"
-								alt="Visual Workflow Builder"
-								className="mx-auto aspect-video animate-fade-in-up overflow-hidden rounded-xl object-cover object-center sm:w-full lg:order-last"
-							/>
-							<div className="flex flex-col justify-center space-y-4 text-center lg:text-left">
+						<div className="mx-auto max-w-5xl items-center gap-6 py-12 lg:gap-12">
+							<div className="flex flex-row justify-center space-y-4 text-center lg:text-left">
 								<ul className="grid gap-6">
 									<li>
 										<div className="grid gap-1">
@@ -166,39 +156,8 @@ function LandingPage() {
 						</div>
 					</div>
 				</section>
-				<section className="flex w-full items-center justify-center py-12 md:py-24 lg:py-32">
-					<div className="container grid items-center justify-center gap-4 px-4 text-center md:px-6">
-						<div className="space-y-3">
-							<h2 className="font-bold text-3xl tracking-tighter md:text-4xl/tight">
-								Ready to Build?
-							</h2>
-							<p className="mx-auto max-w-[600px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-								Start building your first AI-powered workflow today.
-							</p>
-						</div>
-						<div className="flex flex-col justify-center gap-2 min-[400px]:flex-row">
-							<a
-								className="inline-flex h-10 items-center justify-center rounded-md px-8 font-medium text-primary-foreground text-sm shadow transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
-								href="/app"
-								style={{ backgroundColor: "var(--primary)" }}
-							>
-								Request Demo
-							</a>
-							<a
-								className="inline-flex h-10 items-center justify-center rounded-md border border-input bg-background px-8 font-medium text-sm shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
-								href="mailto:dominik@dschulz.dev"
-							>
-								Contact Us
-							</a>
-						</div>
-					</div>
-				</section>
 			</main>
-			<footer className="flex w-full shrink-0 flex-col items-center gap-2 border-t px-4 py-6 sm:flex-row md:px-6">
-				<p className="text-muted-foreground text-xs">
-					© 2025 PromptPipe. All rights reserved.
-				</p>
-			</footer>
+			<footer className="flex min-h-24 w-full shrink-0 flex-col items-center gap-2 border-t px-4 py-6 sm:flex-row md:px-6" />
 		</div>
 	);
 }

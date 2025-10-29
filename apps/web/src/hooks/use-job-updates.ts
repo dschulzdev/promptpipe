@@ -1,6 +1,7 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo } from "react";
 import { useShallow } from "zustand/react/shallow";
+import useEditorState from "@/stores/editor-store";
 import useNodeStore from "@/stores/node-store";
 import useRunnerStore from "@/stores/runner-store";
 import type {
@@ -8,7 +9,8 @@ import type {
 	ProgressMessageWithType,
 	ProgressType,
 } from "../../../backend/src/runner/progress-message";
-import { workflowControllerStreamUpdatesOptions } from "../api-client/@tanstack/react-query.gen";
+import { streamDemoOrWorkflowUpdateOptions } from "./queries/demo-dependent-queries";
+import { useEditorMode } from "./use-editor-mode";
 
 export const useJobUpdates = () => {
 	const connectedToUpdateStream = useRunnerStore(
@@ -21,14 +23,11 @@ export const useJobUpdates = () => {
 	const setConnectedToUpdateStream = useRunnerStore(
 		useShallow((state) => state.setConnectedToUpdateStream),
 	);
+	const mode = useEditorMode();
 
 	const queryKey = useMemo(() => {
-		return workflowControllerStreamUpdatesOptions({
-			path: {
-				runId: currentRunId || "",
-			},
-		}).queryKey;
-	}, [currentRunId]);
+		return streamDemoOrWorkflowUpdateOptions(mode, currentRunId ?? "").queryKey;
+	}, [currentRunId, mode]);
 	const updateNode = useNodeStore(useShallow((state) => state.updateNode));
 	const { data, error } = useQuery<
 		ProgressMessageWithType[],
@@ -60,7 +59,9 @@ export const useJobUpdates = () => {
 		}
 
 		const eventSource = new EventSource(
-			`${import.meta.env.VITE_SERVER_URL}/workflow/stream/${currentRunId}`,
+			mode === "demo"
+				? `${import.meta.env.VITE_SERVER_URL}/demo/stream/${currentRunId}`
+				: `${import.meta.env.VITE_SERVER_URL}/workflow/stream/${currentRunId}`,
 			{ withCredentials: true },
 		);
 
@@ -99,6 +100,7 @@ export const useJobUpdates = () => {
 					updateNode(queryData.payload.payload?.nodeId, {
 						state: "loading",
 					});
+					useEditorState.setState({ dirty: false });
 				}
 			}
 			if (queryData.type === "success_node") {
@@ -107,6 +109,7 @@ export const useJobUpdates = () => {
 						state: "success",
 						...(queryData.payload.payload.data ?? undefined),
 					});
+					useEditorState.setState({ dirty: false });
 				}
 			}
 			if (
@@ -130,6 +133,7 @@ export const useJobUpdates = () => {
 						},
 					})),
 				});
+				useEditorState.setState({ dirty: false });
 				eventSource.close();
 				setConnectedToUpdateStream(false);
 				stopWorkflow();

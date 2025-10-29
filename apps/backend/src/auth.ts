@@ -5,6 +5,7 @@ import { APIError } from "better-auth/api";
 
 const authConfig = (prisma: PrismaClient) =>
 	({
+		appName: "PromptPipe",
 		baseURL: process.env.BETTER_AUTH_URL as string,
 		trustedOrigins: [process.env.FRONTEND_URL as string],
 		database: prismaAdapter(prisma, {
@@ -15,6 +16,8 @@ const authConfig = (prisma: PrismaClient) =>
 		},
 		socialProviders: {
 			github: {
+				// No new signups for production right now
+				disableSignUp: true,
 				enabled: true,
 				clientId: process.env.GITHUB_CLIENT_ID as string,
 				clientSecret: process.env.GITHUB_CLIENT_SECRET as string,

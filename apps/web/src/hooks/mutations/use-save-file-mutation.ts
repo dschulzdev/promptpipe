@@ -1,11 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useShallow } from "zustand/react/shallow";
-import type {
-	Options,
-	UpdateWorkflowDto,
-	WorkflowControllerUpdateData,
-} from "@/api-client";
+import type { Options, WorkflowControllerUpdateData } from "@/api-client";
 import { workflowControllerUpdateMutation } from "@/api-client/@tanstack/react-query.gen";
 import useNodeStore from "@/stores/node-store";
 import type { NodeType } from "~/workflow/dto/nodes.dto";
@@ -19,7 +15,6 @@ export default function useSaveFileMutation(
 			connections: state.edges,
 		})),
 	);
-	const body: UpdateWorkflowDto = {};
 	const mutation = useMutation({
 		...workflowControllerUpdateMutation({
 			path: pathProps,
@@ -56,5 +51,5 @@ export default function useSaveFileMutation(
 				})),
 			},
 		} as Options<WorkflowControllerUpdateData>);
-	return { ...mutation, mutate, body };
+	return { ...mutation, mutate };
 }

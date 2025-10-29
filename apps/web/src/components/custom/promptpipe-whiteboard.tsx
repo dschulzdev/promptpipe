@@ -1,3 +1,5 @@
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { useParams } from "@tanstack/react-router";
 import {
 	Background,
 	BackgroundVariant,
@@ -8,12 +10,21 @@ import {
 	Panel,
 	ReactFlow,
 } from "@xyflow/react";
-import { useCallback } from "react";
+import { ArchiveRestore } from "lucide-react";
+import { Suspense, useCallback } from "react";
 import { useShallow } from "zustand/react/shallow";
 import { nodeTypes } from "@/constants/node_types";
+import { hotkeyMap, useSimpleHotkey } from "@/hooks/hotkeys";
+import { getDemoOrWorkflowOptions } from "@/hooks/queries/demo-dependent-queries";
 import { useJobUpdates } from "@/hooks/use-job-updates";
+import useEditorState from "@/stores/editor-store";
 import type { NodeActions, NodeState } from "@/stores/node-store";
 import useNodeStore from "@/stores/node-store";
+import useRunnerStore from "@/stores/runner-store";
+import type { PipelineNodeDto } from "~/workflow/dto/pipeline-node.dto";
+import { Button } from "../ui/button";
+import { Kbd } from "../ui/kbd";
+import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 import SidebarToggle from "./nodes/panels/sidebar-toggle";
 import {
 	WorkflowButtonGroup,
@@ -31,6 +42,7 @@ export default function PromptpipeWhiteboard() {
 	});
 	const { nodes, edges, onNodesChange, onEdgesChange, onConnect } =
 		useNodeStore(useShallow(selector));
+	const isRunning = useRunnerStore(useShallow((state) => state.isRunning));
 
 	const isValidConnection = useCallback(
 		(connection: Edge | Connection) => {
@@ -68,6 +80,10 @@ export default function PromptpipeWhiteboard() {
 	);
 	return (
 		<ReactFlow
+			nodesConnectable={!isRunning}
+			nodesDraggable={!isRunning}
+			nodesFocusable={!isRunning}
+			edgesFocusable={!isRunning}
 			nodes={nodes}
 			edges={edges}
 			nodeTypes={nodeTypes}
@@ -81,6 +97,9 @@ export default function PromptpipeWhiteboard() {
 			<Panel position={"top-left"}>
 				<WorkflowButtonGroupWrapper>
 					<SidebarToggle />
+					<Suspense>
+						<ResetButton />
+					</Suspense>
 				</WorkflowButtonGroupWrapper>
 			</Panel>
 			<Panel position={"top-right"}>
@@ -88,5 +107,46 @@ export default function PromptpipeWhiteboard() {
 			</Panel>
 			<Background variant={BackgroundVariant.Dots} gap={12} size={1} />
 		</ReactFlow>
+	);
+}
+
+function ResetButton() {
+	const { id } = useParams({ strict: false });
+	const mode = useEditorState((state) => state.mode);
+	const queryOptions = getDemoOrWorkflowOptions(mode, id);
+	//@ts-expect-error
+	const { data } = useSuspenseQuery(queryOptions);
+	const initData = useNodeStore((state) => state.initData);
+
+	const resetToLastSavedState = () =>
+		initData(data.nodes as unknown as PipelineNodeDto[], data.connections);
+
+	useSimpleHotkey(
+		"resetToLastSavedState",
+		() => {
+			resetToLastSavedState();
+		},
+		{},
+		[resetToLastSavedState],
+	);
+
+	return (
+		<Tooltip>
+			<TooltipTrigger asChild>
+				<Button
+					size={"icon"}
+					variant={"secondary"}
+					onClick={resetToLastSavedState}
+				>
+					<ArchiveRestore />
+				</Button>
+			</TooltipTrigger>
+			<TooltipContent>
+				<p>
+					Reset to Last Saved State{" "}
+					<Kbd>{hotkeyMap.resetToLastSavedState.visualRepresentation}</Kbd>
+				</p>
+			</TooltipContent>
+		</Tooltip>
 	);
 }

@@ -86,7 +86,8 @@ export default function BlockSidebar() {
 	];
 
 	return (
-		<Sidebar>
+		// biome-ignore lint/correctness/useUniqueElementIds: id needed for react joyride targeting
+		<Sidebar id="sidebar">
 			<SidebarContent>
 				<Collapsible
 					key={"basic"}

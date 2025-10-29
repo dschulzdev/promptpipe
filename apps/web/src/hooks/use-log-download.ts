@@ -1,12 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
-import { workflowControllerDownloadHistoryOptions } from "@/api-client/@tanstack/react-query.gen";
+import { downloadDemoOrWorkflowLogOptions } from "./queries/demo-dependent-queries";
+import { useEditorMode } from "./use-editor-mode";
 
 export const useLogDownload = (workflowId: string, runId: string) => {
+	const mode = useEditorMode();
 	const query = useQuery({
-		...workflowControllerDownloadHistoryOptions({
-			path: { runId: runId },
-		}),
+		...downloadDemoOrWorkflowLogOptions(mode, runId),
 		enabled: false, // Don't fetch automatically
 		staleTime: Number.POSITIVE_INFINITY, // Never mark as stale → no auto-refetches
 		gcTime: Number.POSITIVE_INFINITY, // Keep in cache forever (no GC)

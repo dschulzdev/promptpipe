@@ -11,6 +11,7 @@ import HistoryLayout from "@/components/layouts/history-layout";
 import { Button } from "@/components/ui/button";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
+import { getDemoOrWorkflowOptions } from "@/hooks/queries/demo-dependent-queries";
 import useEditorState from "@/stores/editor-store";
 import useNodeStore from "@/stores/node-store";
 import type { PipelineNodeDto } from "~/workflow/dto/pipeline-node.dto";
@@ -63,21 +64,20 @@ function RouteComponent() {
 	);
 }
 
-function Backdrop({ id }: { id: string }) {
-	const { data, isPending, isSuccess, error, refetch } = useQuery({
-		...workflowControllerFindOneOptions({
-			path: {
-				id: id,
-			},
-		}),
-	});
+export function Backdrop({ id }: { id?: string }) {
+	const mode = useEditorState((state) => state.mode);
+	const queryOptions = getDemoOrWorkflowOptions(mode, id);
+	//@ts-expect-error
+	const { data, isPending, isSuccess, error, refetch } = useQuery(queryOptions);
 	const initData = useNodeStore((state) => state.initData);
+	const setDirty = useEditorState((state) => state.setDirty);
 
 	useEffect(() => {
 		if (isSuccess && data) {
 			initData(data.nodes as unknown as PipelineNodeDto[], data.connections);
+			setDirty(false);
 		}
-	}, [isSuccess, initData, data]);
+	}, [isSuccess, initData, data, setDirty]);
 
 	if (!isPending && isSuccess) {
 		return null;
